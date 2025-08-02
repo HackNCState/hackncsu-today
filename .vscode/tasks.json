@@ -9,7 +9,8 @@
                 "pub",
                 "run",
                 "build_runner",
-                "watch"
+                "watch",
+                "--delete-conflicting-outputs"
             ],
             "isBackground": true,
             "runOptions": {

@@ -92,6 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // authenticator will try to auto login once initialized
     // let's listen and redirect if it fails (or if the user logs out)
     ref.listen(authenticatorProvider, (previous, next) {
+      print("Authenticator state changed: $next");
       if (next is Unauthenticated) {
         if (context.mounted) {
           context.replace("/login");
