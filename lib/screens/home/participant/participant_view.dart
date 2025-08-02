@@ -1,0 +1,61 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackncsu_today/models/hack_user.dart';
+import 'package:hackncsu_today/screens/home/participant/components/checklist_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/discord_embed.dart';
+import 'package:hackncsu_today/screens/home/participant/components/links_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/live_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/resources_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/team_card.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+
+class ParticipantView extends ConsumerWidget {
+  final Participant participant;
+
+  const ParticipantView(this.participant, {super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(child: LiveCard()),
+                      Expanded(flex: 2, child: TeamCard()),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: DiscordEmbed(
+                    serverID: "723524172839518278",
+                    channelID: "723524172839518281",
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: ChecklistCard()),
+                Expanded(child: ResourcesCard()),
+                Expanded(child: LinksCard()),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,1 @@
+const bool kFirebaseUseEmulator = true;
