@@ -6,16 +6,15 @@ import 'package:hackncsu_today/screens/home/participant/components/basic_card.da
 import 'package:url_launcher/url_launcher.dart';
 
 class LinksCard extends ConsumerWidget {
-  const LinksCard({super.key});
+  final bool showHidden;
+  const LinksCard({super.key, this.showHidden = false});
 
-  Widget _buildLinkList(List<Resource> resources) {
+  Widget _buildLinkList(List<LinkResource> resources) {
     return ListView.builder(
       itemCount: resources.length,
       itemBuilder: (context, index) {
         final resource = resources[index];
-        return resource is LinkResource && !resource.hidden
-            ? LinkItem(resource.name, resource.url)
-            : null;
+        return LinkItem(resource.name, resource.url);
       },
     );
   }
@@ -50,10 +49,17 @@ class LinksCard extends ConsumerWidget {
           'Helpful links to external websites\nThis card is live and updates automatically if new links are added.',
       child: eventData.when(
         data: (data) {
-          if (data == null || data.externalResources.isEmpty) {
+          final eventData =
+              data?.externalResources
+                  .whereType<LinkResource>()
+                  .where((resource) => showHidden || !resource.hidden)
+                  .toList() ??
+              [];
+
+          if (eventData.isEmpty) {
             return _emptyListPlaceholder();
           }
-          return _buildLinkList(data.externalResources);
+          return _buildLinkList(eventData);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _errorPlaceholder(error.toString(), ref),
