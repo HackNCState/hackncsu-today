@@ -47,7 +47,7 @@ class LinksCard extends ConsumerWidget {
     return BasicCard(
       title: 'LINKS',
       helpText:
-          'Useful links to external resources\nThis card is live and updates automatically if new links are added.',
+          'Helpful links to external websites\nThis card is live and updates automatically if new links are added.',
       child: eventData.when(
         data: (data) {
           if (data == null || data.internalResources.isEmpty) {

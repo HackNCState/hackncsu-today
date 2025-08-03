@@ -6,6 +6,10 @@ class TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BasicCard(title: 'YOUR TEAM');
+    return BasicCard(
+      title: 'YOUR TEAM',
+      helpText:
+          'Information about your team such as members, assigned mentor, and judging.\nUpdates will appear automatically.',
+    );
   }
 }

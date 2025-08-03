@@ -8,14 +8,16 @@ class ResourcesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BasicCard(
       title: 'RESOURCES',
-      helpText: 'A live-updating collection of Hack_NCState resources',
+      helpText:
+          'Resources essential to your Hack_NCState experience\n'
+          'This card is live and updates automatically if new resources are added.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ResourceItem('Schedule', onTap: () {}),
           ResourceItem('Menu', onTap: () {}),
           ResourceItem('Opening Slides', onTap: () {}),
-          ],
+        ],
       ),
     );
   }

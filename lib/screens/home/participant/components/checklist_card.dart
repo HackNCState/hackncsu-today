@@ -9,7 +9,7 @@ class ChecklistCard extends StatelessWidget {
     return BasicCard(
       title: 'CHECKLIST',
       helpText:
-          'A checklist to guide you through the event\nThis is synced with your teammates',
+          'Checklist to keep track of important tasks during the event, and even add your own tasks.\nChanges are synced with your team members.',
       child: Stack(
         children: [
           ListView(
