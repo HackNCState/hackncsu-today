@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/exception.dart';
+import 'package:hackncsu_today/models/event/event_data.dart';
+import 'package:hackncsu_today/models/event/event_state.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
 import 'package:hackncsu_today/services/firebase/functions_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,6 +21,10 @@ class FirebaseFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String _usersCollection = 'users';
+  static const String _eventCollection = "event";
+  
+  static const String _eventStateDoc = "state";
+  static const String _eventDataDoc = "data";
 
   /// creates a new user document in Firestore with the given data.
   /// if the user already exists, it returns the existing user document.
@@ -101,6 +107,43 @@ class FirebaseFirestoreService {
     } else {
       return null;
     }
+  }
+
+  // Below are functions that are only authorized for organizers
+  // They will fail for participants by nature of our Firestore rules
+
+  /// initializes event data in Firestore.
+  /// this can be called from the admin panel to set up the event data
+  /// it should be called once at the start of the event
+  /// and then we can update the relevant data as needed
+  Future<void> initializeEventData() async {
+    final eventData = EventData(
+      externalResources: [
+        Resource.link("Hack_NCState Website", "https://hackncstate.org"),
+        Resource.link(
+          "Centennial Map",
+          "https://maps.ncsu.edu/#/buildings/783A",
+        ),
+      ],
+      internalResources: [
+        Resource.link("Discord Server", "https://example.com", hidden: true),
+        Resource.link("Schedule", "https://example.com", hidden: true),
+        Resource.link("Opening Ceremony Slides", "https://hackncstate.org", hidden: true),
+        Resource.internal("Catering Options", InternalResource.menu, hidden: true),
+      ]
+    );
+
+    final stateRef = _firestore.collection(_eventCollection).doc(_eventStateDoc);
+    final dataRef = _firestore.collection(_eventCollection).doc(_eventDataDoc);
+
+    final batch = _firestore.batch();
+
+    batch.set(stateRef, EventState.initial().toJson());
+    batch.set(dataRef, eventData.toJson());
+
+    batch.commit().catchError((error) {
+      throw FirebaseFirestoreException('Failed to initialize event data: $error');
+    });
   }
 }
 

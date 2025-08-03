@@ -8,7 +8,6 @@ part 'hack_user.g.dart';
 sealed class HackUser with _$HackUser {
   const HackUser._();
 
-  // TODO: probably will need to somehow verify w cf worker to ensure client side doesnt spoof organizer
   @FreezedUnionValue('organizer')
   const factory HackUser.organizer({required String id}) = Organizer;
 
