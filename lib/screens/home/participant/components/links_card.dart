@@ -1,25 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackncsu_today/features/streams/event_data_stream.dart';
+import 'package:hackncsu_today/models/event/event_data.dart';
 import 'package:hackncsu_today/screens/home/participant/components/basic_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LinksCard extends StatelessWidget {
+class LinksCard extends ConsumerWidget {
   const LinksCard({super.key});
 
+  Widget _buildLinkList(List<Resource> resources) {
+    return ListView.builder(
+      itemCount: resources.length,
+      itemBuilder: (context, index) {
+        final resource = resources[index];
+        return resource is LinkResource && !resource.hidden
+            ? LinkItem(resource.name, resource.url)
+            : null;
+      },
+    );
+  }
+
+  Widget _emptyListPlaceholder() {
+    return const Center(child: Text('No links available at the moment.'));
+  }
+
+  Widget _errorPlaceholder(String error, WidgetRef ref) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Error loading links: $error'),
+        const SizedBox(height: 16),
+        TextButton(
+          onPressed: () {
+            ref.invalidate(eventDataStreamProvider);
+          },
+          child: const Text('Retry'),
+        ),
+      ],
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final eventData = ref.watch(eventDataStreamProvider);
+
     return BasicCard(
       title: 'LINKS',
-      helpText: 'Useful links to external resources',
-      child: ListView(
-        children: [
-          LinkItem('HackNC State Website', 'https://hackncstate.com'),
-          LinkItem('HackNC State Discord', 'https://discord.gg/hackncstate'),
-          LinkItem(
-            'Map of Centennial Campus',
-            'https://www.ncsu.edu/campus_map/',
-          ),
-          LinkItem('Contact Us', 'https://hackncstate.com/contact'),
-        ],
+      helpText:
+          'Useful links to external resources\nThis card is live and updates automatically if new links are added.',
+      child: eventData.when(
+        data: (data) {
+          if (data == null || data.internalResources.isEmpty) {
+            return _emptyListPlaceholder();
+          }
+          return _buildLinkList(data.internalResources);
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => _errorPlaceholder(error.toString(), ref),
       ),
     );
   }

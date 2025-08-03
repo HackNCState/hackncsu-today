@@ -109,6 +109,20 @@ class FirebaseFirestoreService {
     }
   }
 
+  /// Streams event state data from Firestore.
+  Stream<EventData?> streamEventData() {
+    final eventDataRef = _firestore
+        .collection(_eventCollection)
+        .doc(_eventDataDoc);
+
+    return eventDataRef.snapshots().map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return EventData.fromJson(snapshot.data()!);
+      }
+      return null;
+    });
+  }
+
   // Below are functions that are only authorized for organizers
   // They will fail for participants by nature of our Firestore rules
 

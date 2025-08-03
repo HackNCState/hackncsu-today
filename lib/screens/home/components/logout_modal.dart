@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackncsu_today/features/authenticator.dart';
+import 'package:hackncsu_today/features/authenticator/authenticator.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hackncsu_today/features/authenticator.dart';
+import 'package:hackncsu_today/features/authenticator/authenticator.dart';
 
 class AuthenticatingModal extends StatelessWidget {
   final Authenticating state;
