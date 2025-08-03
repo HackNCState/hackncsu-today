@@ -37,14 +37,17 @@ class FirebaseFirestoreService {
     if (docSnapshot.exists) {
       final existingUser = HackUser.fromJson(docSnapshot.data()!);
 
-      if (existingUser is Organizer && !response.isOrganizer) {
-        throw FirebaseFirestoreException(
-          'User with ID ${response.id} is an organizer, but previous records indicate they are not.',
-        );
-      } else if (existingUser is Participant && response.isOrganizer) {
-        throw FirebaseFirestoreException(
-          'User with ID ${response.id} is a participant, but previous records indicate they are an organizer.',
-        );
+      // Skip this check in debug mode to allow for flexible testing with different user types
+      if (!kDebugMode) {
+        if (existingUser is Organizer && !response.isOrganizer) {
+          throw FirebaseFirestoreException(
+            'User with ID ${response.id} is an organizer, but previous records indicate they are not.',
+          );
+        } else if (existingUser is Participant && response.isOrganizer) {
+          throw FirebaseFirestoreException(
+            'User with ID ${response.id} is a participant, but previous records indicate they are an organizer.',
+          );
+        }
       }
 
       return existingUser;

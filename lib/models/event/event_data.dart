@@ -24,6 +24,7 @@ sealed class EventData with _$EventData {
 /// The 'hidden' property indicates whether the resource should be hidden from the UI
 /// This allows us to manually show and hide resources without having to remove them from the database
 @Freezed(unionKey: 'type')
+
 sealed class Resource with _$Resource {
   const Resource._();
 
@@ -48,4 +49,5 @@ sealed class Resource with _$Resource {
 }
 
 /// Represents an internal resource that can be a page or a popup.
+@JsonEnum()
 enum InternalResource { menu }

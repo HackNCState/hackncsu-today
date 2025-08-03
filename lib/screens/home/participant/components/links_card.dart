@@ -50,10 +50,10 @@ class LinksCard extends ConsumerWidget {
           'Helpful links to external websites\nThis card is live and updates automatically if new links are added.',
       child: eventData.when(
         data: (data) {
-          if (data == null || data.internalResources.isEmpty) {
+          if (data == null || data.externalResources.isEmpty) {
             return _emptyListPlaceholder();
           }
-          return _buildLinkList(data.internalResources);
+          return _buildLinkList(data.externalResources);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _errorPlaceholder(error.toString(), ref),
