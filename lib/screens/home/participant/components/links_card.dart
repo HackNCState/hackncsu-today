@@ -14,7 +14,7 @@ class LinksCard extends ConsumerWidget {
       itemCount: resources.length,
       itemBuilder: (context, index) {
         final resource = resources[index];
-        return LinkItem(resource.name, resource.url);
+        return LinkItem(resource);
       },
     );
   }
@@ -69,16 +69,14 @@ class LinksCard extends ConsumerWidget {
 }
 
 class LinkItem extends StatelessWidget {
-  final String title;
-  final String url;
+  final LinkResource linkResource;
 
-  const LinkItem(this.title, this.url, {super.key});
+  const LinkItem(this.linkResource, {super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _itemBuilder(BuildContext context) {
     return InkWell(
       onTap: () {
-        launchUrl(Uri.parse(url), webOnlyWindowName: '_blank');
+        launchUrl(Uri.parse(linkResource.url), webOnlyWindowName: '_blank');
       },
       borderRadius: BorderRadius.circular(8),
       child: Padding(
@@ -87,7 +85,10 @@ class LinkItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text(title, style: Theme.of(context).textTheme.bodyLarge),
+              child: Text(
+                linkResource.name,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
             ),
             Icon(
               Icons.open_in_new,
@@ -98,5 +99,37 @@ class LinkItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _hiddenItemBuilder(BuildContext context) {
+    return Stack(
+      children: [
+        _itemBuilder(context),
+
+        Align(
+          alignment: Alignment.topRight,
+          child: IgnorePointer(
+            child: Container(
+              color: Colors.black.withAlpha(150),
+              child: Text(
+                'HIDDEN TO PARTICIPANTS',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Colors.white.withAlpha(255),
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return linkResource.hidden
+        ? _hiddenItemBuilder(context)
+        : _itemBuilder(context);
   }
 }

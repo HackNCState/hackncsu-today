@@ -26,7 +26,7 @@ class OrganizerView extends ConsumerWidget {
     // also add (separate?) ui for adding/removing links and resources and stuff
   ];
 
-  List<Widget> get cards => [LinksCard(), ResourcesCard()];
+  List<Widget> get cards => [LinksCard(showHidden: true), ResourcesCard()];
 
   void _showTaskExecuteModal(BuildContext context, Task task) {
     showDialog(
