@@ -14,17 +14,17 @@ FirebaseFirestoreService firebaseFirestoreService(Ref ref) {
   return FirebaseFirestoreService();
 }
 
-/// note: firestore rules are set up such that authenticated users may only
-/// get/update their own user data. cloud functions can be used to
+/// Note: firestore rules are set up such that authenticated users may only
+/// get/update their own user data. Cloud functions can be used to
 /// get a small amount of data about other users
 class FirebaseFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String _usersCollection = 'users';
-  static const String _eventCollection = "event";
+  static const String _eventCollection = 'event';
   
-  static const String _eventStateDoc = "state";
-  static const String _eventDataDoc = "data";
+  static const String _eventStateDoc = 'state';
+  static const String _eventDataDoc = 'data';
 
   /// creates a new user document in Firestore with the given data.
   /// if the user already exists, it returns the existing user document.
@@ -48,7 +48,6 @@ class FirebaseFirestoreService {
 
       return existingUser;
     } else {
-      // Create a new user document
       final HackUser hackUser;
 
       if (response.isOrganizer) {
@@ -119,17 +118,17 @@ class FirebaseFirestoreService {
   Future<void> initializeEventData() async {
     final eventData = EventData(
       externalResources: [
-        Resource.link("Hack_NCState Website", "https://hackncstate.org"),
+        Resource.link('Hack_NCState Website', 'https://hackncstate.org'),
         Resource.link(
-          "Centennial Map",
-          "https://maps.ncsu.edu/#/buildings/783A",
+          'Centennial Map',
+          'https://maps.ncsu.edu/#/buildings/783A',
         ),
       ],
       internalResources: [
-        Resource.link("Discord Server", "https://example.com", hidden: true),
-        Resource.link("Schedule", "https://example.com", hidden: true),
-        Resource.link("Opening Ceremony Slides", "https://hackncstate.org", hidden: true),
-        Resource.internal("Catering Options", InternalResource.menu, hidden: true),
+        Resource.link('Discord Server', 'https://example.com', hidden: true),
+        Resource.link('Schedule', 'https://example.com', hidden: true),
+        Resource.link('Opening Ceremony Slides', 'https://hackncstate.org', hidden: true),
+        Resource.internal('Catering Options', InternalResource.menu, hidden: true),
       ]
     );
 

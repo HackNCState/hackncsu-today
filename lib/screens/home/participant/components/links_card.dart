@@ -8,17 +8,17 @@ class LinksCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasicCard(
-      title: "LINKS",
-      helpText: "Useful links to external resources",
+      title: 'LINKS',
+      helpText: 'Useful links to external resources',
       child: ListView(
         children: [
-          LinkItem("HackNC State Website", "https://hackncstate.com"),
-          LinkItem("HackNC State Discord", "https://discord.gg/hackncstate"),
+          LinkItem('HackNC State Website', 'https://hackncstate.com'),
+          LinkItem('HackNC State Discord', 'https://discord.gg/hackncstate'),
           LinkItem(
-            "Map of Centennial Campus",
-            "https://www.ncsu.edu/campus_map/",
+            'Map of Centennial Campus',
+            'https://www.ncsu.edu/campus_map/',
           ),
-          LinkItem("Contact Us", "https://hackncstate.com/contact"),
+          LinkItem('Contact Us', 'https://hackncstate.com/contact'),
         ],
       ),
     );

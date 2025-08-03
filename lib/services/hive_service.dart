@@ -2,7 +2,7 @@ import 'package:hackncsu_today/exception.dart';
 
 /// contains box names lol
 class HiveService {
-  static const oauth2Cache = "oauth2_cache";
+  static const oauth2Cache = 'oauth2_cache';
 }
 
 class BoxClosedException extends AppException {

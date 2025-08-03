@@ -38,8 +38,8 @@ class ParticipantView extends ConsumerWidget {
                 Expanded(
                   flex: 2,
                   child: DiscordEmbed(
-                    serverID: "723524172839518278",
-                    channelID: "723524172839518281",
+                    serverID: '723524172839518278',
+                    channelID: '723524172839518281',
                   ),
                 ),
               ],

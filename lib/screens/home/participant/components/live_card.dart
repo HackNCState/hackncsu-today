@@ -7,9 +7,9 @@ class LiveCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasicCard(
-      title: "LIVE",
+      title: 'LIVE',
       color: Theme.of(context).colorScheme.primaryContainer,
-      child: Text("Live Card"),
+      child: Text('Live Card'),
     );
   }
 }

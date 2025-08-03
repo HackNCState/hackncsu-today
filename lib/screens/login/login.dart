@@ -24,7 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   FutureOr<void> afterFirstLayout(BuildContext context) {
     if (ref.read(authenticatorProvider) is Authenticated) {
       if (context.mounted) {
-        context.replace("/");
+        context.replace('/');
       }
     }
   }
@@ -62,7 +62,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           break;
 
         case Authenticated():
-          if (context.mounted) context.replace("/");
+          if (context.mounted) context.replace('/');
           break;
       }
     });
@@ -93,9 +93,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     Flex(
                       direction: isDesktop ? Axis.horizontal : Axis.vertical,
                       children: [
-                        Image.asset("img/name.png", height: 50),
+                        Image.asset('img/name.png', height: 50),
                         Text(
-                          "2026",
+                          '2026',
                           style: TextStyle(
                             fontSize: 45,
                             color: theme.onSurface,
@@ -105,7 +105,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     ),
                     SizedBox(height: 15),
                     Text(
-                      "Participant Login",
+                      'Participant Login',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: isDesktop ? 100 : 30,
@@ -114,16 +114,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     SizedBox(height: 15),
                     Text(
                       "Welcome to Hack_NCState 2026! We hope you'll have a baller time bla bla "
-                      "bla bla words and more words lorem ipsum dolor shit amet. This blurb will "
-                      "contain information about Hack_NCState website and what it does. You will "
-                      "be so informed after this blurb that you will have 3000% increased iq!!!",
+                      'bla bla words and more words lorem ipsum dolor shit amet. This blurb will '
+                      'contain information about Hack_NCState website and what it does. You will '
+                      'be so informed after this blurb that you will have 3000% increased iq!!!',
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(height: 15),
                     Text(
-                      "Note that you must have completed check-in in order to log in. We will "
-                      "compare your Discord username to your check-in information in order to "
-                      "authenticate you.",
+                      'Note that you must have completed check-in in order to log in. We will '
+                      'compare your Discord username to your check-in information in order to '
+                      'authenticate you.',
                     ),
                     SizedBox(height: 15),
                     PrimaryButton(
@@ -133,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            "Log in with Discord",
+                            'Log in with Discord',
                             style: TextStyle(fontSize: 20),
                           ),
                           const SizedBox(width: 16), // Added for spacing

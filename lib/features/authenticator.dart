@@ -35,7 +35,7 @@ class Authenticator extends _$Authenticator {
                 firebaseAuth.user!.uid,
               ))) !=
               null) {
-        if (kDebugMode) print("Auto-login successful with Firebase Auth.");
+        if (kDebugMode) print('Auto-login successful with Firebase Auth.');
 
         state = Authenticated(user: existingUser!);
 
@@ -43,13 +43,13 @@ class Authenticator extends _$Authenticator {
       } else {
         if (kDebugMode) {
           print(
-            "Auto-login: Manual log in required.",
+            'Auto-login: Manual log in required.',
           );
         }
       }
     } catch (e) {
       // any error during auto-login 
-      if (kDebugMode) print("Auto-login failed: $e");
+      if (kDebugMode) print('Auto-login failed: $e');
     }
 
     await Future.delayed(
@@ -61,7 +61,7 @@ class Authenticator extends _$Authenticator {
 
   Future<void> login() async {
     state = Authenticating(
-      message: "Please continue logging into Discord in the other window.",
+      message: 'Please continue logging into Discord in the other window.',
     );
 
     final oauthService = ref.read(oauthServiceProvider);
@@ -73,7 +73,7 @@ class Authenticator extends _$Authenticator {
 
       state = Authenticating(
         message:
-            "We are now logging you in. Please wait a moment.",
+            'We are now logging you in. Please wait a moment.',
       );
 
       await authService.login(response);
@@ -92,7 +92,7 @@ class Authenticator extends _$Authenticator {
 
     await authService.logout();
     state = Unauthenticated();
-    if (kDebugMode) print("Logout successful.");
+    if (kDebugMode) print('Logout successful.');
   }
 }
 
@@ -103,7 +103,7 @@ class Unauthenticated extends AuthenticatorState {}
 class Authenticating extends AuthenticatorState {
   final String message;
 
-  Authenticating({this.message = "Authentication is in progress."});
+  Authenticating({this.message = 'Authentication is in progress.'});
 }
 
 class AutoAuthenticating extends AuthenticatorState {}

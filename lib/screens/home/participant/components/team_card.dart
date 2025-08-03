@@ -6,6 +6,6 @@ class TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BasicCard(title: "YOUR TEAM");
+    return BasicCard(title: 'YOUR TEAM');
   }
 }

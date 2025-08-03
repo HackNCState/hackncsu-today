@@ -7,9 +7,9 @@ class ChecklistCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasicCard(
-      title: "CHECKLIST",
+      title: 'CHECKLIST',
       helpText:
-          "A checklist to guide you through the event\nThis is synced with your teammates",
+          'A checklist to guide you through the event\nThis is synced with your teammates',
       child: Stack(
         children: [
           ListView(
@@ -17,32 +17,32 @@ class ChecklistCard extends StatelessWidget {
               CheckboxListTile(
                 value: false,
                 onChanged: (_) {},
-                title: Text("Check in at the registration desk"),
+                title: Text('Check in at the registration desk'),
               ),
               CheckboxListTile(
                 value: false,
                 onChanged: (_) {},
-                title: Text("Join the HackNC State Discord server"),
+                title: Text('Join the HackNC State Discord server'),
               ),
               CheckboxListTile(
                 value: false,
                 onChanged: (_) {},
-                title: Text("Join your team channel on Discord"),
+                title: Text('Join your team channel on Discord'),
               ),
               CheckboxListTile(
                 value: false,
                 onChanged: (_) {},
-                title: Text("Attend the opening ceremony"),
+                title: Text('Attend the opening ceremony'),
               ),
               CheckboxListTile(
                 value: false,
                 onChanged: (_) {},
-                title: Text("Attend the workshops"),
+                title: Text('Attend the workshops'),
               ),
               CheckboxListTile(
                 value: false,
                 onChanged: (_) {},
-                title: Text("Submit your project on Devpost"),
+                title: Text('Submit your project on Devpost'),
               ),
               SizedBox(height: 32), // Add some space at the bottom
             ],

@@ -28,7 +28,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     if (state is Unauthenticated) {
       if (context.mounted) {
-        context.replace("/login");
+        context.replace('/login');
       }
     }
   }
@@ -57,10 +57,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     bool isDesktop,
   ) {
     return AppBar(
-      title: Text(state.user is Participant ? "Dashboard" : "Scanner"),
+      title: Text(state.user is Participant ? 'Dashboard' : 'Scanner'),
       actions: [
         if (isDesktop) ...[
-          Text("Logged in as ${state.user}"),
+          Text('Logged in as ${state.user}'),
           SizedBox(width: 10),
         ],
         isDesktop
@@ -71,7 +71,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     builder: (_) => LogoutModal(),
                   ),
               icon: const Icon(Icons.logout),
-              label: Text("Log out"),
+              label: Text('Log out'),
             )
             : IconButton.filledTonal(
               onPressed:
@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     builder: (_) => LogoutModal(),
                   ),
               icon: Icon(Icons.logout),
-              tooltip: "Log out",
+              tooltip: 'Log out',
             ),
         SizedBox(width: 10),
       ],
@@ -92,10 +92,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // authenticator will try to auto login once initialized
     // let's listen and redirect if it fails (or if the user logs out)
     ref.listen(authenticatorProvider, (previous, next) {
-      print("Authenticator state changed: $next");
+      print('Authenticator state changed: $next');
       if (next is Unauthenticated) {
         if (context.mounted) {
-          context.replace("/login");
+          context.replace('/login');
         }
       }
     });
@@ -120,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       context: context,
                       builder: (_) => LogoutModal(),
                     ),
-                tooltip: "Log out (${state.user})",
+                tooltip: 'Log out (${state.user})',
                 child: Icon(Icons.logout),
               )
               : null,

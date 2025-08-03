@@ -10,19 +10,19 @@ class LogoutModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PointerInterceptor(
       child: AlertDialog(
-        title: Text("Log out?"),
+        title: Text('Log out?'),
         icon: Icon(Icons.logout),
         content: Text(
-          "Are you sure you want to log out? You will need to reconnect your Discord account to log in again.",
+          'Are you sure you want to log out? You will need to reconnect your Discord account to log in again.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text("Cancel"),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: ref.read(authenticatorProvider.notifier).logout,
-            child: Text("Log out"),
+            child: Text('Log out'),
           ),
         ],
       ),

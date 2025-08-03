@@ -7,14 +7,14 @@ class ResourcesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasicCard(
-      title: "RESOURCES",
-      helpText: "A live-updating collection of Hack_NCState resources",
+      title: 'RESOURCES',
+      helpText: 'A live-updating collection of Hack_NCState resources',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ResourceItem("Schedule", onTap: () {}),
-          ResourceItem("Menu", onTap: () {}),
-          ResourceItem("Opening Slides", onTap: () {}),
+          ResourceItem('Schedule', onTap: () {}),
+          ResourceItem('Menu', onTap: () {}),
+          ResourceItem('Opening Slides', onTap: () {}),
           ],
       ),
     );

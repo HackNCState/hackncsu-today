@@ -19,15 +19,15 @@ OAuthService oauthService(Ref ref) {
 }
 
 class OAuthService {
-  static const String _clientID = "1371413608394653736";
+  static const String _clientID = '1371413608394653736';
   static const String _baseUrl =
-      "discord.com";
+      'discord.com';
   static const String _authorizationEndpoint =
-      "/api/oauth2/authorize";
+      '/api/oauth2/authorize';
 
   static final String _redirectUrl = kDebugMode
-        ? "http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback"
-        : "https://cf.today.hackncstate.org/oauth/redirect";
+        ? 'http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback'
+        : 'https://cf.today.hackncstate.org/oauth/redirect';
   // TODO: https://stackoverflow.com/questions/49825799/use-custom-domain-for-firebase-function-http-calls
 
   /// performs interactive oauth2 flow
@@ -43,13 +43,13 @@ class OAuthService {
 
     final authWindow = window.open(
       authUrl.toString(),
-      "Discord Sign In",
-      "opener=1,width=500,height=800",
+      'Discord Sign In',
+      'opener=1,width=500,height=800',
     );
 
     if (authWindow == null) {
       throw OAuthRedirectException(
-        "Failed to open authentication window. Please ensure popups are not blocked.",
+        'Failed to open authentication window. Please ensure popups are not blocked.',
       );
     }
 
@@ -59,7 +59,7 @@ class OAuthService {
         timer.cancel();
         if (!completer.isCompleted) {
           completer.completeError(
-            OAuthRedirectException("Authentication was canceled."),
+            OAuthRedirectException('Authentication was canceled.'),
           );
         }
       }
@@ -88,7 +88,7 @@ class OAuthService {
         } catch (e) {
           completer.completeError(
             OAuthRedirectException(
-              "Failed to parse authentication response: $e",
+              'Failed to parse authentication response: $e',
             ),
           );
         }
@@ -98,7 +98,7 @@ class OAuthService {
     try {
       return await completer.future.timeout(const Duration(minutes: 3));
     } on TimeoutException {
-      throw OAuthRedirectException("Authentication timed out.");
+      throw OAuthRedirectException('Authentication timed out.');
     } finally {
       timer.cancel();
       messageSubscription.cancel();
@@ -111,7 +111,7 @@ class OAuthService {
 
 class UnauthenticatedException extends AppException {
   const UnauthenticatedException()
-    : super("OAuth2 client accessed without first authenticating");
+    : super('OAuth2 client accessed without first authenticating');
 }
 
 class OAuthRedirectException extends AppException {

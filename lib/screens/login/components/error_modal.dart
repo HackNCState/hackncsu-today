@@ -8,10 +8,10 @@ class ErrorModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Error Authenticating"),
+      title: Text('Error Authenticating'),
       icon: Icon(Icons.warning),
       content: Text(content),
-      actions: [TextButton(onPressed: () => context.pop(), child: Text("OK"))],
+      actions: [TextButton(onPressed: () => context.pop(), child: Text('OK'))],
     );
   }
 }

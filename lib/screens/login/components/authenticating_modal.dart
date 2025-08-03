@@ -9,7 +9,7 @@ class AuthenticatingModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Authenticating..."),
+      title: Text('Authenticating...'),
       icon: Icon(Icons.lock_clock_outlined),
       content: Text(state.message),
     );
