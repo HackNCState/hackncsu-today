@@ -42,13 +42,11 @@ class Authenticator extends _$Authenticator {
         return;
       } else {
         if (kDebugMode) {
-          print(
-            'Auto-login: Manual log in required.',
-          );
+          print('Auto-login: Manual log in required.');
         }
       }
     } catch (e) {
-      // any error during auto-login 
+      // any error during auto-login
       if (kDebugMode) print('Auto-login failed: $e');
     }
 
@@ -72,8 +70,7 @@ class Authenticator extends _$Authenticator {
       final response = await oauthService.authenticate();
 
       state = Authenticating(
-        message:
-            'We are now logging you in. Please wait a moment.',
+        message: 'We are now logging you in. Please wait a moment.',
       );
 
       await authService.login(response);
@@ -93,6 +90,23 @@ class Authenticator extends _$Authenticator {
     await authService.logout();
     state = Unauthenticated();
     if (kDebugMode) print('Logout successful.');
+  }
+
+  /// Switches the user type for debugging purposes.
+  Future<void> debugSetUserType(String type) async {
+    if (kDebugMode) {
+      final firestore = ref.read(firebaseFirestoreServiceProvider);
+      final auth = ref.read(firebaseAuthServiceProvider);
+
+      final userId = auth.user!.uid;
+
+      await firestore.debugSetUserType(userId, type).catchError((error) {
+        state = AuthenticationError(error: error);
+        if (kDebugMode) print('Failed to switch view: $error');
+      });
+
+      state = Authenticated(user: (await firestore.fetchUserData(userId))!);
+    }
   }
 }
 
@@ -119,4 +133,3 @@ class Authenticated extends AuthenticatorState {
 
   Authenticated({required this.user});
 }
-

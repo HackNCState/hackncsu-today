@@ -17,7 +17,7 @@ class FirebaseAuthService {
 
   User? get user => _auth.currentUser;
 
-  /// authenticates the user with firebase using the token returned from the
+  /// Authenticates the user with firebase using the token returned from the
   /// firebase function that checks if the user is registered for the hackathon.
   /// this way, one can only access the firebase database if they are registered.
   Future<void> login(AuthenticateFunctionResponse response) async {

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/exception.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
@@ -143,6 +144,21 @@ class FirebaseFirestoreService {
     batch.commit().catchError((error) {
       throw FirebaseFirestoreException('Failed to initialize event data: $error');
     });
+  }
+
+  // Below are functions that are used only during debugging
+
+  /// Sets the user type (useful for debugging purposes).
+  Future<void> debugSetUserType(String id, String type) async {
+    if (kDebugMode) {
+      _firestore
+          .collection(_usersCollection)
+          .doc(id)
+          .update({'type': type})
+          .catchError((error) {
+            throw FirebaseFirestoreException('Failed to switch view: $error');
+          });
+    }
   }
 }
 
