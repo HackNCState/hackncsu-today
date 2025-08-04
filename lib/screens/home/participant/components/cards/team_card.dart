@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hackncsu_today/screens/home/participant/components/basic_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/basic_card.dart';
 
 class TeamCard extends StatelessWidget {
   const TeamCard({super.key});

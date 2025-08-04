@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackncsu_today/models/event/event_data.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
-import 'package:hackncsu_today/screens/home/participant/components/checklist_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/checklist_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/resource_card.dart';
 import 'package:hackncsu_today/screens/home/participant/components/discord_embed.dart';
-import 'package:hackncsu_today/screens/home/participant/components/links_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/live_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/resources_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/team_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/live_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/team_card.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class ParticipantView extends ConsumerWidget {
@@ -49,8 +49,8 @@ class ParticipantView extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(child: ChecklistCard()),
-                Expanded(child: ResourcesCard()),
-                Expanded(child: LinksCard()),
+                Expanded(child: ResourceCard(ResourceSource.external)),
+                Expanded(child: ResourceCard(ResourceSource.internal)),
               ],
             ),
           ),

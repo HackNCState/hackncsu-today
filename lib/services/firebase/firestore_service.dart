@@ -23,7 +23,7 @@ class FirebaseFirestoreService {
 
   static const String _usersCollection = 'users';
   static const String _eventCollection = 'event';
-  
+
   static const String _eventStateDoc = 'state';
   static const String _eventDataDoc = 'data';
 
@@ -129,11 +129,11 @@ class FirebaseFirestoreService {
   // Below are functions that are only authorized for organizers
   // They will fail for participants by nature of our Firestore rules
 
-  /// initializes event data in Firestore.
-  /// this can be called from the admin panel to set up the event data
+  /// initializes event in Firestore.
+  /// this can be called from the admin panel to set up the event
   /// it should be called once at the start of the event
   /// and then we can update the relevant data as needed
-  Future<void> initializeEventData() async {
+  Future<void> initializeEvent() async {
     final eventData = EventData(
       externalResources: [
         Resource.link('Hack_NCState Website', 'https://hackncstate.org'),
@@ -145,12 +145,18 @@ class FirebaseFirestoreService {
       internalResources: [
         Resource.link('Discord Server', 'https://example.com', hidden: true),
         Resource.link('Schedule', 'https://example.com', hidden: true),
-        Resource.link('Opening Ceremony Slides', 'https://hackncstate.org', hidden: true),
-        Resource.internal('Catering Options', InternalResource.menu, hidden: true),
-      ]
+        Resource.link(
+          'Opening Ceremony Slides',
+          'https://hackncstate.org',
+          hidden: true,
+        ),
+        Resource.action('Catering Options', ActionType.menu, hidden: true),
+      ],
     );
 
-    final stateRef = _firestore.collection(_eventCollection).doc(_eventStateDoc);
+    final stateRef = _firestore
+        .collection(_eventCollection)
+        .doc(_eventStateDoc);
     final dataRef = _firestore.collection(_eventCollection).doc(_eventDataDoc);
 
     final batch = _firestore.batch();
@@ -159,7 +165,9 @@ class FirebaseFirestoreService {
     batch.set(dataRef, eventData.toJson());
 
     batch.commit().catchError((error) {
-      throw FirebaseFirestoreException('Failed to initialize event data: $error');
+      throw FirebaseFirestoreException(
+        'Failed to initialize event data: $error',
+      );
     });
   }
 

@@ -20,11 +20,13 @@ sealed class EventData with _$EventData {
       _$EventDataFromJson(json);
 }
 
+/// Reflects how eventData holds both external and internal resources
+enum ResourceSource { external, internal }
+
 /// Represents a resource that can be a link or an internal, hardcoded page
 /// The 'hidden' property indicates whether the resource should be hidden from the UI
 /// This allows us to manually show and hide resources without having to remove them from the database
 @Freezed(unionKey: 'type')
-
 sealed class Resource with _$Resource {
   const Resource._();
 
@@ -37,12 +39,12 @@ sealed class Resource with _$Resource {
   }) = LinkResource;
 
   /// hardcoded resources like a schedule page, dialog with catering menu, etc.
-  @FreezedUnionValue('internal')
-  const factory Resource.internal(
+  @FreezedUnionValue('action')
+  const factory Resource.action(
     String name,
-    InternalResource resource, {
+    ActionType action, {
     @Default(false) bool hidden,
-  }) = InternalResourceResource;
+  }) = ActionResource;
 
   factory Resource.fromJson(Map<String, Object?> json) =>
       _$ResourceFromJson(json);
@@ -50,4 +52,4 @@ sealed class Resource with _$Resource {
 
 /// Represents an internal resource that can be a page or a popup.
 @JsonEnum()
-enum InternalResource { menu }
+enum ActionType { menu }
