@@ -171,6 +171,18 @@ class FirebaseFirestoreService {
     });
   }
 
+  Future<void> updateEventData(EventData eventData) async {
+    final dataRef = _firestore.collection(_eventCollection).doc(_eventDataDoc);
+
+    await dataRef.set(eventData.toJson(), SetOptions(merge: true)).catchError(
+      (error) {
+        throw FirebaseFirestoreException(
+          'Failed to update event data: $error',
+        );
+      },
+    );
+  }
+
   // Below are functions that are used only during debugging
 
   /// Sets the user type (useful for debugging purposes).
