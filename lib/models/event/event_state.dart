@@ -11,6 +11,12 @@ sealed class EventState with _$EventState {
   @FreezedUnionValue('initial')
   const factory EventState.initial() = InitialEventState;
 
+  @FreezedUnionValue('openingCeremony')
+  const factory EventState.openingCeremony() = OpeningCeremonyEventState;
+
+  @FreezedUnionValue('closingCeremony')
+  const factory EventState.closingCeremony() = ClosingCeremonyEventState;
+
   factory EventState.fromJson(Map<String, Object?> json) =>
       _$EventStateFromJson(json);
 }
