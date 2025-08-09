@@ -41,12 +41,13 @@ class OrganizerView extends ConsumerWidget {
       content:
           'Changes the event state to In Progress.\n\n'
           'This should be executed when the hackathon starts.',
-      parameters: [
-        TaskParameter.dateTime(
-          'Hackathon End Time (default is 24h from now)',
-          DateTime.now().add(const Duration(hours: 24)),
-        ),
-      ],
+      parameters:
+          (_) => [
+            TaskParameter.dateTime(
+              'Hackathon End Time (default is 24h from now)',
+              DateTime.now().add(const Duration(hours: 24)),
+            ),
+          ],
       onExecute: (ref, parameters) async {
         final firestoreService = ref.read(firebaseFirestoreServiceProvider);
 

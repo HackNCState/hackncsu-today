@@ -10,7 +10,8 @@ sealed class Task with _$Task {
   const factory Task({
     required String title,
     required String content,
-    @Default([]) List<TaskParameter> parameters,
+    List<TaskParameter> Function(WidgetRef)?
+    parameters, // TODO: make this a builder
     required Future<void> Function(WidgetRef, List<TaskParameter>) onExecute,
   }) = _Task;
 }

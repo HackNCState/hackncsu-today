@@ -20,7 +20,7 @@ class _ExecuteModalState extends ConsumerState<ExecuteModal> {
   @override
   void initState() {
     super.initState();
-    _parameters = widget.task.parameters.toList();
+    _parameters = widget.task.parameters?.call(ref) ?? [];
   }
 
   Future<void> _executeTask() async {
@@ -177,7 +177,7 @@ class _ExecuteModalState extends ConsumerState<ExecuteModal> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(widget.task.content),
-            if (widget.task.parameters.isNotEmpty) ...[
+            if (widget.task.parameters != null) ...[
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 16),
