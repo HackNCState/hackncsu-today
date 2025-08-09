@@ -1,4 +1,3 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'event_state.freezed.dart';
@@ -13,6 +12,12 @@ sealed class EventState with _$EventState {
 
   @FreezedUnionValue('openingCeremony')
   const factory EventState.openingCeremony() = OpeningCeremonyEventState;
+
+  @FreezedUnionValue('inProgress')
+  const factory EventState.inProgress({
+    required DateTime startTime,
+    required DateTime endTime,
+  }) = InProgressEventState;
 
   @FreezedUnionValue('closingCeremony')
   const factory EventState.closingCeremony() = ClosingCeremonyEventState;
