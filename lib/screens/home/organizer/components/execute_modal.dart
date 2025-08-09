@@ -71,7 +71,7 @@ class _ExecuteModalState extends ConsumerState<ExecuteModal> {
               setState(() {
                 _parameters[index] = TaskParameter.string(
                   p.description,
-                  newValue,
+                  value: newValue,
                 );
               });
             },
@@ -88,7 +88,7 @@ class _ExecuteModalState extends ConsumerState<ExecuteModal> {
               setState(() {
                 _parameters[index] = TaskParameter.integer(
                   p.description,
-                  int.tryParse(newValue) ?? p.value,
+                  value: int.tryParse(newValue) ?? p.value,
                 );
               });
             },
@@ -100,7 +100,7 @@ class _ExecuteModalState extends ConsumerState<ExecuteModal> {
               setState(() {
                 _parameters[index] = TaskParameter.boolean(
                   p.description,
-                  newValue,
+                  value: newValue,
                 );
               });
             },
@@ -119,7 +119,7 @@ class _ExecuteModalState extends ConsumerState<ExecuteModal> {
               setState(() {
                 _parameters[index] = TaskParameter.doubleValue(
                   p.description,
-                  double.tryParse(newValue) ?? p.value,
+                  value: double.tryParse(newValue) ?? p.value,
                 );
               });
             },

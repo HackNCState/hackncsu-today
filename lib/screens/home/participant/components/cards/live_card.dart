@@ -47,7 +47,7 @@ class LiveCard extends ConsumerWidget {
             return switch (state) {
               InitialEventState() => LiveCardInitialView(),
               StandbyEventState() => LiveCardStandbyView(),
-              InProgressEventState() => LiveCardInProgressView(),
+              InProgressEventState() => LiveCardInProgressView(state),
               OpeningCeremonyEventState() => LiveCardOpeningCeremonyView(),
               ClosingCeremonyEventState() => LiveCardClosingCeremonyView(),
             };

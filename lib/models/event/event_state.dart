@@ -8,22 +8,25 @@ sealed class EventState with _$EventState {
   const EventState._();
 
   @FreezedUnionValue('initial')
-  const factory EventState.initial() = InitialEventState;
+  const factory EventState.initial({String? announcement}) = InitialEventState;
 
   @FreezedUnionValue('standby')
-  const factory EventState.standby() = StandbyEventState;
+  const factory EventState.standby({String? announcement}) = StandbyEventState;
 
   @FreezedUnionValue('openingCeremony')
-  const factory EventState.openingCeremony() = OpeningCeremonyEventState;
+  const factory EventState.openingCeremony({String? announcement}) =
+      OpeningCeremonyEventState;
 
   @FreezedUnionValue('inProgress')
   const factory EventState.inProgress({
     required DateTime startTime,
     required DateTime endTime,
+    String? announcement,
   }) = InProgressEventState;
 
   @FreezedUnionValue('closingCeremony')
-  const factory EventState.closingCeremony() = ClosingCeremonyEventState;
+  const factory EventState.closingCeremony({String? announcement}) =
+      ClosingCeremonyEventState;
 
   factory EventState.fromJson(Map<String, Object?> json) =>
       _$EventStateFromJson(json);

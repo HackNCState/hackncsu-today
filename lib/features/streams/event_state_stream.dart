@@ -11,17 +11,24 @@ Stream<EventState?> eventStateStream(Ref ref) {
   return firestoreService.streamEventState();
 }
 
-Stream<Duration> _countdownStream(DateTime to) {
-  if (to.isBefore(DateTime.now())) {
-    return Stream.value(Duration.zero);
-  }
+Stream<Duration> _countdownStream(DateTime to) async* {
+  yield to.difference(DateTime.now()).isNegative
+      ? Duration.zero
+      : to.difference(DateTime.now());
 
-  return Stream.periodic(const Duration(seconds: 1), (_) {
+  final ticker = Stream.periodic(const Duration(seconds: 1));
+
+  await for (final _ in ticker) {
     final now = DateTime.now();
     final difference = to.difference(now);
 
-    return difference.isNegative ? Duration.zero : difference;
-  }).takeWhile((duration) => duration != Duration.zero);
+    if (difference.isNegative) {
+      yield Duration.zero;
+      break;
+    } else {
+      yield difference;
+    }
+  }
 }
 
 @riverpod

@@ -4,10 +4,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/features/streams/event_state_stream.dart';
+import 'package:hackncsu_today/models/event/event_state.dart';
 import 'package:hackncsu_today/models/extensions/duration.dart';
 
 class LiveCardInProgressView extends ConsumerStatefulWidget {
-  const LiveCardInProgressView({super.key});
+  final InProgressEventState state;
+
+  const LiveCardInProgressView(this.state, {super.key});
 
   @override
   ConsumerState<LiveCardInProgressView> createState() =>
@@ -150,12 +153,28 @@ class _LiveCardInProgressViewState
     }
   }
 
-  /// Builds a view with a random title and text from the provided lists.
   Widget _flavorTextBuilder(BuildContext context, String title, String text) {
     return Text('$title $text', style: Theme.of(context).textTheme.titleLarge);
   }
 
+  Widget _announcementBuilder(BuildContext context, String announcement) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: 'Announcement: ',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(text: announcement),
+        ],
+        style: Theme.of(context).textTheme.titleLarge,
+      ),
+    );
+  }
+
   Widget _countdownBuilder(BuildContext context, Duration countdown) {
+    final announcement = widget.state.announcement;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -165,7 +184,9 @@ class _LiveCardInProgressViewState
             context,
           ).textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        _randomFlavorTextBuilder(context, countdown),
+        announcement == null
+            ? _randomFlavorTextBuilder(context, countdown)
+            : _announcementBuilder(context, announcement),
       ],
     );
   }

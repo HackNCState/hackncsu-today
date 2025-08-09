@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackncsu_today/exception.dart';
+import 'package:hackncsu_today/features/streams/event_state_stream.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
 import 'package:hackncsu_today/models/event/event_state.dart';
 import 'package:hackncsu_today/screens/home/organizer/components/edit_resources_modal.dart';
@@ -24,6 +26,45 @@ class OrganizerView extends ConsumerWidget {
       onExecute: (ref, _) async {
         final firestoreService = ref.read(firebaseFirestoreServiceProvider);
         await firestoreService.initializeEvent();
+      },
+    ),
+    Task(
+      title: 'Post announcement',
+      content:
+          'Posts an announcement to the event state.\n'
+          'This is useful for quick announcements or updates during the event.\n'
+          'It will appear under the countdown timer on the Live Card with format "Announcement: <announcement>".\n'
+          'Please remember to remove it when it is no longer relevant.',
+      parameters: (_) => [TaskParameter.string('Content')],
+      onExecute: (ref, parameters) async {
+        final firestoreService = ref.read(firebaseFirestoreServiceProvider);
+        final announcement = parameters[0] as StringTaskParameter;
+
+        final eventState = ref.read(eventStateStreamProvider).valueOrNull;
+        if (eventState == null) {
+          throw TaskExecutionException('Event state is not initialized.');
+        }
+
+        final updatedEventState = eventState.copyWith(
+          announcement: announcement.value.trim(),
+        );
+        await firestoreService.updateEventState(updatedEventState);
+      },
+    ),
+    Task(
+      title: 'Remove announcement',
+      content:
+          'Removes the announcement from the event state.\n'
+          'This is useful when the announcement is no longer relevant.',
+      onExecute: (ref, _) async {
+        final firestoreService = ref.read(firebaseFirestoreServiceProvider);
+        final eventState = ref.read(eventStateStreamProvider).valueOrNull;
+        if (eventState == null) {
+          throw TaskExecutionException('Event state is not initialized.');
+        }
+
+        final updatedEventState = eventState.copyWith(announcement: null);
+        await firestoreService.updateEventState(updatedEventState);
       },
     ),
   ];
@@ -208,4 +249,8 @@ class OrganizerView extends ConsumerWidget {
       ),
     );
   }
+}
+
+class TaskExecutionException extends AppException {
+  TaskExecutionException(super.message);
 }
