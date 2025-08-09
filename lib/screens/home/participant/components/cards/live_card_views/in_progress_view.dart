@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/features/streams/event_state_stream.dart';
 import 'package:hackncsu_today/models/event/event_state.dart';
+import 'package:hackncsu_today/models/extensions/duration.dart';
 
 class LiveCardInProgressView extends ConsumerWidget {
   const LiveCardInProgressView({super.key});
 
-  Widget _countdownBuilder(Duration countdown) {
-    final hours = countdown.inHours;
-    final minutes = (countdown.inMinutes % 60);
-    final seconds = (countdown.inSeconds % 60);
-
-    return Text(
-      'Time left: ${hours.toString().padLeft(2, '0')}:'
-      '${minutes.toString().padLeft(2, '0')}:'
-      '${seconds.toString().padLeft(2, '0')}',
-      style: const TextStyle(fontSize: 24),
+  Widget _countdownBuilder(BuildContext context, Duration countdown) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          countdown.toFormattedString(),
+          style: Theme.of(
+            context,
+          ).textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          'Hack_NCState is in progress!',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ],
     );
   }
 
@@ -33,7 +39,7 @@ class LiveCardInProgressView extends ConsumerWidget {
           return _nullBuilder();
         }
 
-        return _countdownBuilder(duration);
+        return _countdownBuilder(context, duration);
       },
       loading: () => CircularProgressIndicator(),
       error: (_, _) => _nullBuilder(),
