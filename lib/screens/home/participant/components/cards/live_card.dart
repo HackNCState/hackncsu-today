@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/features/streams/event_state_stream.dart';
+import 'package:hackncsu_today/models/event/event_state.dart';
 import 'package:hackncsu_today/screens/home/participant/components/cards/basic_card.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/live_card_views/initial_view.dart';
 
 class LiveCard extends ConsumerWidget {
   const LiveCard({super.key});
@@ -35,10 +37,13 @@ class LiveCard extends ConsumerWidget {
         data: (state) {
           if (state == null) {
             return const Center(
-              child: Text('No live updates available at the moment.'),
+              child: Text("We're still setting things up, please stand by!"),
             );
           }
-          return Center(child: Text(state.toString()));
+
+          return switch (state) {
+            InitialEventState() => LiveCardInitialView(),
+          };
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _errorPlaceholder(error.toString(), ref),
