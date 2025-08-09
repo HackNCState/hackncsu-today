@@ -112,7 +112,7 @@ class FirebaseFirestoreService {
     }
   }
 
-  /// Streams event state data from Firestore.
+  /// Streams event data from Firestore.
   Stream<EventData?> streamEventData() {
     final eventDataRef = _firestore
         .collection(_eventCollection)
@@ -121,6 +121,20 @@ class FirebaseFirestoreService {
     return eventDataRef.snapshots().map((snapshot) {
       if (snapshot.exists && snapshot.data() != null) {
         return EventData.fromJson(snapshot.data()!);
+      }
+      return null;
+    });
+  }
+
+  /// Streams event state from Firestore
+  Stream<EventState?> streamEventState() {
+    final eventStateRef = _firestore
+        .collection(_eventCollection)
+        .doc(_eventStateDoc);
+
+    return eventStateRef.snapshots().map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return EventState.fromJson(snapshot.data()!);
       }
       return null;
     });
@@ -174,13 +188,11 @@ class FirebaseFirestoreService {
   Future<void> updateEventData(EventData eventData) async {
     final dataRef = _firestore.collection(_eventCollection).doc(_eventDataDoc);
 
-    await dataRef.set(eventData.toJson(), SetOptions(merge: true)).catchError(
-      (error) {
-        throw FirebaseFirestoreException(
-          'Failed to update event data: $error',
-        );
-      },
-    );
+    await dataRef.set(eventData.toJson(), SetOptions(merge: true)).catchError((
+      error,
+    ) {
+      throw FirebaseFirestoreException('Failed to update event data: $error');
+    });
   }
 
   // Below are functions that are used only during debugging

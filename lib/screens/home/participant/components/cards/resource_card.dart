@@ -46,7 +46,7 @@ class ResourceCard extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Error loading EventData: $error'),
+        Text('Error loading data: $error'),
         const SizedBox(height: 16),
         TextButton(
           onPressed: () {

@@ -49,8 +49,8 @@ class ParticipantView extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(child: ChecklistCard()),
-                Expanded(child: ResourceCard(ResourceSource.external)),
                 Expanded(child: ResourceCard(ResourceSource.internal)),
+                Expanded(child: ResourceCard(ResourceSource.external)),
               ],
             ),
           ),
