@@ -13,7 +13,7 @@ import 'package:hackncsu_today/services/firebase/firestore_service.dart';
 class OrganizerView extends ConsumerWidget {
   const OrganizerView({super.key});
 
-  List<Task> get organizerTasks => [
+  List<Task> get _quickTasks => [
     Task(
       title: 'Initialize Event',
       content:
@@ -26,10 +26,23 @@ class OrganizerView extends ConsumerWidget {
         await firestoreService.initializeEvent();
       },
     ),
+  ];
+
+  List<Task> get _eventStateManagementTasks => [
+    Task(
+      title: 'Set State to Initial State',
+      content:
+          'Changes the event state to Initial.\n'
+          'Pre-event state, before opening ceremony.',
+      onExecute: (ref, _) async {
+        final firestoreService = ref.read(firebaseFirestoreServiceProvider);
+        await firestoreService.updateEventState(EventState.initial());
+      },
+    ),
     Task(
       title: 'Set State to Opening Ceremony',
       content:
-          'Changes the event state to Opening Ceremony.\n\n'
+          'Changes the event state to Opening Ceremony.\n'
           'This should be executed when the opening ceremony starts.',
       onExecute: (ref, _) async {
         final firestoreService = ref.read(firebaseFirestoreServiceProvider);
@@ -39,12 +52,12 @@ class OrganizerView extends ConsumerWidget {
     Task(
       title: 'Set State to In Progress',
       content:
-          'Changes the event state to In Progress.\n\n'
+          'Changes the event state to In Progress.\n'
           'This should be executed when the hackathon starts.',
       parameters:
           (_) => [
             TaskParameter.dateTime(
-              'Hackathon End Time (default is 24h from now)',
+              'Hackathon End Time\n(default: 24h from now)',
               DateTime.now().add(const Duration(hours: 24)),
             ),
           ],
@@ -62,7 +75,7 @@ class OrganizerView extends ConsumerWidget {
     Task(
       title: 'Set State to Closing Ceremony',
       content:
-          'Changes the event state to Closing Ceremony.\n\n'
+          'Changes the event state to Closing Ceremony.\n'
           'This should be executed when the closing ceremony starts.',
       onExecute: (ref, _) async {
         final firestoreService = ref.read(firebaseFirestoreServiceProvider);
@@ -102,46 +115,86 @@ class OrganizerView extends ConsumerWidget {
     );
   }
 
+  Widget _taskWrapBuilder(BuildContext context, List<Task> tasks) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      alignment: WrapAlignment.center,
+      runAlignment: WrapAlignment.center,
+      children:
+          tasks.map((task) {
+            return ElevatedButton(
+              onPressed: () => _showTaskExecuteModal(context, task),
+              child: Text(task.title),
+            );
+          }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Organizer View',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Text('Tasks', style: Theme.of(context).textTheme.titleLarge),
-          Text('Click a button to see task description and execute it.'),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children:
-                organizerTasks.map((task) {
-                  return ElevatedButton(
-                    onPressed: () => _showTaskExecuteModal(context, task),
-                    child: Text(task.title),
-                  );
-                }).toList(),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Participant Cards',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            children:
-                _cardsBuilder(context).map((card) {
-                  return SizedBox(width: 500, height: 200, child: card);
-                }).toList(),
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Organizer View',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'This view is for organizers to manage the event state and resources. Tasks require confirmation so feel free to explore.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Divider(),
+
+            const SizedBox(height: 16),
+            Text('Quick Tasks', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'These tasks are quick actions to set up the event state and resources.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            _taskWrapBuilder(context, _quickTasks),
+            const SizedBox(height: 16),
+            Divider(),
+            const SizedBox(height: 16),
+            Text(
+              'Event State Management',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Text(
+              'Use the tasks below to manage the event state. You may need to provide parameters for some tasks.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            _taskWrapBuilder(context, _eventStateManagementTasks),
+            const SizedBox(height: 16),
+            Divider(),
+            const SizedBox(height: 16),
+            Text(
+              'Participant Cards',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Text(
+              'These cards are visible to participants. Click the edit icon to modify its content.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+
+              children:
+                  _cardsBuilder(context).map((card) {
+                    return SizedBox(width: 500, height: 200, child: card);
+                  }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
