@@ -7,6 +7,7 @@ import 'package:hackncsu_today/screens/home/participant/components/cards/live_ca
 import 'package:hackncsu_today/screens/home/participant/components/cards/live_card_views/in_progress_view.dart';
 import 'package:hackncsu_today/screens/home/participant/components/cards/live_card_views/initial_view.dart';
 import 'package:hackncsu_today/screens/home/participant/components/cards/live_card_views/opening_ceremony_view.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/live_card_views/standby_view.dart';
 
 class LiveCard extends ConsumerWidget {
   const LiveCard({super.key});
@@ -45,6 +46,7 @@ class LiveCard extends ConsumerWidget {
 
             return switch (state) {
               InitialEventState() => LiveCardInitialView(),
+              StandbyEventState() => LiveCardStandbyView(),
               InProgressEventState() => LiveCardInProgressView(),
               OpeningCeremonyEventState() => LiveCardOpeningCeremonyView(),
               ClosingCeremonyEventState() => LiveCardClosingCeremonyView(),

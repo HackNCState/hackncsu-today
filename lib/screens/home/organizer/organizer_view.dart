@@ -40,6 +40,16 @@ class OrganizerView extends ConsumerWidget {
       },
     ),
     Task(
+      title: 'Set State to Standby',
+      content:
+          'Changes the event state to Standby.\n'
+          'This should be executed between states (between in progress and judging, for example).',
+      onExecute: (ref, _) async {
+        final firestoreService = ref.read(firebaseFirestoreServiceProvider);
+        await firestoreService.updateEventState(EventState.standby());
+      },
+    ),
+    Task(
       title: 'Set State to Opening Ceremony',
       content:
           'Changes the event state to Opening Ceremony.\n'

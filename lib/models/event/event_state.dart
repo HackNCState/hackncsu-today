@@ -10,6 +10,9 @@ sealed class EventState with _$EventState {
   @FreezedUnionValue('initial')
   const factory EventState.initial() = InitialEventState;
 
+  @FreezedUnionValue('standby')
+  const factory EventState.standby() = StandbyEventState;
+
   @FreezedUnionValue('openingCeremony')
   const factory EventState.openingCeremony() = OpeningCeremonyEventState;
 
