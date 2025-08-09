@@ -10,6 +10,22 @@ sealed class Task with _$Task {
   const factory Task({
     required String title,
     required String content,
-    required Future<void> Function(WidgetRef) onExecute,
+    @Default([]) List<TaskParameter> parameters,
+    required Future<void> Function(WidgetRef, List<TaskParameter>) onExecute,
   }) = _Task;
+}
+
+@freezed
+sealed class TaskParameter with _$TaskParameter {
+  const TaskParameter._();
+  const factory TaskParameter.string(String description, String value) =
+      StringTaskParameter;
+  const factory TaskParameter.integer(String description, int value) =
+      IntegerTaskParameter;
+  const factory TaskParameter.boolean(String description, bool value) =
+      BooleanTaskParameter;
+  const factory TaskParameter.doubleValue(String description, double value) =
+      DoubleTaskParameter;
+  const factory TaskParameter.dateTime(String description, DateTime value) =
+      DateTimeTaskParameter;
 }

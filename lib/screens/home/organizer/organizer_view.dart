@@ -21,7 +21,7 @@ class OrganizerView extends ConsumerWidget {
           'This creates structure for hackathon state and supplementary data (links, resources, etc.)\n\n'
           'Should be executed once at the start of the event, before any participants join.\n'
           'Afterwards, edit the data to set the discord server invite etc. and make sure to set hidden to false so it shows up for participants.',
-      onExecute: (ref) async {
+      onExecute: (ref, _) async {
         final firestoreService = ref.read(firebaseFirestoreServiceProvider);
         await firestoreService.initializeEvent();
       },
@@ -31,9 +31,19 @@ class OrganizerView extends ConsumerWidget {
       content:
           'Changes the event state to Opening Ceremony.\n\n'
           'This should be executed when the opening ceremony starts.',
-      onExecute: (ref) async {
+      onExecute: (ref, _) async {
         final firestoreService = ref.read(firebaseFirestoreServiceProvider);
         await firestoreService.updateEventState(EventState.openingCeremony());
+      },
+    ),
+    Task(
+      title: 'Set State to Closing Ceremony',
+      content:
+          'Changes the event state to Closing Ceremony.\n\n'
+          'This should be executed when the closing ceremony starts.',
+      onExecute: (ref, _) async {
+        final firestoreService = ref.read(firebaseFirestoreServiceProvider);
+        await firestoreService.updateEventState(EventState.closingCeremony());
       },
     ),
   ];
