@@ -195,6 +195,18 @@ class FirebaseFirestoreService {
     });
   }
 
+  Future<void> updateEventState(EventState eventState) async {
+    final stateRef = _firestore
+        .collection(_eventCollection)
+        .doc(_eventStateDoc);
+
+    await stateRef.set(eventState.toJson(), SetOptions(merge: true)).catchError((
+      error,
+    ) {
+      throw FirebaseFirestoreException('Failed to update event state: $error');
+    });
+  }
+
   // Below are functions that are used only during debugging
 
   /// Sets the user type (useful for debugging purposes).

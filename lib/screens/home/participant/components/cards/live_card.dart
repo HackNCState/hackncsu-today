@@ -35,22 +35,22 @@ class LiveCard extends ConsumerWidget {
       helpText:
           "Critical information such as the timer and other updates\nEnable desktop notifications to stay up to date even when you're in another tab.",
       color: Theme.of(context).colorScheme.primaryContainer,
-      child: eventState.when(
-        data: (state) {
-          if (state == null) {
-            return const Center(
-              child: Text("We're still setting things up, please stand by!"),
-            );
-          }
+      child: Center(
+        child: eventState.when(
+          data: (state) {
+            if (state == null) {
+              return Text("We're still setting things up, please stand by!");
+            }
 
-          return switch (state) {
-            InitialEventState() => LiveCardInitialView(),
-            OpeningCeremonyEventState() => LiveCardOpeningCeremonyView(),
-            ClosingCeremonyEventState() => LiveCardClosingCeremonyView(),
-          };
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => _errorPlaceholder(error.toString(), ref),
+            return switch (state) {
+              InitialEventState() => LiveCardInitialView(),
+              OpeningCeremonyEventState() => LiveCardOpeningCeremonyView(),
+              ClosingCeremonyEventState() => LiveCardClosingCeremonyView(),
+            };
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => _errorPlaceholder(error.toString(), ref),
+        ),
       ),
     );
   }

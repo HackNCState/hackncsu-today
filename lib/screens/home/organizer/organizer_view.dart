@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
+import 'package:hackncsu_today/models/event/event_state.dart';
 import 'package:hackncsu_today/screens/home/organizer/components/edit_resources_modal.dart';
 import 'package:hackncsu_today/screens/home/organizer/components/editable_overlay.dart';
 import 'package:hackncsu_today/screens/home/organizer/components/execute_modal.dart';
 import 'package:hackncsu_today/screens/home/organizer/models/task.dart';
+import 'package:hackncsu_today/screens/home/participant/components/cards/live_card.dart';
 import 'package:hackncsu_today/screens/home/participant/components/cards/resource_card.dart';
 import 'package:hackncsu_today/services/firebase/firestore_service.dart';
 
@@ -24,11 +26,20 @@ class OrganizerView extends ConsumerWidget {
         await firestoreService.initializeEvent();
       },
     ),
-    // TODO: add tasks for managing event state, like starting the event
-    // also add (separate?) ui for adding/removing links and resources and stuff
+    Task(
+      title: 'Set State to Opening Ceremony',
+      content:
+          'Changes the event state to Opening Ceremony.\n\n'
+          'This should be executed when the opening ceremony starts.',
+      onExecute: (ref) async {
+        final firestoreService = ref.read(firebaseFirestoreServiceProvider);
+        await firestoreService.updateEventState(EventState.openingCeremony());
+      },
+    ),
   ];
 
   List<Widget> _cardsBuilder(BuildContext context) => [
+    LiveCard(),
     EditableOverlay(
       onEdit: () => _showEditResourcesModal(context, ResourceSource.internal),
       child: ResourceCard(ResourceSource.internal, showHidden: true),
@@ -94,7 +105,7 @@ class OrganizerView extends ConsumerWidget {
           Wrap(
             children:
                 _cardsBuilder(context).map((card) {
-                  return SizedBox(width: 400, height: 200, child: card);
+                  return SizedBox(width: 500, height: 200, child: card);
                 }).toList(),
           ),
         ],
