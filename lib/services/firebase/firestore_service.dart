@@ -5,6 +5,7 @@ import 'package:hackncsu_today/exception.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
 import 'package:hackncsu_today/models/event/event_state.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
+import 'package:hackncsu_today/models/team.dart';
 import 'package:hackncsu_today/services/firebase/functions_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -23,6 +24,7 @@ class FirebaseFirestoreService {
 
   static const String _usersCollection = 'users';
   static const String _eventCollection = 'event';
+  static const String _teamsCollection = 'teams';
 
   static const String _eventStateDoc = 'state';
   static const String _eventDataDoc = 'data';
@@ -30,7 +32,7 @@ class FirebaseFirestoreService {
   /// creates a new user document in Firestore with the given data.
   /// if the user already exists, it returns the existing user document.
   /// this is meant for use in the login flow
-  Future<HackUser> createUserData(AuthenticateFunctionResponse response) async {
+  Future<HackUser> createUser(AuthenticateFunctionResponse response) async {
     final userDocRef = _firestore.collection(_usersCollection).doc(response.id);
     final docSnapshot = await userDocRef.get();
 
@@ -82,7 +84,7 @@ class FirebaseFirestoreService {
   }
 
   /// updates the user document in Firestore with the given user data.
-  Future<void> updateUserData(HackUser user) async {
+  Future<void> updateUser(HackUser user) async {
     _firestore
         .collection(_usersCollection)
         .doc(user.id)
@@ -99,7 +101,7 @@ class FirebaseFirestoreService {
   /// NOTE: this will fail for participants if they try to fetch another user's data
   /// because of Firestore rules. they can only fetch their own data.
   /// or use cloud functions to fetch limited data about other users.
-  Future<HackUser?> fetchUserData(String userId) async {
+  Future<HackUser?> fetchUser(String userId) async {
     final userDocRef = _firestore.collection(_usersCollection).doc(userId);
     final docSnapshot = await userDocRef.get().catchError((error) {
       throw FirebaseFirestoreException('Failed to fetch user data: $error');
@@ -107,6 +109,22 @@ class FirebaseFirestoreService {
 
     if (docSnapshot.exists) {
       return HackUser.fromJson(docSnapshot.data()!);
+    } else {
+      return null;
+    }
+  }
+
+  /// fetches the team data from Firestore for the given team ID.
+  /// returns null if the team does not exist.
+  /// NOTE: this will fail for participants if they try to fetch another team's data.
+  Future<Team?> fetchTeamData(String teamId) async {
+    final teamDocRef = _firestore.collection(_teamsCollection).doc(teamId);
+    final docSnapshot = await teamDocRef.get().catchError((error) {
+      throw FirebaseFirestoreException('Failed to fetch team data: $error');
+    });
+
+    if (docSnapshot.exists) {
+      return Team.fromJson(docSnapshot.data()!);
     } else {
       return null;
     }
@@ -200,11 +218,13 @@ class FirebaseFirestoreService {
         .collection(_eventCollection)
         .doc(_eventStateDoc);
 
-    await stateRef.set(eventState.toJson(), SetOptions(merge: true)).catchError((
-      error,
-    ) {
-      throw FirebaseFirestoreException('Failed to update event state: $error');
-    });
+    await stateRef.set(eventState.toJson(), SetOptions(merge: true)).catchError(
+      (error) {
+        throw FirebaseFirestoreException(
+          'Failed to update event state: $error',
+        );
+      },
+    );
   }
 
   // Below are functions that are used only during debugging

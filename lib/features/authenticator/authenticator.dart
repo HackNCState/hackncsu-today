@@ -31,7 +31,7 @@ class Authenticator extends _$Authenticator {
       // otherwise, we try the else if block.
 
       if (firebaseAuth.user != null &&
-          (existingUser = (await firebaseFirestore.fetchUserData(
+          (existingUser = (await firebaseFirestore.fetchUser(
                 firebaseAuth.user!.uid,
               ))) !=
               null) {
@@ -74,7 +74,7 @@ class Authenticator extends _$Authenticator {
       );
 
       await authService.login(response);
-      final hackUser = await firestoreService.createUserData(response);
+      final hackUser = await firestoreService.createUser(response);
 
       state = Authenticated(user: hackUser);
     } on AppException catch (e) {
@@ -105,7 +105,7 @@ class Authenticator extends _$Authenticator {
         if (kDebugMode) print('Failed to switch view: $error');
       });
 
-      state = Authenticated(user: (await firestore.fetchUserData(userId))!);
+      state = Authenticated(user: (await firestore.fetchUser(userId))!);
     }
   }
 }

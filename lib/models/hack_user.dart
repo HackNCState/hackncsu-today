@@ -25,6 +25,7 @@ sealed class HackUser with _$HackUser {
     required bool hadDinner,
     required bool hadBreakfast,
     required bool hadSecondLunch,
+    String? teamId
   }) = Participant;
 
   factory HackUser.fromJson(Map<String, Object?> json) =>
