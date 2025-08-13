@@ -120,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       context: context,
                       builder: (_) => LogoutModal(),
                     ),
-                tooltip: 'Log out (${state.user})',
+                tooltip: 'Log out',
                 child: Icon(Icons.logout),
               )
               : null,

@@ -114,6 +114,17 @@ class FirebaseFirestoreService {
     }
   }
 
+  /// Streams user data from Firestore for the given user ID.
+  Stream<HackUser?> streamUser(String userId) {
+    final userDocRef = _firestore.collection(_usersCollection).doc(userId);
+    return userDocRef.snapshots().map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return HackUser.fromJson(snapshot.data()!);
+      }
+      return null;
+    });
+  }
+
   /// fetches the team data from Firestore for the given team ID.
   /// returns null if the team does not exist.
   /// NOTE: this will fail for participants if they try to fetch another team's data.

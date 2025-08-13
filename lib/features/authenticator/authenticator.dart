@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/exception.dart';
+import 'package:hackncsu_today/features/streams/hack_user_stream.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
 import 'package:hackncsu_today/services/firebase/auth_service.dart';
 import 'package:hackncsu_today/services/firebase/firestore_service.dart';
@@ -10,14 +12,16 @@ part 'authenticator.g.dart';
 
 @Riverpod(keepAlive: true)
 class Authenticator extends _$Authenticator {
+  ProviderSubscription<AsyncValue<HackUser?>>? _userListenerSubscription;
+
   @override
   AuthenticatorState build() {
     // try to log in automatically in the background
-    _tryAutoLogin();
+    _autoLogin();
     return AutoAuthenticating();
   }
 
-  Future<void> _tryAutoLogin() async {
+  Future<void> _autoLogin() async {
     final firebaseAuth = ref.read(firebaseAuthServiceProvider);
     final firebaseFirestore = ref.read(firebaseFirestoreServiceProvider);
 
@@ -38,6 +42,7 @@ class Authenticator extends _$Authenticator {
         if (kDebugMode) print('Auto-login successful with Firebase Auth.');
 
         state = Authenticated(user: existingUser!);
+        _listenForUserUpdates(existingUser);
 
         return;
       } else {
@@ -53,8 +58,46 @@ class Authenticator extends _$Authenticator {
     await Future.delayed(
       const Duration(seconds: 1),
     ); // wait a bit because idk it doesn't work without it
+    // TODO: fix fragility
 
     state = Unauthenticated();
+  }
+
+  /// Listens to the user stream and updates state whenever user data changes
+  /// force logs out if user data disappears
+  void _listenForUserUpdates(HackUser user) {
+    _userListenerSubscription?.close();
+
+    if (kDebugMode) print('Starting auto-update for user data...');
+    _userListenerSubscription = ref.listen(hackUserStreamProvider(user.id), (
+      previous,
+      next,
+    ) {
+      next.when(
+        data: (userData) {
+          if (state is Authenticated &&
+              previous != next &&
+              (previous?.hasValue ?? false)) {
+            if (userData != null) {
+              if (kDebugMode) {
+                print('User data auto-updating...');
+              }
+              state = Authenticated(user: userData);
+            } else {
+              if (kDebugMode) {
+                print('User data is null in auto update. Forcing logout...');
+              }
+              logout();
+            }
+          }
+        },
+        loading: () {},
+        error: (error, stack) {
+          state = AuthenticationError(error: error);
+          if (kDebugMode) print('Error during user data auto update: $error');
+        },
+      );
+    });
   }
 
   Future<void> login() async {
@@ -77,6 +120,7 @@ class Authenticator extends _$Authenticator {
       final hackUser = await firestoreService.createUser(response);
 
       state = Authenticated(user: hackUser);
+      _listenForUserUpdates(hackUser);
     } on AppException catch (e) {
       state = AuthenticationError(error: e);
     } catch (e) {
@@ -87,6 +131,8 @@ class Authenticator extends _$Authenticator {
   Future<void> logout() async {
     final authService = ref.read(firebaseAuthServiceProvider);
 
+    _userListenerSubscription?.close();
+    _userListenerSubscription = null;
     await authService.logout();
     state = Unauthenticated();
     if (kDebugMode) print('Logout successful.');
@@ -95,6 +141,8 @@ class Authenticator extends _$Authenticator {
   /// Switches the user type for debugging purposes.
   Future<void> debugSetUserType(String type) async {
     if (kDebugMode) {
+      _userListenerSubscription?.close();
+
       final firestore = ref.read(firebaseFirestoreServiceProvider);
       final auth = ref.read(firebaseAuthServiceProvider);
 
@@ -105,7 +153,11 @@ class Authenticator extends _$Authenticator {
         if (kDebugMode) print('Failed to switch view: $error');
       });
 
-      state = Authenticated(user: (await firestore.fetchUser(userId))!);
+      final user = (await firestore.fetchUser(userId))!;
+
+      state = Authenticated(user: user);
+
+      _listenForUserUpdates(user);
     }
   }
 }
