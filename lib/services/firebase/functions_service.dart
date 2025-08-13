@@ -23,7 +23,7 @@ class FirebaseFunctionsService {
   /// if the user is an organizer, it returns null.
   /// if the user is not found, it returns null.
   /// TODO: implement this
-  Future<FetchUserFunctionResponse?> fetchUser(String id) async {
+  Future<FetchPublicUserFunctionResponse?> fetchPublicUser(String id) async {
     try {
       final callable = _functions.httpsCallable(_fetchUserEndpoint);
       final response = await callable.call<RawFirebaseFunctionResponse?>({
@@ -31,7 +31,7 @@ class FirebaseFunctionsService {
       });
 
       if (response.data != null) {
-        return FetchUserFunctionResponse.fromJson(response.data!);
+        return FetchPublicUserFunctionResponse.fromJson(response.data!);
       } else {
         return null;
       }
@@ -48,8 +48,7 @@ typedef RawFirebaseFunctionResponse = Map<String, Object?>;
 /// note: this is used in the OAuthService
 /// but it's here because an (oauth redirected) firebase function handles the authentication
 @freezed
-abstract class AuthenticateFunctionResponse
-    with _$AuthenticateFunctionResponse {
+sealed class AuthenticateFunctionResponse with _$AuthenticateFunctionResponse {
   AuthenticateFunctionResponse._();
 
   factory AuthenticateFunctionResponse({
@@ -70,18 +69,17 @@ abstract class AuthenticateFunctionResponse
 /// Represents the response from the fetchUser Firebase function.
 /// Contains the user's public information.
 @freezed
-abstract class FetchUserFunctionResponse
-    with _$FetchUserFunctionResponse {
-  FetchUserFunctionResponse._();
+sealed class FetchPublicUserFunctionResponse with _$FetchPublicUserFunctionResponse {
+  FetchPublicUserFunctionResponse._();
 
-  factory FetchUserFunctionResponse({
+  factory FetchPublicUserFunctionResponse({
     required String id,
     required String firstName,
     required String lastName,
-  }) = _FetchUserFunctionResponse;
+  }) = _FetchPublicUserFunctionResponse;
 
-  factory FetchUserFunctionResponse.fromJson(Map<String, Object?> json) =>
-      _$FetchUserFunctionResponseFromJson(json);
+  factory FetchPublicUserFunctionResponse.fromJson(Map<String, Object?> json) =>
+      _$FetchPublicUserFunctionResponseFromJson(json);
 }
 
 class FirebaseFunctionException extends AppException {
