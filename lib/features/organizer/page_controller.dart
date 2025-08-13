@@ -18,7 +18,6 @@ enum OrganizerPage {
 class OrganizerPageController extends _$OrganizerPageController {
   @override
   OrganizerPage build() {
-    // The default page when the view is first built.
     return OrganizerPage.dashboard;
   }
 

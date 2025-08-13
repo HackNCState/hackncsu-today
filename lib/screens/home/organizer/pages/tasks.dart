@@ -36,33 +36,31 @@ class TasksPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final taskService = ref.watch(taskServiceProvider);
 
-    return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Quick Tasks', style: Theme.of(context).textTheme.titleLarge),
-            Text(
-              'These tasks are quick actions to manage the event. Click on one to see its description.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            _taskWrapBuilder(context, taskService.quickTasks),
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-            Text(
-              'Event State Management',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            Text(
-              'Use the tasks below to manage the event state. You may need to provide parameters for some tasks.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            _taskWrapBuilder(context, taskService.eventStateManagementTasks),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Quick Tasks', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'These tasks are quick actions to manage the event. Click on one to see its description.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          _taskWrapBuilder(context, taskService.quickTasks),
+          const SizedBox(height: 16),
+          Divider(),
+          const SizedBox(height: 16),
+          Text(
+            'Event State Management',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          Text(
+            'Use the tasks below to manage the event state. You may need to provide parameters for some tasks.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          _taskWrapBuilder(context, taskService.eventStateManagementTasks),
+        ],
       ),
     );
   }
