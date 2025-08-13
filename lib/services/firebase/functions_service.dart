@@ -20,8 +20,9 @@ class FirebaseFunctionsService {
 
   /// fetches the user document from Firestore with the given user ID.
   /// returns only limited fields (name, last name, id) for public access.
-  /// if the user is an organizer, it throws an exception.
+  /// if the user is an organizer, it returns null.
   /// if the user is not found, it returns null.
+  /// TODO: implement this
   Future<FetchUserFunctionResponse?> fetchUser(String id) async {
     try {
       final callable = _functions.httpsCallable(_fetchUserEndpoint);
@@ -66,6 +67,8 @@ abstract class AuthenticateFunctionResponse
       _$AuthenticateFunctionResponseFromJson(json);
 }
 
+/// Represents the response from the fetchUser Firebase function.
+/// Contains the user's public information.
 @freezed
 abstract class FetchUserFunctionResponse
     with _$FetchUserFunctionResponse {
