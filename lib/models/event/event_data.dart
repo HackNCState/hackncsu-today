@@ -9,6 +9,9 @@ sealed class EventData with _$EventData {
   const EventData._();
 
   const factory EventData({
+    /// Tracks
+    required List<String> tracks,
+
     /// Loosely related resources (e.g. hackathon website, centennial map...)
     required List<Resource> externalResources,
 

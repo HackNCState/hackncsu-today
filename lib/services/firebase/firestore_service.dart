@@ -178,6 +178,11 @@ class FirebaseFirestoreService {
   /// and then we can update the relevant data as needed
   Future<void> initializeEvent() async {
     final eventData = EventData(
+      tracks: [
+        'Track 1',
+        'Track 2',
+        'Track 3',
+      ],
       externalResources: [
         Resource.link('Hack_NCState Website', 'https://hackncstate.org'),
         Resource.link(
