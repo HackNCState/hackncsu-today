@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:hackncsu_today/constants.dart';
+import 'package:hackncsu_today/config/constants.dart';
 import 'package:web/web.dart' as web;
 
 class DiscordEmbed extends StatelessWidget {

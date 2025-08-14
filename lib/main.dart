@@ -5,9 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hackncsu_today/constants.dart';
-import 'package:hackncsu_today/features/router.dart';
-import 'package:hackncsu_today/firebase_options.dart';
+import 'package:hackncsu_today/config/constants.dart';
+import 'package:hackncsu_today/config/router.dart';
+import 'package:hackncsu_today/config/firebase_options.dart';
 import 'package:responsive_framework/responsive_framework.dart'; // Update import path
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
