@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Organizers have full admin access
+    allow read, write: if request.auth.token.isOrganizer == true;
+
+    match /users/{userId} {
+      // Only the authenticated user can read or write their own data.
+      allow read, write: if request.auth.uid == userId;
+
+      // Organizers have full admin access
+      allow read, write: if request.auth.token.isOrganizer == true;
+    }
+
+    match /teams/{teamId} {
+      // Team members can read the entire team document.
+      allow read: if request.auth.uid in resource.data.memberIds;
+
+      // Team members can only write to the 'checklist' field.
+      // This rule prevents them from changing other fields like the team name or member list.
+      allow write: if request.auth.uid in resource.data.memberIds &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['checklist']);
+
+      // Organizers have full admin access
+      allow read, write: if request.auth.token.isOrganizer == true;
+    }
+
+    match /event/{data} {
+      // Anyone can read event data.
+      allow read;
+
+      // Organizers have full admin access
+      allow read, write: if request.auth.token.isOrganizer == true;
+    }
+  }
+}

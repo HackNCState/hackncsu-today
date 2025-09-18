@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackncsu_today/config/constants.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
 import 'package:hackncsu_today/screens/home/participant/components/cards/checklist_card.dart';
@@ -38,8 +39,8 @@ class ParticipantView extends ConsumerWidget {
                 Expanded(
                   flex: 2,
                   child: DiscordEmbed(
-                    serverID: '723524172839518278',
-                    channelID: '723524172839518281',
+                    serverID: kDiscordServerId,
+                    channelID: kDiscordChannelId,
                   ),
                 ),
               ],
