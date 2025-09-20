@@ -113,10 +113,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     ),
                     SizedBox(height: 15),
                     Text(
-                      "Welcome to Hack_NCState 2026! We hope you'll have a baller time bla bla "
-                      'bla bla words and more words lorem ipsum dolor shit amet. This blurb will '
-                      'contain information about Hack_NCState website and what it does. You will '
-                      'be so informed after this blurb that you will have 3000% increased iq!!!',
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" 
+                      'tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,' 
+                      'quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(height: 15),
