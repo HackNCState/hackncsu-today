@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/basic_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/basic_card.dart';
 
 class ChecklistCard extends StatelessWidget {
   const ChecklistCard({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hackncsu_today/screens/home/organizer/components/execute_modal.dart';
-import 'package:hackncsu_today/screens/home/organizer/models/task.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/components/execute_modal.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/models/task.dart';
 import 'package:hackncsu_today/services/organizer/task_service.dart';
 
 class TasksPage extends ConsumerWidget {

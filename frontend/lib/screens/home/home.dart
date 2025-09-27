@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hackncsu_today/features/authenticator/authenticator.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
 import 'package:hackncsu_today/screens/home/components/logout_modal.dart';
-import 'package:hackncsu_today/screens/home/organizer/organizer_view.dart';
-import 'package:hackncsu_today/screens/home/participant/participant_view.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/organizer_view.dart';
+import 'package:hackncsu_today/screens/home/views/participant/participant_view.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {

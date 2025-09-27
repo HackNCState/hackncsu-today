@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackncsu_today/screens/home/organizer/models/task.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/models/task.dart';
 
 class ExecuteModal extends ConsumerStatefulWidget {
   final Task task;

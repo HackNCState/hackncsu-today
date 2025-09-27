@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
-import 'package:hackncsu_today/screens/home/participant/components/resource_items/resource_item.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/resource_items/resource_item.dart';
 
 class InternalResourceItem extends StatelessWidget {
   final ActionResource internalResource;

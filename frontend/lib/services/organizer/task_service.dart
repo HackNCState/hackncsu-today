@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/exception.dart';
 import 'package:hackncsu_today/features/streams/event_state_stream.dart';
 import 'package:hackncsu_today/models/event/event_state.dart';
-import 'package:hackncsu_today/screens/home/organizer/models/task.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/models/task.dart';
 import 'package:hackncsu_today/services/firebase/firestore_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

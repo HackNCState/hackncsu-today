@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hackncsu_today/exception.dart';
-import 'package:hackncsu_today/features/authenticator/authenticator.dart';
-import 'package:hackncsu_today/features/organizer/page_controller.dart';
-import 'package:hackncsu_today/features/streams/event_state_stream.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/features/page_controller.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
-import 'package:hackncsu_today/models/event/event_state.dart';
-import 'package:hackncsu_today/screens/home/organizer/components/edit_resources_modal.dart';
-import 'package:hackncsu_today/screens/home/organizer/components/editable_overlay.dart';
-import 'package:hackncsu_today/screens/home/organizer/components/execute_modal.dart';
-import 'package:hackncsu_today/screens/home/organizer/models/task.dart';
-import 'package:hackncsu_today/screens/home/organizer/pages/tasks.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/live_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/resource_card.dart';
-import 'package:hackncsu_today/services/firebase/auth_service.dart';
-import 'package:hackncsu_today/services/firebase/firestore_service.dart';
-import 'package:hackncsu_today/services/organizer/task_service.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/components/edit_resources_modal.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/components/editable_overlay.dart';
+import 'package:hackncsu_today/screens/home/views/organizer/pages/tasks.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/live_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/resource_card.dart';
 
 class OrganizerView extends ConsumerWidget {
   const OrganizerView({super.key});

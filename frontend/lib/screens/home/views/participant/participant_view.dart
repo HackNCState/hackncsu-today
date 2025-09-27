@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/config/constants.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
 import 'package:hackncsu_today/models/hack_user.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/checklist_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/resource_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/discord_embed.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/live_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/team_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/checklist_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/resource_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/discord_embed.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/live_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/team_card.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class ParticipantView extends ConsumerWidget {

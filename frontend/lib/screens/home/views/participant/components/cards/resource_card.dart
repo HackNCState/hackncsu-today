@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackncsu_today/features/streams/event_data_stream.dart';
 import 'package:hackncsu_today/models/event/event_data.dart';
-import 'package:hackncsu_today/screens/home/participant/components/cards/basic_card.dart';
-import 'package:hackncsu_today/screens/home/participant/components/resource_items/internal_resource_item.dart';
-import 'package:hackncsu_today/screens/home/participant/components/resource_items/link_resource_item.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/cards/basic_card.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/resource_items/internal_resource_item.dart';
+import 'package:hackncsu_today/screens/home/views/participant/components/resource_items/link_resource_item.dart';
 
 class ResourceCard extends ConsumerWidget {
   final bool showHidden;
