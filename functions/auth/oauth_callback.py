@@ -15,7 +15,7 @@ CLIENT_SECRET = SecretParam(
 )  # set this via command: firebase functions:secrets:set CLIENT_SECRET
 REDIRECT_URI = StringParam(
     "REDIRECT_URI",
-    default="https://cf.today.hackncstate.org/oauth/callback",
+    default="https://us-central1-hackncsu-today.cloudfunctions.net/oauth_callback",
     description="The redirect URI for Discord OAuth2.",
 )  # set to http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback in .env.local for local testing
 

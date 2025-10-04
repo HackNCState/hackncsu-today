@@ -24,6 +24,28 @@
                 "isDefault": true
             },
             "detail": "Runs `dart pub run build_runner watch` to automatically rebuild generated files."
+        },
+        {
+            "label": "Start Firebase Emulators",
+            "type": "shell",
+            "command": "firebase",
+            "args": [
+                "emulators:start"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "GOOGLE_APPLICATION_CREDENTIALS": "<path-to-your-service-account-file>.json"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "dedicated",
+                "clear": true
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
         }
     ]
 }

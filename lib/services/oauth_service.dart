@@ -27,7 +27,7 @@ class OAuthService {
 
   static final String _redirectUrl = kDebugMode
         ? 'http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback'
-        : 'https://cf.today.hackncstate.org/oauth/redirect';
+        : 'https://us-central1-hackncsu-today.cloudfunctions.net/oauth_callback';
   // TODO: https://stackoverflow.com/questions/49825799/use-custom-domain-for-firebase-function-http-calls
 
   /// performs interactive oauth2 flow
