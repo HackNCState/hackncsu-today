@@ -2,30 +2,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run build_runner watch",
-            "type": "shell",
-            "command": "dart",
-            "args": [
-                "pub",
-                "run",
-                "build_runner",
-                "watch",
-                "--delete-conflicting-outputs"
-            ],
-            "isBackground": true,
-            "runOptions": {
-                "runOn": "folderOpen"
-            },
-            "problemMatcher": [
-                "$dart-build_runner"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "detail": "Runs `dart pub run build_runner watch` to automatically rebuild generated files."
-        },
-        {
             "label": "Start Firebase Emulators",
             "type": "shell",
             "command": "firebase",
