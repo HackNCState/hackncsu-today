@@ -1,3 +1,4 @@
+import { useAuth } from '@/services/auth.service'
 import { Navigate } from 'react-router-dom'
 
 interface ProtectedRouteProps {
@@ -5,18 +6,18 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  // TODO: Replace with actual Firebase auth check
-  // Example when ready:
-  // const { user, loading } = useAuth()
-  // if (loading) return <div>Loading...</div>
-  // if (!user) return <Navigate to="/login" replace />
-  
-  // PLACEHOLDER: Currently allows all access
-  const isAuthenticated = true // Change to false to test redirect
+  const { user, loading } = useAuth();
 
-  if (!isAuthenticated) {
+  if (loading) {
+    return <div></div>;
+  }
+
+  if (!user) {
     return <Navigate to="/login" replace />
   }
+
+  // TODO remove
+  console.log("User is authenticated:", user);
 
   return <>{children}</>
 }

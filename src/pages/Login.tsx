@@ -8,15 +8,14 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { authService } from "@/services/auth.service";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
 	const navigation = useNavigate();
 
 	const handleDiscordLogin = () => {
-		// TODO: Implement Firebase Discord OAuth
-
-		navigation("/");
+		authService.startOAuth();
 	};
 
 	return (

@@ -3,7 +3,7 @@ import os
 import requests
 from firebase_functions import https_fn
 from firebase_functions.params import SecretParam, StringParam, IntParam
-from firebase_admin import auth
+from firebase_admin import auth, firestore
 
 import google.auth
 
@@ -18,6 +18,11 @@ REDIRECT_URI = StringParam(
     default="https://us-central1-hackncsu-today.cloudfunctions.net/oauth_callback",
     description="The redirect URI for Discord OAuth2.",
 )  # set to http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback in .env.local for local testing
+FRONTEND_AUTH_URI = StringParam(
+    "FRONTEND_AUTH_URI",
+    default="https://today.hackncstate.org/auth",
+    description="The frontend URI to redirect to after authentication is complete.",
+)  # set to http://localhost:8080/auth in .env.local for local testing
 
 SPREADSHEET_URL = StringParam(
     "SPREADSHEET_URL",
@@ -67,10 +72,13 @@ DISCORD_USERNAME_COLUMN = IntParam(
 )
 
 
-def _generate_auth_token(id: str, username: str) -> dict:
+def _validate_user(id: str, username: str) -> tuple[str, dict]:
     """Compare a Discord user with the participants spreadsheet
     and give a token if they are included and checked in. Also returns
-    user information if available."""
+    user information.
+
+    Most user information will be missing if the user is an organizer since
+    organizers do not need to be in the spreadsheet."""
     print(f"Generating auth token for user {username} ({id})")
 
     import gspread
@@ -174,24 +182,58 @@ def _generate_auth_token(id: str, username: str) -> dict:
         if os.getenv("FUNCTIONS_EMULATOR") == "true":
             is_organizer = False
 
-        result = {
-            "token": custom_token.decode("utf-8"),
+        user = {  # TODO update to be dataclass for nicer typing
             "id": id,
             "username": username,
             "firstName": first_name,
             "lastName": last_name,
             "phone": phone,
             "email": email,
+            "dietaryRestrictions": None,  # TODO get this from spreadsheet?
+            "shirtSize": None,  # TODO get this from spreadsheet?
+            "eventsAttended": [],
+            "hadFirstLunch": False,
+            "hadSecondLunch": False,
+            "hadDinner": False,
+            "hadBreakfast": False,
+            "notes": [],
             "isOrganizer": is_organizer,
         }
-        print(f"Successfully generated token and user data: {result}")
-        return result
+        print(f"Successfully generated token and user data: {user}")
+        return (custom_token.decode("utf-8"), user)
     except Exception as e:
         print(f"Error creating custom token: {e}")
         raise ValueError(
             "token-creation-failed",
             f"Error creating custom token: {e}",
         )
+
+
+def _create_user(data: dict):
+    """Create the user in Firestore (/users/{id}) if they do not already exist."""
+    db = firestore.client()
+    user_id = data["id"]
+    user_ref = db.collection("users").document(user_id)
+
+    user_doc = user_ref.get()
+
+    if user_doc.exists:
+        print(f"User {user_id} already exists in Firestore. Updating...")
+        user_ref.update(
+            {
+                "username": data["username"],
+                "firstName": data.get("firstName"),
+                "lastName": data.get("lastName"),
+                "phone": data.get("phone"),
+                "email": data.get("email"),
+                "isOrganizer": data["isOrganizer"],
+            }
+        )
+    else:
+        print(f"Creating new user {user_id} in Firestore...")
+        user_ref.set(data)
+
+    print(f"User {user_id} saved successfully.")
 
 
 @https_fn.on_request(secrets=[CLIENT_SECRET])
@@ -203,18 +245,7 @@ def oauth_callback(req: https_fn.Request) -> https_fn.Response:
     code = req.args.get("code")
     print(f"Received code: {code}")
 
-    if not code:
-        print("Missing 'code' parameter. Args: ", req.url)
-        response_json = json.dumps(
-            {
-                "status": "error",
-                "error": {
-                    "code": "missing-parameter",
-                    "message": "Missing 'code' parameter in the request.",
-                },
-            }
-        )
-    else:
+    if code:
         try:
             token_data = {
                 "grant_type": "authorization_code",
@@ -247,58 +278,31 @@ def oauth_callback(req: https_fn.Request) -> https_fn.Response:
             discord_user_id = discord_user["id"]
             discord_username = discord_user["username"]
 
-            print("Calling _generate_auth_token...")
-            auth_token = _generate_auth_token(
+            print("Calling _validate_user...")
+
+            token, user = _validate_user(
                 id=discord_user_id,
                 username=discord_username,
             )
-            print(f"Received auth token from _generate_auth_token: {auth_token}")
+            print(f"Received auth token from _validate_user: {token}")
 
-            success_payload = {
-                "status": "success",
-                "data": auth_token,
-            }
-            response_json = json.dumps(success_payload)
-            print(f"Success payload: {response_json}")
+            _create_user(user)
 
-        except ValueError as e:
-            # Handle specific ValueError exceptions (e.g., missing parameters, invalid format)
-            print(f"Caught ValueError: {e}")
-            error_code, error_message = e.args
-            error_payload = {
-                "status": "error",
-                "error": {"code": error_code, "message": error_message},
-            }
-            response_json = json.dumps(error_payload)
-            print(f"Error payload (ValueError): {response_json}")
+            print("Ensured user exists in Firestore.")
+
+            # Redirect to frontend with token
+            redirect_url = f"{FRONTEND_AUTH_URI.value}?token={token}"
+            print(f"Redirecting to: {redirect_url}")
+            return https_fn.Response(status=302, headers={"Location": redirect_url})
+
         except Exception as e:
-            # Handle unexpected errors (e.g., Discord API is down, parsing failed)
-            print(f"Caught unexpected exception: {e}")
-            error_payload = {
-                "status": "error",
-                "error": {
-                    "code": "internal-server-error",
-                    "message": f"An unexpected error occurred during authentication. Contact a staff member.\n{e}",
-                },
-            }
-            response_json = json.dumps(error_payload)
-            print(f"Error payload (Exception): {response_json}")
+            # Handle any errors during authentication
+            print(f"Caught exception: {e}")
+            redirect_url = f"{FRONTEND_AUTH_URI.value}?error=internal_error"
+            print(f"Redirecting to error page: {redirect_url}")
+            return https_fn.Response(status=302, headers={"Location": redirect_url})
 
-    html_response = f"""
-    <!DOCTYPE html>
-    <html>
-    <head><title>Authenticating...</title></head>
-    <body>
-    <p>Please wait, finishing authentication...</p>
-    <script>
-        // Send the JSON payload (string) to the main window
-        window.opener.postMessage({json.dumps(response_json)}, '*');
-        // Close this popup window
-        window.close();
-    </script>
-    </body>
-    </html>
-    """
-    print("Sending HTML response to close popup.")
-
-    return https_fn.Response(html_response, status=200, content_type="text/html")
+    # Handle missing code parameter
+    redirect_url = f"{FRONTEND_AUTH_URI.value}?error=missing_code"
+    print(f"Redirecting to error page: {redirect_url}")
+    return https_fn.Response(status=302, headers={"Location": redirect_url})
