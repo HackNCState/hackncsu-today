@@ -8,15 +8,23 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { authService } from "@/services/auth.service";
+import { authService, useAuth } from "@/services/auth.service";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
 	const navigation = useNavigate();
+	const { user, loading } = useAuth();
 
 	const handleDiscordLogin = () => {
 		authService.startOAuth();
 	};
+
+	useEffect(() => {
+		if (!loading && user) {
+			navigation("/", { replace: true });
+		}
+	}, [user, loading, navigation]);
 
 	return (
 		<div className="flex flex-col gap-8 items-center justify-center sm:text-center p-4 sm:p-8 min-h-screen">
@@ -24,6 +32,11 @@ export default function Login() {
 				<h1 className="font-playfair font-semibold text-5xl sm:text-7xl">
 					Hack_NCState Today
 				</h1>
+				<title>Hack_NCState Today - Login</title>
+				<meta
+					name="description"
+					content="The essential platform for Hack_NCState 2026 participants."
+				/>
 			</header>
 			<main className="font-synemono sm:text-2xl flex flex-col gap-4">
 				<p>
@@ -46,7 +59,7 @@ export default function Login() {
 			<p className="font-splash text-2xl select-none">Team Hack_NCState</p>
 
 			<Dialog>
-				<DialogTrigger>
+				<DialogTrigger asChild>
 					<Button variant="link" className="text-muted-foreground">
 						Learn more
 					</Button>
@@ -55,23 +68,23 @@ export default function Login() {
 					<DialogHeader>
 						<DialogTitle>About Hack_NCState Today</DialogTitle>
 						<DialogDescription>
-							<p>
+							<div>
 								The Hack_NCState Today platform is designed to enhance your
 								hackathon experience by providing real-time updates,
 								announcements, and resources throughout the event.
-							</p>
+							</div>
 							<br />
-							<p>
+							<div>
 								As long as you leave this page open, you'll receive
 								notifications about important happenings during the hackathon.
-							</p>
+							</div>
 							<br />
-							<p>
+							<div>
 								This year is our first time launching this platform, so we'd
 								love to hear your feedback!
-							</p>
+							</div>
 							<br />
-							<p>Made with ❤️ by the Hack_NCState team.</p>
+							<div>Made with ❤️ by the Hack_NCState team.</div>
 						</DialogDescription>
 					</DialogHeader>
 				</DialogContent>
