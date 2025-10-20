@@ -112,7 +112,7 @@ def _validate_user(id: str, username: str) -> tuple[str, dict]:
 
             if not cell:
                 raise ValueError(
-                    "participant-not-found",
+                    "participant_not_found",
                     "This Discord account is not associated with a registered participant.\nLet a staff member know if you think this is a mistake.",
                 )
 
@@ -124,7 +124,7 @@ def _validate_user(id: str, username: str) -> tuple[str, dict]:
 
             if str(checked_in_status).upper() != "TRUE":
                 raise ValueError(
-                    "not-checked-in",
+                    "not_checked_in",
                     "You're a participant but it seems you haven't checked in yet!\nPlease check in at the registration desk or let a staff member know if you think this is a mistake.",
                 )
 
@@ -136,14 +136,14 @@ def _validate_user(id: str, username: str) -> tuple[str, dict]:
 
             if not first_name or not last_name or not email:
                 raise ValueError(
-                    "missing-info",
+                    "missing_info",
                     "Participant's name or email is missing in the spreadsheet.",
                 )
 
         except gspread.exceptions.SpreadsheetNotFound:
             print("Spreadsheet not found.")
             raise ValueError(
-                "spreadsheet-not-found",
+                "spreadsheet_not_found",
                 "Spreadsheet not found. Check name and permissions.",
             )
         except https_fn.HttpsError as e:
@@ -152,7 +152,7 @@ def _validate_user(id: str, username: str) -> tuple[str, dict]:
         except Exception as e:
             print(f"Caught exception while checking spreadsheet: {e}")
             raise ValueError(
-                "internal-error",
+                "spreadsheet_check_error",
                 f"An error occurred checking spreadsheet: {e}",
             )
     else:
@@ -204,7 +204,7 @@ def _validate_user(id: str, username: str) -> tuple[str, dict]:
     except Exception as e:
         print(f"Error creating custom token: {e}")
         raise ValueError(
-            "token-creation-failed",
+            "token_creation_failed",
             f"Error creating custom token: {e}",
         )
 
@@ -293,6 +293,13 @@ def oauth_callback(req: https_fn.Request) -> https_fn.Response:
             # Redirect to frontend with token
             redirect_url = f"{FRONTEND_AUTH_URI.value}?token={token}"
             print(f"Redirecting to: {redirect_url}")
+            return https_fn.Response(status=302, headers={"Location": redirect_url})
+        
+        except ValueError as ve:
+            error_code, error_message = ve.args
+            print(f"Caught ValueError: {error_code}, {error_message}")
+            redirect_url = f"{FRONTEND_AUTH_URI.value}?error={error_code}"
+            print(f"Redirecting to error page: {redirect_url}")
             return https_fn.Response(status=302, headers={"Location": redirect_url})
 
         except Exception as e:
