@@ -1,4 +1,4 @@
-interface ResourcesListProps {
+export interface ResourcesListProps {
 	title?: string;
 	items?: ResourceItemProps[];
 }
