@@ -10,7 +10,6 @@ export default function Auth() {
 
 	const [errorCode, setErrorCode] = useState("");
 
-	// TODO: navigate from Login to / if auth is successful
 	useEffect(() => {
 		const token = searchParams.get("token");
 		const error = searchParams.get("error");

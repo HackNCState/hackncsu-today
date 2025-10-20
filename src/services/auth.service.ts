@@ -2,7 +2,6 @@ import { auth } from "@/lib/firebase-config";
 import {
 	onAuthStateChanged,
 	signInWithCustomToken,
-	signInWithPopup,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 
@@ -25,6 +24,8 @@ export const authService = {
 	},
 
 	logout: async () => auth.signOut(),
+
+	isAuthenticated: () => auth.currentUser !== null,
 
 	getCurrentUser: () => auth.currentUser,
 };
