@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/sheet";
 import ResourcesSection from "./ResourcesSection";
 import { authService } from "@/services/auth.service";
+import { useAtomValue } from "jotai";
+import { userAtom } from "@/atoms/user";
 
 export default function Home() {
 	const sampleResourcesSection = [
@@ -62,6 +64,12 @@ export default function Home() {
 		},
 	];
 
+	const user = useAtomValue(userAtom);
+
+	const resourcesContent = (
+		<ResourcesSection sections={sampleResourcesSection} />
+	);
+
 	return (
 		<div className="flex flex-col sm:flex-row items-stretch min-h-screen">
 			<header className="sr-only">
@@ -88,18 +96,16 @@ export default function Home() {
 								</SheetDescription>
 							</SheetHeader>
 
-							<ResourcesSection sections={sampleResourcesSection} />
+							{resourcesContent}
 						</SheetContent>
 					</Sheet>
 				</div>
 
-				<div className="hidden sm:flex flex-col gap-6">
-					<ResourcesSection sections={sampleResourcesSection} />
-				</div>
+				<div className="hidden sm:flex flex-col gap-6">{resourcesContent}</div>
 			</aside>
 
 			<main className="bg-blue-500 flex-1">
-				<p>Main content area</p>
+				<p>Main content area</p> {user?.username}
 			</main>
 		</div>
 	);

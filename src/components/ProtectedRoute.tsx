@@ -1,23 +1,22 @@
-import { useAuth } from '@/services/auth.service'
-import { Navigate } from 'react-router-dom'
+import { Navigate } from "react-router-dom";
+import { useAtomValue } from "jotai";
+import { userAtom } from "@/atoms/user";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
+	children: React.ReactNode;
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+	const user = useAtomValue(userAtom);
+	const loading = user === undefined;
 
-  if (loading) {
-    return <div></div>;
-  }
+	if (loading) {
+		return null;
+	}
 
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
+	if (!user) {
+		return <Navigate to="/login" replace />;
+	}
 
-  // TODO remove
-  console.log("User is authenticated:", user);
-
-  return <>{children}</>
+	return <>{children}</>;
 }

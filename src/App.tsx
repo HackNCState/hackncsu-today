@@ -3,8 +3,11 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Auth from "./pages/Auth";
+import { useAuthListener } from "@/hooks/useAuthListener";
 
 function App() {
+	useAuthListener();
+
 	return (
 		<BrowserRouter>
 			<div className="min-h-screen">

@@ -8,13 +8,16 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { authService, useAuth } from "@/services/auth.service";
+import { authService } from "@/services/auth.service";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAtomValue } from "jotai";
+import { userAtom } from "@/atoms/user";
 
 export default function Login() {
 	const navigation = useNavigate();
-	const { user, loading } = useAuth();
+	const user = useAtomValue(userAtom);
+	const loading = user === undefined;
 
 	const handleDiscordLogin = () => {
 		authService.startOAuth();

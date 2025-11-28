@@ -1,9 +1,5 @@
 import { auth } from "@/lib/firebase-config";
-import {
-	onAuthStateChanged,
-	signInWithCustomToken,
-} from "firebase/auth";
-import { useEffect, useState } from "react";
+import { signInWithCustomToken } from "firebase/auth";
 
 const clientId = "1371413608394653736";
 const baseUrl = "https://discord.com/api/oauth2/authorize";
@@ -29,18 +25,3 @@ export const authService = {
 
 	getCurrentUser: () => auth.currentUser,
 };
-
-// TODO: Replace w/ atom-based firestore user data
-export function useAuth() {
-	const [user, setUser] = useState(auth.currentUser);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		return onAuthStateChanged(auth, (firebaseUser) => {
-			setUser(firebaseUser);
-			setLoading(false);
-		});
-	}, []);
-
-	return { user, loading };
-}
