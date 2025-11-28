@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import json
 import os
 import requests
@@ -6,6 +7,8 @@ from firebase_functions.params import SecretParam, StringParam, IntParam
 from firebase_admin import auth, firestore
 
 import google.auth
+
+from .models import User
 
 CLIENT_ID = StringParam(
     "CLIENT_ID", default="1371413608394653736", description="Discord OAuth2 Client ID."
@@ -26,13 +29,8 @@ FRONTEND_AUTH_URI = StringParam(
 
 SPREADSHEET_URL = StringParam(
     "SPREADSHEET_URL",
-    default="https://docs.google.com/spreadsheets/d/1QoWfF3ooyeb5S9LkwmDgaG-3_01sOWNf1BUIpAALotk/edit?gid=0#gid=0",
+    default="https://docs.google.com/spreadsheets/d/160mQFRW4EXJpxHGi2QGIWsn0yqPNyMfmfXf5gxvYHCU/edit?gid=0#gid=0",
     description="The URL of the Google Spreadsheet containing participant registrations.",
-)
-WORKSHEET_NAME = StringParam(
-    "WORKSHEET_NAME",
-    default="Registrations",
-    description="The name of the worksheet in the Google Spreadsheet where participant registrations are stored.",
 )
 ORGANIZERS_LIST = StringParam(
     "ORGANIZERS_LIST",
@@ -40,219 +38,186 @@ ORGANIZERS_LIST = StringParam(
     description="Comma-separated list of organizer Discord IDs. These users will be logged in as organizers.",
 )
 
-FIRST_NAME_COLUMN = IntParam(
-    "FIRST_NAME_COLUMN",
-    default=0,
-    description="The column number in the spreadsheet where first names are stored. Default is 0 (column A).",
-)
-LAST_NAME_COLUMN = IntParam(
-    "LAST_NAME_COLUMN",
-    default=1,
-    description="The column number in the spreadsheet where last names are stored. Default is 1 (column B).",
-)
-PHONE_NUMBER_COLUMN = IntParam(
-    "PHONE_NUMBER_COLUMN",
-    default=2,
-    description="The column number in the spreadsheet where phone numbers are stored. Default is 2 (column C).",
-)
-EMAIL_COLUMN = IntParam(
-    "EMAIL_COLUMN",
-    default=3,
-    description="The column number in the spreadsheet where email addresses are stored. Default is 3 (column D).",
-)
-CHECKED_IN_COLUMN = IntParam(
-    "CHECKED_IN_COLUMN",
+USERNAME_COL_R = IntParam(
+    "USERNAME_COL_R",
     default=6,
-    description="The column number in the spreadsheet where the checked-in checkboxes are stored. Default is 6 (column G).",
+    description="The zero-based index of the column containing Discord usernames in the Registrations sheet.",
 )
-DISCORD_USERNAME_COLUMN = IntParam(
-    "DISCORD_USERNAME_COLUMN",
-    default=7,
-    description="The column number in the spreadsheet where Discord usernames are stored. Default is 7 (column H).",
+SHIRT_SIZE_COL_R = IntParam(
+    "SHIRT_SIZE_COL_R",
+    default=16,
+    description="The zero-based index of the column containing shirt sizes in the Registrations sheet.",
+)
+
+CHECKED_IN_COL_C = IntParam(
+    "CHECKED_IN_COL_C",
+    default=0,
+    description="The zero-based index of the column indicating whether the participant has checked in.",
+)
+FIRST_NAME_COL_C = IntParam(
+    "FIRST_NAME_COL_C",
+    default=1,
+    description="The zero-based index of the column containing participants' first names.",
+)
+LAST_NAME_COL_C = IntParam(
+    "LAST_NAME_COL_C",
+    default=2,
+    description="The zero-based index of the column containing participants' last names.",
+)
+PHONE_NUMBER_COL_C = IntParam(
+    "PHONE_NUMBER_COL_C",
+    default=3,
+    description="The zero-based index of the column containing participants' phone numbers.",
+)
+EMAIL_COL_C = IntParam(
+    "EMAIL_COL_C",
+    default=4,
+    description="The zero-based index of the column containing participants' email addresses.",
+)
+DIETARY_RESTRICTIONS_COL_C = IntParam(
+    "DIETARY_RESTRICTIONS_COL_C",
+    default=5,
+    description="The zero-based index of the column containing participants' dietary restrictions.",
+)
+RFID_UUID_COL_C = IntParam(
+    "RFID_UUID_COL_C",
+    default=6,
+    description="The zero-based index of the column containing participants' RFID UUIDs.",
 )
 
 
-def _validate_user(id: str, username: str) -> tuple[str, dict]:
-    """Compare a Discord user with the participants spreadsheet
-    and give a token if they are included and checked in. Also returns
-    user information.
-
-    Most user information will be missing if the user is an organizer since
-    organizers do not need to be in the spreadsheet."""
-    print(f"Generating auth token for user {username} ({id})")
+def _get_registration(uid: str, username: str) -> User:
+    """Gets a participant's registration and returns their User.
+    Organizers will not need to be present on the spreadsheet
+    """
 
     import gspread
 
-    is_organizer = id in ORGANIZERS_LIST.value.split(",")
-    print(f"User is organizer: {is_organizer}")
+    is_organizer = uid in ORGANIZERS_LIST.value.split(",")
 
-    if not is_organizer:
-        # check spreadsheet for participant registration (by Discord username)
-        try:
-            print("Checking spreadsheet for participant registration...")
-            creds, _ = google.auth.default(
-                scopes=[
-                    "https://www.googleapis.com/auth/spreadsheets.readonly",
-                    "https://www.googleapis.com/auth/drive",
-                ]
-            )
-            gc = gspread.authorize(creds)
-
-            spreadsheet = gc.open_by_url(
-                SPREADSHEET_URL.value,
-            )
-
-            worksheet = spreadsheet.worksheet("Registrations")
-            print(
-                f"Searching for '{username}' in column {DISCORD_USERNAME_COLUMN.value}"
-            )
-
-            cell = worksheet.find(username, in_column=DISCORD_USERNAME_COLUMN.value + 1)
-            print(f"Found cell: {cell}")
-
-            if not cell:
-                raise ValueError(
-                    "participant_not_found",
-                    "This Discord account is not associated with a registered participant.\nLet a staff member know if you think this is a mistake.",
-                )
-
-            row_data = worksheet.row_values(cell.row)
-
-            # access data from the row using column indices
-            checked_in_status = row_data[CHECKED_IN_COLUMN.value]
-            print(f"Checked in status for {username}: {checked_in_status}")
-
-            if str(checked_in_status).upper() != "TRUE":
-                raise ValueError(
-                    "not_checked_in",
-                    "You're a participant but it seems you haven't checked in yet!\nPlease check in at the registration desk or let a staff member know if you think this is a mistake.",
-                )
-
-            first_name = row_data[FIRST_NAME_COLUMN.value]
-            last_name = row_data[LAST_NAME_COLUMN.value]
-            phone = row_data[PHONE_NUMBER_COLUMN.value]
-            email = row_data[EMAIL_COLUMN.value]
-            print(f"Participant info: {first_name} {last_name}, {email}, {phone}")
-
-            if not first_name or not last_name or not email:
-                raise ValueError(
-                    "missing_info",
-                    "Participant's name or email is missing in the spreadsheet.",
-                )
-
-        except gspread.exceptions.SpreadsheetNotFound:
-            print("Spreadsheet not found.")
-            raise ValueError(
-                "spreadsheet_not_found",
-                "Spreadsheet not found. Check name and permissions.",
-            )
-        except https_fn.HttpsError as e:
-            print(f"Caught HttpsError: {e}")
-            raise e
-        except Exception as e:
-            print(f"Caught exception while checking spreadsheet: {e}")
-            raise ValueError(
-                "spreadsheet_check_error",
-                f"An error occurred checking spreadsheet: {e}",
-            )
+    if is_organizer:
+        return User(id=uid, role="organizer", username=username)
     else:
-        print("User is an organizer, skipping spreadsheet check.")
-        first_name = None
-        last_name = None
-        phone = None
-        email = None
+        creds, _ = google.auth.default(
+            scopes=[
+                "https://www.googleapis.com/auth/spreadsheets.readonly",
+                "https://www.googleapis.com/auth/drive",
+            ]
+        )
+        gc = gspread.authorize(creds)
 
-    # If running in the emulator, give organizer permissions to all users
-    # Normally an organizer is denoted by their Discord ID being in the ORGANIZERS_LIST
-    # and they won't need to be in the spreadsheet to get a token,
-    # but in the emulator we want to allow all users to test organizer functionality
+        spreadsheet = gc.open_by_url(
+            SPREADSHEET_URL.value,
+        )
+
+        print(spreadsheet.worksheets())
+
+        reg_sheet = spreadsheet.worksheet("Registration Submissions")
+        checkin_sheet = spreadsheet.worksheet("Check-in")
+
+        cell = reg_sheet.find(username, in_column=USERNAME_COL_R.value + 1)
+
+        # participant not registered
+        if not cell:
+            raise ValueError("participant_not_found")
+
+        reg_row = reg_sheet.row_values(cell.row)
+        checkin_row = checkin_sheet.row_values(cell.row)
+
+        checked_in = checkin_row[CHECKED_IN_COL_C.value]
+
+        # participant did not check in
+        if str(checked_in).upper() != "TRUE":
+            raise ValueError(
+                "not_checked_in",
+            )
+
+        shirt_size = reg_row[SHIRT_SIZE_COL_R.value]
+
+        email = checkin_row[EMAIL_COL_C.value]
+        first_name = checkin_row[FIRST_NAME_COL_C.value]
+        last_name = checkin_row[LAST_NAME_COL_C.value]
+        phone = checkin_row[PHONE_NUMBER_COL_C.value]
+        dietary_restrictions = checkin_row[DIETARY_RESTRICTIONS_COL_C.value]
+        rfid_uuid = checkin_row[RFID_UUID_COL_C.value]
+
+        print(
+            email,
+            first_name,
+            last_name,
+            phone,
+            dietary_restrictions,
+            shirt_size,
+            rfid_uuid,
+        )
+
+        return User(
+            id=uid,
+            role="participant",
+            username=username,
+            firstName=first_name,
+            lastName=last_name,
+            phone=phone,
+            email=email,
+            dietaryRestrictions=dietary_restrictions,
+            shirtSize=shirt_size,
+            rfidUUID=rfid_uuid,
+        )
+
+
+def _create_user(user: User):
+    """Create the user in Firestore (/users/{id}) if they do not already exist."""
+
+    db = firestore.client()
+    user_doc = db.collection("users").document(user.id)
+
+    user_doc.set(asdict(user), merge=True)
+
+
+def _generate_login_token(uid: str, username: str) -> str:
+    """Given an ID and username:
+
+    - identify them in the registration sheet
+    - if not checked in or missing, return error
+    - if not in firestore, create user data
+    - return a frontend login token
+    """
+
+    user = _get_registration(uid, username)
+
+    _create_user(user)
+
+    # if running locally with the emulator, give all users organizer permissions
     if os.getenv("FUNCTIONS_EMULATOR") == "true":
-        is_organizer = True
+        claims = {"isOrganizer": True}
+    else:
+        claims = {"isOrganizer": user.role == "organizer"}
 
     try:
-        custom_token = auth.create_custom_token(
-            id,
-            developer_claims={
-                "isOrganizer": is_organizer,
-            },
-        )
-
-        # Trick frontend into still thinking this is a participant
-        # (you will be able to switch to organizer mode while developing)
-        if os.getenv("FUNCTIONS_EMULATOR") == "true":
-            is_organizer = False
-
-        user = {  # TODO update to be dataclass for nicer typing
-            "id": id,
-            "username": username,
-            "firstName": first_name,
-            "lastName": last_name,
-            "phone": phone,
-            "email": email,
-            "dietaryRestrictions": None,  # TODO get this from spreadsheet?
-            "shirtSize": None,  # TODO get this from spreadsheet?
-            "eventsAttended": [],
-            "hadFirstLunch": False,
-            "hadSecondLunch": False,
-            "hadDinner": False,
-            "hadBreakfast": False,
-            "notes": [],
-            "isOrganizer": is_organizer,
-        }
-        print(f"Successfully generated token and user data: {user}")
-        return (custom_token.decode("utf-8"), user)
+        return auth.create_custom_token(uid, developer_claims=claims).decode("utf-8")
     except Exception as e:
-        print(f"Error creating custom token: {e}")
-        raise ValueError(
-            "token_creation_failed",
-            f"Error creating custom token: {e}",
-        )
-
-
-def _create_user(data: dict):
-    """Create the user in Firestore (/users/{id}) if they do not already exist."""
-    db = firestore.client()
-    user_id = data["id"]
-    user_ref = db.collection("users").document(user_id)
-
-    user_doc = user_ref.get()
-
-    if user_doc.exists:
-        print(f"User {user_id} already exists in Firestore. Updating...")
-        user_ref.update(
-            {
-                "username": data["username"],
-                "firstName": data.get("firstName"),
-                "lastName": data.get("lastName"),
-                "phone": data.get("phone"),
-                "email": data.get("email"),
-                "isOrganizer": data["isOrganizer"],
-            }
-        )
-    else:
-        print(f"Creating new user {user_id} in Firestore...")
-        user_ref.set(data)
-
-    print(f"User {user_id} saved successfully.")
+        raise ValueError("token_creation_failed")
 
 
 @https_fn.on_request(secrets=[CLIENT_SECRET])
 def oauth_callback(req: https_fn.Request) -> https_fn.Response:
-    """Handle OAuth2 callback from Discord. Returns HTML page that is listened to
-    by the main window to receive the authentication token, plus user information."""
-    print("oauth_callback function started.")
+    """Handle OAuth2 for frontend"""
 
+    print("oauth callback started")
+
+    redirect_url: str
     code = req.args.get("code")
-    print(f"Received code: {code}")
 
-    if code:
+    if not code:
+        redirect_url = f"{FRONTEND_AUTH_URI.value}?error=missing_code"
+    else:
         try:
+
             token_data = {
                 "grant_type": "authorization_code",
                 "code": code,
                 "redirect_uri": REDIRECT_URI.value,
             }
-            print(f"Exchanging code for token with data: {token_data}")
 
             token_response = requests.post(
                 "https://discord.com/api/oauth2/token",
@@ -260,56 +225,30 @@ def oauth_callback(req: https_fn.Request) -> https_fn.Response:
                 headers={"Content-Type": "application/x-www-form-urlencoded"},
                 auth=(CLIENT_ID.value, CLIENT_SECRET.value),
             )
-            print(f"Token response status: {token_response.status_code}")
-            print(f"Token response content: {token_response.text}")
 
             token_response.raise_for_status()
             access_token = token_response.json()["access_token"]
-            print(f"Received access token: {access_token[:10]}...")
 
             user_response = requests.get(
                 "https://discord.com/api/users/@me",
                 headers={"Authorization": f"Bearer {access_token}"},
             )
-            print(f"User response status: {user_response.status_code}")
+
             user_response.raise_for_status()
             discord_user = user_response.json()
-            print(f"Discord user data: {discord_user}")
+
             discord_user_id = discord_user["id"]
             discord_username = discord_user["username"]
 
-            print("Calling _validate_user...")
+            token = _generate_login_token(discord_user_id, discord_username)
 
-            token, user = _validate_user(
-                id=discord_user_id,
-                username=discord_username,
-            )
-            print(f"Received auth token from _validate_user: {token}")
-
-            _create_user(user)
-
-            print("Ensured user exists in Firestore.")
-
-            # Redirect to frontend with token
             redirect_url = f"{FRONTEND_AUTH_URI.value}?token={token}"
-            print(f"Redirecting to: {redirect_url}")
-            return https_fn.Response(status=302, headers={"Location": redirect_url})
-        
-        except ValueError as ve:
-            error_code, error_message = ve.args
-            print(f"Caught ValueError: {error_code}, {error_message}")
-            redirect_url = f"{FRONTEND_AUTH_URI.value}?error={error_code}"
-            print(f"Redirecting to error page: {redirect_url}")
-            return https_fn.Response(status=302, headers={"Location": redirect_url})
 
+        except ValueError as e:
+            code = e.args[0]
+            redirect_url = f"{FRONTEND_AUTH_URI.value}?error={code}"
         except Exception as e:
-            # Handle any errors during authentication
-            print(f"Caught exception: {e}")
+            print(f"Internal error during OAuth callback: {e}")
             redirect_url = f"{FRONTEND_AUTH_URI.value}?error=internal_error"
-            print(f"Redirecting to error page: {redirect_url}")
-            return https_fn.Response(status=302, headers={"Location": redirect_url})
 
-    # Handle missing code parameter
-    redirect_url = f"{FRONTEND_AUTH_URI.value}?error=missing_code"
-    print(f"Redirecting to error page: {redirect_url}")
     return https_fn.Response(status=302, headers={"Location": redirect_url})

@@ -9,6 +9,7 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import ResourcesSection from "./ResourcesSection";
+import { authService } from "@/services/auth.service";
 
 export default function Home() {
 	const sampleResourcesSection = [
@@ -51,7 +52,7 @@ export default function Home() {
 			items: [
 				{
 					label: "Log out",
-					href: () => alert("Logging out..."),
+					href: () => authService.logout(),
 				},
 				{
 					label: "About",
