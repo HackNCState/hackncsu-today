@@ -8,7 +8,7 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import ResourcesSection from "./ResourcesSection";
+import ResourcesList from "./ResourcesList";
 import { authService } from "@/services/auth.service";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/atoms/user";
@@ -66,8 +66,12 @@ export default function Home() {
 
 	const user = useAtomValue(userAtom);
 
-	const resourcesContent = (
-		<ResourcesSection sections={sampleResourcesSection} />
+	const resourcesContent = <ResourcesList sections={sampleResourcesSection} />;
+
+	const sidebarFooter = (
+		<footer className="font-playfair text-sm text-muted-foreground select-none">
+			Hack_NCState Today
+		</footer>
 	);
 
 	return (
@@ -97,11 +101,17 @@ export default function Home() {
 							</SheetHeader>
 
 							{resourcesContent}
+
+							<div className="mt-auto sm:hidden">{sidebarFooter}</div>
 						</SheetContent>
 					</Sheet>
 				</div>
 
 				<div className="hidden sm:flex flex-col gap-6">{resourcesContent}</div>
+
+				<p>(temporary) {user?.username}</p>
+
+				<div className="mt-auto ">{sidebarFooter}</div>
 			</aside>
 
 			<main className="bg-blue-500 flex-1">
