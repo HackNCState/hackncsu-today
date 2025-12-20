@@ -75,7 +75,7 @@ export default function Home() {
 	);
 
 	return (
-		<div className="flex flex-col sm:flex-row items-stretch min-h-screen">
+		<div className="flex flex-col sm:flex-row items-stretch min-h-screen sm:h-screen sm:overflow-hidden">
 			<header className="sr-only">
 				<h1>Hack_NCState Today</h1>
 				<h2>
@@ -83,7 +83,7 @@ export default function Home() {
 				</h2>
 			</header>
 
-			<aside className="flex flex-col gap-6 p-6 sm:w-55">
+			<nav className="flex flex-col gap-6 p-6 sm:w-55 sm:overflow-y-auto">
 				<div className="flex flex-row w-full justify-between items-start">
 					<Countdown />
 
@@ -102,7 +102,7 @@ export default function Home() {
 
 							{resourcesContent}
 
-							<div className="mt-auto sm:hidden">{sidebarFooter}</div>
+							<div className="mt-auto">{sidebarFooter}</div>
 						</SheetContent>
 					</Sheet>
 				</div>
@@ -111,12 +111,18 @@ export default function Home() {
 
 				<p>(temporary) {user?.username}</p>
 
-				<div className="mt-auto ">{sidebarFooter}</div>
-			</aside>
+				<div className="mt-auto hidden sm:block">{sidebarFooter}</div>
+			</nav>
 
-			<main className="bg-blue-500 flex-1">
-				<p>Main content area</p> {user?.username}
-			</main>
+			<div className="flex-1 flex flex-col md:flex-row sm:overflow-y-auto md:overflow-hidden">
+				<main className="bg-muted flex-1 p-8 md:overflow-y-auto">
+					<p>Main content area</p> {user?.username}
+				</main>
+
+				<aside className="w-full md:w-72 md:overflow-y-auto">
+					<p>auxiliary sidebar</p>
+				</aside>
+			</div>
 		</div>
 	);
 }
