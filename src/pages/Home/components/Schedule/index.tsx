@@ -13,6 +13,7 @@ type DaySchedule = {
 	items: ScheduleItem[];
 };
 
+// temporary
 const scheduleData: DaySchedule[] = [
 	{
 		day: "Day 1",
@@ -151,6 +152,8 @@ export default function Schedule() {
 	const currentItemRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
+        // this use effect is ai generated 
+
 		if (currentItemRef.current && containerRef.current) {
 			// Check if screen is lg (1024px) or larger
 			if (window.matchMedia("(min-width: 1024px)").matches) {

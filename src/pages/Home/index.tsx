@@ -1,13 +1,8 @@
-import { useAtomValue } from "jotai";
-import { userAtom } from "@/atoms/user";
-import FeedItem from "./components/Main/FeedItem";
 import Schedule from "./components/Schedule";
 import Nav from "./components/Nav";
 import Main from "./components/Main";
 
 export default function Home() {
-	const user = useAtomValue(userAtom);
-
 	return (
 		<div className="flex flex-col sm:flex-row items-stretch min-h-screen sm:h-screen sm:overflow-hidden">
 			<header className="sr-only">
