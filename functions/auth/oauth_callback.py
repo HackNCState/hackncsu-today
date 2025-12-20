@@ -3,7 +3,7 @@ import json
 import os
 import requests
 from firebase_functions import https_fn
-from firebase_functions.params import SecretParam, StringParam, IntParam
+from firebase_functions.params import SecretParam, StringParam
 from firebase_admin import auth, firestore
 
 import google.auth
@@ -38,52 +38,71 @@ ORGANIZERS_LIST = StringParam(
     description="Comma-separated list of organizer Discord IDs. These users will be logged in as organizers.",
 )
 
-USERNAME_COL_R = IntParam(
+USERNAME_COL_R = StringParam(
     "USERNAME_COL_R",
-    default=6,
-    description="The zero-based index of the column containing Discord usernames in the Registrations sheet.",
+    default="Discord",
+    description="The header name of the column containing Discord usernames in the Registrations sheet.",
 )
-SHIRT_SIZE_COL_R = IntParam(
+SHIRT_SIZE_COL_R = StringParam(
     "SHIRT_SIZE_COL_R",
-    default=16,
-    description="The zero-based index of the column containing shirt sizes in the Registrations sheet.",
+    default="Shirt Size",
+    description="The header name of the column containing shirt sizes in the Registrations sheet.",
 )
 
-CHECKED_IN_COL_C = IntParam(
+CHECKED_IN_COL_C = StringParam(
     "CHECKED_IN_COL_C",
-    default=0,
-    description="The zero-based index of the column indicating whether the participant has checked in.",
+    default="Checked in",
+    description="The header name of the column indicating whether the participant has checked in.",
 )
-FIRST_NAME_COL_C = IntParam(
+FIRST_NAME_COL_C = StringParam(
     "FIRST_NAME_COL_C",
-    default=1,
-    description="The zero-based index of the column containing participants' first names.",
+    default="First Name",
+    description="The header name of the column containing participants' first names.",
 )
-LAST_NAME_COL_C = IntParam(
+LAST_NAME_COL_C = StringParam(
     "LAST_NAME_COL_C",
-    default=2,
-    description="The zero-based index of the column containing participants' last names.",
+    default="Last Name",
+    description="The header name of the column containing participants' last names.",
 )
-PHONE_NUMBER_COL_C = IntParam(
+PHONE_NUMBER_COL_C = StringParam(
     "PHONE_NUMBER_COL_C",
-    default=3,
-    description="The zero-based index of the column containing participants' phone numbers.",
+    default="Phone",
+    description="The header name of the column containing participants' phone numbers.",
 )
-EMAIL_COL_C = IntParam(
+EMAIL_COL_C = StringParam(
     "EMAIL_COL_C",
-    default=4,
-    description="The zero-based index of the column containing participants' email addresses.",
+    default="Email",
+    description="The header name of the column containing participants' email addresses.",
 )
-DIETARY_RESTRICTIONS_COL_C = IntParam(
+DIETARY_RESTRICTIONS_COL_C = StringParam(
     "DIETARY_RESTRICTIONS_COL_C",
-    default=5,
-    description="The zero-based index of the column containing participants' dietary restrictions.",
+    default="Dietary Restrictions",
+    description="The header name of the column containing participants' dietary restrictions.",
 )
-RFID_UUID_COL_C = IntParam(
+RFID_UUID_COL_C = StringParam(
     "RFID_UUID_COL_C",
-    default=6,
-    description="The zero-based index of the column containing participants' RFID UUIDs.",
+    default="RFID UUID",
+    description="The header name of the column containing participants' RFID UUIDs.",
 )
+
+
+def _get_col_index_from_headers(headers: list[str], name: str) -> int:
+    """Return 1-based column index for a given header name.
+
+    Matches case-insensitively and trims whitespace. Raises ValueError
+    if the header is not found.
+    """
+    name_norm = name.strip().lower()
+    for i, h in enumerate(headers):
+        if h.strip().lower() == name_norm:
+            return i + 1
+    raise ValueError("column_not_found")
+
+
+def _get_cell_from_row(row: list[str], index_1based: int) -> str:
+    """Get cell value from row given a 1-based column index."""
+    index_0based = index_1based - 1
+    return row[index_0based] if len(row) > index_0based else ""
 
 
 def _get_registration(uid: str, username: str) -> User:
@@ -115,7 +134,14 @@ def _get_registration(uid: str, username: str) -> User:
         reg_sheet = spreadsheet.worksheet("Registration Submissions")
         checkin_sheet = spreadsheet.worksheet("Check-in")
 
-        cell = reg_sheet.find(username, in_column=USERNAME_COL_R.value + 1)
+        reg_headers = reg_sheet.row_values(1)
+        checkin_headers = checkin_sheet.row_values(1)
+
+        username_col_idx = _get_col_index_from_headers(
+            reg_headers, USERNAME_COL_R.value
+        )
+
+        cell = reg_sheet.find(username, in_column=username_col_idx)
 
         # participant not registered
         if not cell:
@@ -124,7 +150,10 @@ def _get_registration(uid: str, username: str) -> User:
         reg_row = reg_sheet.row_values(cell.row)
         checkin_row = checkin_sheet.row_values(cell.row)
 
-        checked_in = checkin_row[CHECKED_IN_COL_C.value]
+        checked_in_idx = _get_col_index_from_headers(
+            checkin_headers, CHECKED_IN_COL_C.value
+        )
+        checked_in = _get_cell_from_row(checkin_row, checked_in_idx)
 
         # participant did not check in
         if str(checked_in).upper() != "TRUE":
@@ -132,14 +161,36 @@ def _get_registration(uid: str, username: str) -> User:
                 "not_checked_in",
             )
 
-        shirt_size = reg_row[SHIRT_SIZE_COL_R.value]
+        shirt_size_idx = _get_col_index_from_headers(
+            reg_headers, SHIRT_SIZE_COL_R.value
+        )
+        shirt_size = _get_cell_from_row(reg_row, shirt_size_idx)
 
-        email = checkin_row[EMAIL_COL_C.value]
-        first_name = checkin_row[FIRST_NAME_COL_C.value]
-        last_name = checkin_row[LAST_NAME_COL_C.value]
-        phone = checkin_row[PHONE_NUMBER_COL_C.value]
-        dietary_restrictions = checkin_row[DIETARY_RESTRICTIONS_COL_C.value]
-        rfid_uuid = checkin_row[RFID_UUID_COL_C.value]
+        email_idx = _get_col_index_from_headers(checkin_headers, EMAIL_COL_C.value)
+        email = _get_cell_from_row(checkin_row, email_idx)
+
+        first_name_idx = _get_col_index_from_headers(
+            checkin_headers, FIRST_NAME_COL_C.value
+        )
+        first_name = _get_cell_from_row(checkin_row, first_name_idx)
+
+        last_name_idx = _get_col_index_from_headers(
+            checkin_headers, LAST_NAME_COL_C.value
+        )
+        last_name = _get_cell_from_row(checkin_row, last_name_idx)
+
+        phone_idx = _get_col_index_from_headers(
+            checkin_headers, PHONE_NUMBER_COL_C.value
+        )
+        phone = _get_cell_from_row(checkin_row, phone_idx)
+
+        dietary_idx = _get_col_index_from_headers(
+            checkin_headers, DIETARY_RESTRICTIONS_COL_C.value
+        )
+        dietary_restrictions = _get_cell_from_row(checkin_row, dietary_idx)
+
+        rfid_idx = _get_col_index_from_headers(checkin_headers, RFID_UUID_COL_C.value)
+        rfid_uuid = _get_cell_from_row(checkin_row, rfid_idx)
 
         print(
             email,
