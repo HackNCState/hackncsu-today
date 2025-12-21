@@ -10,8 +10,13 @@ import Countdown from "./Countdown";
 import { MenuIcon } from "lucide-react";
 import ResourcesList from "./ResourcesList";
 import { authService } from "@/services/auth.service";
+import { useAtomValue, useSetAtom } from "jotai";
+import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
 
 export default function Nav() {
+	const user = useAtomValue(userAtom);
+	const debugSwitchRole = useSetAtom(debugSwitchUserRoleAtom);
+
 	const sampleResourcesSection = [
 		{
 			title: "Resources",
@@ -50,6 +55,22 @@ export default function Nav() {
 		{
 			title: "System",
 			items: [
+				...(import.meta.env.DEV && user?.role !== "organizer"
+					? [
+							{
+								label: "(dev) View as Organizer",
+								href: () => debugSwitchRole("organizer"),
+							},
+						]
+					: []),
+				...(import.meta.env.DEV && user?.role !== "participant"
+					? [
+							{
+								label: "(dev) View as Participant",
+								href: () => debugSwitchRole("participant"),
+							},
+						]
+					: []),
 				{
 					label: "Log out",
 					href: () => authService.logout(),

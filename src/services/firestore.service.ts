@@ -1,6 +1,6 @@
 import { firestore } from "@/lib/firebase-config";
 import { UserSchema } from "@/types/user";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 const collections = {
 	users: "users",
@@ -17,6 +17,24 @@ export const firestoreService = {
 			return UserSchema.parse(userSnapshot.data());
 		}
 
-        return null;
+		return null;
+	},
+
+	// this only works in debug mode. useful for testing different user roles
+	debugSetUserType: async (
+		userId: string,
+		type: "organizer" | "participant",
+	) => {
+		if (import.meta.env.DEV) {
+			const userDocRef = doc(firestore, collections.users, userId);
+			const userSnapshot = await getDoc(userDocRef);
+
+			if (userSnapshot.exists()) {
+				const updatedData = {
+					role: type,
+				};
+				await updateDoc(userDocRef, updatedData);
+			}
+		}
 	},
 };

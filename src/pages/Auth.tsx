@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { signInWithCustomToken } from "firebase/auth";
-import { auth } from "@/lib/firebase-config";
+
 import { Button } from "@/components/ui/button";
+import { authService } from "@/services/auth.service";
 
 export default function Auth() {
 	const [searchParams] = useSearchParams();
@@ -15,7 +15,7 @@ export default function Auth() {
 		const error = searchParams.get("error");
 
 		if (token) {
-			signInWithCustomToken(auth, token)
+			authService.login(token)
 				.then(() => {
 					navigate("/");
 				})
