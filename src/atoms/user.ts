@@ -1,3 +1,9 @@
+/**
+ * Atom to store user authentication and profile data.
+ * 
+ * (the atoms are read by components and other atoms)
+ */
+
 import { atom } from "jotai";
 import type { User as FirebaseUser } from "firebase/auth";
 import type { UserData } from "@/types/user";

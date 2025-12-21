@@ -1,3 +1,7 @@
+/**
+ * Event configuration types (things like schedules, announcements, resources, etc.)
+ */
+
 import { z } from "zod";
 
 export const ScheduleItemSchema = z.object({

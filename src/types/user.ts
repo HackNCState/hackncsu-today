@@ -1,3 +1,7 @@
+/**
+ * User types (organizer and participant)
+ */
+
 import { z } from "zod";
 
 const BaseUserSchema = z.object({

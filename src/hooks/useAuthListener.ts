@@ -1,3 +1,10 @@
+/**
+ * A component that uses this hook will listen for authentication state changes
+ * and update the user state in Jotai atoms accordingly.
+ * 
+ * (it is used globally in App.tsx so that all components have access to auth state)
+ */
+
 import { auth } from "@/lib/firebase-config";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
