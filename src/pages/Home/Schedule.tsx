@@ -152,7 +152,7 @@ export default function Schedule() {
 	const currentItemRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-        // this use effect is ai generated 
+		// this use effect is ai generated
 
 		if (currentItemRef.current && containerRef.current) {
 			// Check if screen is lg (1024px) or larger

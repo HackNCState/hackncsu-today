@@ -1,6 +1,6 @@
 interface FeedItemProps {
 	title: string;
-	description: string;
+	description?: string;
 	children?: React.ReactNode;
 }
 
@@ -12,9 +12,12 @@ export default function FeedItem({
 	return (
 		<article className="flex flex-col w-full gap-2">
 			<h2 className="font-playfair font-semibold text-3xl">{title}</h2>
-			<h3 className="font-synemono text-lg text-muted-foreground">{description}</h3>
-
-			<div>{children}</div>
+			{description && (
+				<h3 className="font-synemono text-lg text-muted-foreground">
+					{description}
+				</h3>
+			)}
+			<div className="mt-2">{children}</div>
 		</article>
 	);
 }

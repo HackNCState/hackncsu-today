@@ -1,6 +1,6 @@
-import Schedule from "./components/Schedule";
-import Nav from "./components/Nav";
-import Main from "./components/Main";
+import Schedule from "./Schedule";
+import Nav from "./Nav";
+import Main from "./Main";
 
 export default function Home() {
 	return (

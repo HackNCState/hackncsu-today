@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import FeedItem from "./FeedItem";
 import { userAtom } from "@/atoms/user";
+import OrganizerView from "./OrganizerView";
 
 export default function Main() {
 	const user = useAtomValue(userAtom);
@@ -9,12 +10,7 @@ export default function Main() {
 		<main className="flex-1 flex flex-col p-4 lg:p-8 gap-8 lg:overflow-y-auto border-y lg:border-y-0 lg:border-r border-border">
 			{user?.role === "organizer" && (
 				<>
-					<FeedItem
-						title="Organizer Dashboard"
-						description="Manage event settings and monitor overall progress."
-					>
-						<p>TBA UI</p>
-					</FeedItem>
+					<OrganizerView />
 
 					<div className="w-full border-t border-dashed border-primary" />
 				</>
@@ -28,17 +24,17 @@ export default function Main() {
 			</FeedItem>
 
 			<FeedItem
-				title="Checklist"
-				description="Your personal to-do list for the event to stay on track."
+				title="Your Team"
+				description="View and manage your team information here."
 			>
 				<p>Sample text within this space.</p>
 			</FeedItem>
 
 			<FeedItem
-				title="Your Team"
-				description="View and manage your team information here."
+				title="Checklist"
+				description="Your team's to-do list to stay on track."
 			>
-				<p>Sample text within this space.</p>
+				<p>Sample text within this space. You will need a team.</p>
 			</FeedItem>
 		</main>
 	);
