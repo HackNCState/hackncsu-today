@@ -2,15 +2,17 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { firestoreService } from "@/services/firestore.service";
-import type { EventConfig } from "@/types/event";
+import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { SendIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import FeedItem from "../FeedItem";
 import HackingDatesPicker from "./HackingDatesPicker";
+import { Label } from "@/components/ui/label";
 
 export default function OrganizerView() {
 	// TODO: replace with atom listener
 	const [config, setConfig] = useState<EventConfig | null>(null);
+	const [announcementText, setAnnouncementText] = useState("");
 
 	useEffect(() => {
 		firestoreService.fetchEventConfig().then((data) => {
@@ -23,7 +25,7 @@ export default function OrganizerView() {
 				const endTime = new Date(startTime);
 				endTime.setDate(startTime.getDate() + 1);
 
-				setConfig({
+				const defaultConfig = EventConfigSchema.parse({
 					hackingState: "setup",
 					hackingStartTime: startTime.toISOString(),
 					hackingEndTime: endTime.toISOString(),
@@ -31,6 +33,10 @@ export default function OrganizerView() {
 					announcements: [],
 					resources: [],
 				});
+
+				setConfig(defaultConfig);
+
+				firestoreService.updateEventConfig(defaultConfig);
 
 				console.log("No event config found, initializing default config");
 			}
@@ -44,6 +50,23 @@ export default function OrganizerView() {
 		firestoreService.updateEventConfig(updates);
 	};
 
+	const handlePostAnnouncement = (e: React.FormEvent) => {
+		// should also handle sending to discord webhook
+
+		e.preventDefault();
+		if (!config || !announcementText.trim()) return;
+
+		const newAnnouncement = {
+			content: announcementText,
+			timestamp: new Date().toISOString(),
+		};
+
+		updateConfig({
+			announcements: [newAnnouncement, ...config.announcements],
+		});
+		setAnnouncementText("");
+	};
+
 	if (!config) return null;
 
 	return (
@@ -51,14 +74,33 @@ export default function OrganizerView() {
 			<div className="flex flex-col gap-4">
 				<h4 className="text-xl font-synemono">Announcements</h4>
 
-				<ButtonGroup className="w-full">
-					<Input placeholder="Post an announcement" className="flex-1" />
-					<Button variant="outline" aria-label="Search">
-						<SendIcon />
-					</Button>
-				</ButtonGroup>
+				<form onSubmit={handlePostAnnouncement}>
+					<ButtonGroup className="w-full">
+						<Input
+							placeholder="Post an announcement"
+							className="flex-1"
+							value={announcementText}
+							onChange={(e) => setAnnouncementText(e.target.value)}
+						/>
+						<Button type="submit" variant="outline" aria-label="Post">
+							<SendIcon />
+						</Button>
+					</ButtonGroup>
 
-				<h4 className="text-xl font-synemono">Event Configuration</h4>
+					<p className="text-sm text-muted-foreground mt-2">
+						Press ENTER to submit an announcement. Announcements will also be
+						sent in the Discord server.
+					</p>
+				</form>
+
+				<h4 className="text-xl font-synemono">Management</h4>
+
+				<div className="flex flex-wrap gap-2">
+					<Button variant="outline">Manage Participants</Button>
+					<Button variant="outline">Manage & Approve Teams</Button>
+				</div>
+
+				<h4 className="text-xl font-synemono">Configuration (saved automatically)</h4>
 
 				<HackingDatesPicker
 					startDate={
@@ -88,14 +130,14 @@ export default function OrganizerView() {
 					</Button>
 				</div>
 
-				<h4 className="text-xl font-synemono">Event State</h4>
+				<Label>Hacking State</Label>
 
 				<ButtonGroup>
 					<Button
 						variant={config.hackingState === "setup" ? "default" : "outline"}
 						onClick={() => updateConfig({ hackingState: "setup" })}
 					>
-						Setup
+						Setup (pre hacking)
 					</Button>
 					<Button
 						variant={config.hackingState === "started" ? "default" : "outline"}

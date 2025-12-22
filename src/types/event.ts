@@ -17,7 +17,6 @@ export const ScheduleSchema = z.object({
 });
 
 export const AnnouncementSchema = z.object({
-	title: z.string(),
 	content: z.string(),
 	timestamp: z.iso.datetime(),
 });
