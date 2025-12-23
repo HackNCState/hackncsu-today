@@ -10,9 +10,11 @@ import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
 import { useAtomValue } from "jotai";
 import { eventConfigAtom } from "@/atoms/event";
+import { useBreakpoint } from "@/hooks/use-media-query";
 
 export default function OrganizerView() {
 	const config = useAtomValue(eventConfigAtom);
+	const isDesktop = useBreakpoint("lg");
 
 	const [announcementText, setAnnouncementText] = useState("");
 
@@ -127,7 +129,7 @@ export default function OrganizerView() {
 
 				<Label>Hacking State</Label>
 
-				<ButtonGroup>
+				<ButtonGroup orientation={isDesktop ? "horizontal" : "vertical"}>
 					<Button
 						variant={config.hackingState === "setup" ? "default" : "outline"}
 						onClick={() =>
