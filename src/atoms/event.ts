@@ -3,3 +3,8 @@ import { atom } from "jotai";
 
 // undefined = loading, null = no config (should create one i reckon), EventConfig = config
 export const eventConfigAtom = atom<EventConfig | null | undefined>(undefined);
+
+export const announcementsAtom = atom((get) => {
+    const config = get(eventConfigAtom);
+    return config?.announcements ?? [];
+});
