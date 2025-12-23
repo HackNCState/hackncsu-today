@@ -2,6 +2,10 @@ import { useAtomValue } from "jotai";
 import FeedItem from "./FeedItem";
 import { userAtom } from "@/atoms/user";
 import OrganizerView from "./OrganizerView";
+import AnnouncementCard from "./AnnouncementsView/AnnouncementCard";
+import { Button } from "@/components/ui/button";
+import { Maximize2 } from "lucide-react";
+import AnnouncementsView from "./AnnouncementsView";
 
 export default function Main() {
 	const user = useAtomValue(userAtom);
@@ -16,12 +20,7 @@ export default function Main() {
 				</>
 			)}
 
-			<FeedItem
-				title="Announcements"
-				description="Updates regarding the event will appear here."
-			>
-				<p>No new announcements.</p>
-			</FeedItem>
+			<AnnouncementsView />
 
 			<FeedItem
 				title="Your Team"
