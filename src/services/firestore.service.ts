@@ -1,7 +1,7 @@
 import { firestore } from "@/lib/firebase-config";
 import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { UserSchema } from "@/types/user";
-import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 
 const collections = {
 	users: "users",
@@ -20,6 +20,19 @@ export const firestoreService = {
 		}
 
 		return null;
+	},
+
+	onEventConfigChange: (callback: (config: EventConfig | null) => void) => {
+		const eventDocRef = doc(firestore, collections.event, "main");
+
+		return onSnapshot(eventDocRef, (snapshot) => {
+			if (snapshot.exists()) {
+				const data = EventConfigSchema.parse(snapshot.data());
+				callback(data);
+			} else {
+				callback(null);
+			}
+		});
 	},
 
 	fetchEventConfig: async () => {

@@ -4,9 +4,11 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Auth from "./pages/Auth";
 import { useAuthListener } from "@/hooks/useAuthListener";
+import { useEventConfigListener } from "./hooks/useEventConfigListener";
 
 function App() {
 	useAuthListener();
+	useEventConfigListener();
 
 	return (
 		<BrowserRouter>

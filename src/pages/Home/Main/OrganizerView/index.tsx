@@ -2,53 +2,42 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { firestoreService } from "@/services/firestore.service";
-import { EventConfigSchema, type EventConfig } from "@/types/event";
+import { EventConfigSchema } from "@/types/event";
 import { SendIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import FeedItem from "../FeedItem";
 import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
+import { useAtomValue } from "jotai";
+import { eventConfigAtom } from "@/atoms/event";
 
 export default function OrganizerView() {
-	// TODO: replace with atom listener
-	const [config, setConfig] = useState<EventConfig | null>(null);
+	const config = useAtomValue(eventConfigAtom);
+
 	const [announcementText, setAnnouncementText] = useState("");
 
 	useEffect(() => {
-		firestoreService.fetchEventConfig().then((data) => {
-			if (data) {
-				setConfig(data);
-			} else {
-				// set config if none exists
-				const startTime = new Date();
-				startTime.setHours(11, 0, 0);
-				const endTime = new Date(startTime);
-				endTime.setDate(startTime.getDate() + 1);
+		if (config === null) {
+			// set config if none exists
+			const startTime = new Date();
+			startTime.setHours(11, 0, 0);
+			const endTime = new Date(startTime);
+			endTime.setDate(startTime.getDate() + 1);
 
-				const defaultConfig = EventConfigSchema.parse({
-					hackingState: "setup",
-					hackingStartTime: startTime.toISOString(),
-					hackingEndTime: endTime.toISOString(),
-					schedules: [],
-					announcements: [],
-					resources: [],
-				});
+			const defaultConfig = EventConfigSchema.parse({
+				hackingState: "setup",
+				hackingStartTime: startTime.toISOString(),
+				hackingEndTime: endTime.toISOString(),
+				schedules: [],
+				announcements: [],
+				resources: [],
+			});
 
-				setConfig(defaultConfig);
+			firestoreService.updateEventConfig(defaultConfig);
 
-				firestoreService.updateEventConfig(defaultConfig);
-
-				console.log("No event config found, initializing default config");
-			}
-		});
-	}, []);
-
-	const updateConfig = (updates: Partial<EventConfig>) => {
-		if (!config) return;
-		const newConfig = { ...config, ...updates };
-		setConfig(newConfig);
-		firestoreService.updateEventConfig(updates);
-	};
+			console.log("No event config found, initializing default config");
+		}
+	}, [config]);
 
 	const handlePostAnnouncement = (e: React.FormEvent) => {
 		// should also handle sending to discord webhook
@@ -61,7 +50,7 @@ export default function OrganizerView() {
 			timestamp: new Date().toISOString(),
 		};
 
-		updateConfig({
+		firestoreService.updateEventConfig({
 			announcements: [newAnnouncement, ...config.announcements],
 		});
 		setAnnouncementText("");
@@ -100,7 +89,9 @@ export default function OrganizerView() {
 					<Button variant="outline">Manage & Approve Teams</Button>
 				</div>
 
-				<h4 className="text-xl font-synemono">Configuration (saved automatically)</h4>
+				<h4 className="text-xl font-synemono">
+					Configuration (saved automatically)
+				</h4>
 
 				<HackingDatesPicker
 					startDate={
@@ -109,13 +100,17 @@ export default function OrganizerView() {
 							: undefined
 					}
 					onStartDateChange={(date) =>
-						updateConfig({ hackingStartTime: date?.toISOString() })
+						firestoreService.updateEventConfig({
+							hackingStartTime: date?.toISOString(),
+						})
 					}
 					endDate={
 						config.hackingEndTime ? new Date(config.hackingEndTime) : undefined
 					}
 					onEndDateChange={(date) =>
-						updateConfig({ hackingEndTime: date?.toISOString() })
+						firestoreService.updateEventConfig({
+							hackingEndTime: date?.toISOString(),
+						})
 					}
 				/>
 
@@ -135,25 +130,33 @@ export default function OrganizerView() {
 				<ButtonGroup>
 					<Button
 						variant={config.hackingState === "setup" ? "default" : "outline"}
-						onClick={() => updateConfig({ hackingState: "setup" })}
+						onClick={() =>
+							firestoreService.updateEventConfig({ hackingState: "setup" })
+						}
 					>
 						Setup (pre hacking)
 					</Button>
 					<Button
 						variant={config.hackingState === "started" ? "default" : "outline"}
-						onClick={() => updateConfig({ hackingState: "started" })}
+						onClick={() =>
+							firestoreService.updateEventConfig({ hackingState: "started" })
+						}
 					>
 						In progress (show countdown)
 					</Button>
 					<Button
 						variant={config.hackingState === "judging" ? "default" : "outline"}
-						onClick={() => updateConfig({ hackingState: "judging" })}
+						onClick={() =>
+							firestoreService.updateEventConfig({ hackingState: "judging" })
+						}
 					>
 						Judging
 					</Button>
 					<Button
 						variant={config.hackingState === "ended" ? "default" : "outline"}
-						onClick={() => updateConfig({ hackingState: "ended" })}
+						onClick={() =>
+							firestoreService.updateEventConfig({ hackingState: "ended" })
+						}
 					>
 						Ended
 					</Button>
