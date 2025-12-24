@@ -61,6 +61,7 @@ export const deleteResourceAtom = atom(null, async (get, _, index: number) => {
 	await firestoreService.updateEventConfig({ resources: updatedResources });
 });
 
+// TODO: add reorderResourceAtom?
 export const setResourceAtom = atom(
 	null,
 	async (get, _, payload: { index: number; resource: Resource }) => {

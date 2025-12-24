@@ -10,6 +10,14 @@ import { Label } from "@/components/ui/label";
 import { useAtomValue, useSetAtom } from "jotai";
 import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event";
 import { useBreakpoint } from "@/hooks/useMediaQuery";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import ResourceEditor from "./ResourceEditor";
 
 export default function OrganizerView() {
 	const config = useAtomValue(eventConfigAtom);
@@ -118,12 +126,21 @@ export default function OrganizerView() {
 				/>
 
 				<div className="flex flex-wrap gap-2">
-					<Button variant="outline">Edit resources</Button>
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Edit resources</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col">
+							<DialogHeader>
+								<DialogTitle>Manage Resources</DialogTitle>
+							</DialogHeader>
+
+							<ResourceEditor />
+						</DialogContent>
+					</Dialog>
+
 					<Button variant="outline">Import schedule</Button>
-					<Button
-						variant="destructive"
-						onClick={() => updateConfig(null)}
-					>
+					<Button variant="destructive" onClick={() => updateConfig(null)}>
 						Reset event data
 					</Button>
 				</div>
@@ -133,33 +150,25 @@ export default function OrganizerView() {
 				<ButtonGroup orientation={isDesktop ? "horizontal" : "vertical"}>
 					<Button
 						variant={config.hackingState === "setup" ? "default" : "outline"}
-						onClick={() =>
-							updateConfig({ hackingState: "setup" })
-						}
+						onClick={() => updateConfig({ hackingState: "setup" })}
 					>
 						Setup (pre hacking)
 					</Button>
 					<Button
 						variant={config.hackingState === "started" ? "default" : "outline"}
-						onClick={() =>
-							updateConfig({ hackingState: "started" })
-						}
+						onClick={() => updateConfig({ hackingState: "started" })}
 					>
 						In progress (show countdown)
 					</Button>
 					<Button
 						variant={config.hackingState === "judging" ? "default" : "outline"}
-						onClick={() =>
-							updateConfig({ hackingState: "judging" })
-						}
+						onClick={() => updateConfig({ hackingState: "judging" })}
 					>
 						Judging
 					</Button>
 					<Button
 						variant={config.hackingState === "ended" ? "default" : "outline"}
-						onClick={() =>
-							updateConfig({ hackingState: "ended" })
-						}
+						onClick={() => updateConfig({ hackingState: "ended" })}
 					>
 						Ended
 					</Button>
