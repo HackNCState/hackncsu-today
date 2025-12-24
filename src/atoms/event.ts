@@ -1,5 +1,5 @@
 import { firestoreService } from "@/services/firestore.service";
-import type { EventConfig } from "@/types/event";
+import type { EventConfig, Resource } from "@/types/event";
 import { atom } from "jotai";
 
 // undefined = loading, null = no config (should create one i reckon), EventConfig = config
@@ -28,14 +28,49 @@ export const deleteAnnouncementAtom = atom(
 		const announcements = get(announcementsAtom);
 		if (!announcements) return;
 
-		const updatedAnnouncements = announcements.filter(
-			(_, i) => i !== index,
+		const updatedAnnouncements = announcements.filter((_, i) => i !== index);
+
+		await firestoreService.updateEventConfig({
+			announcements: updatedAnnouncements,
+		});
+	},
+);
+
+export const resourcesAtom = atom((get) => {
+	const config = get(eventConfigAtom);
+	return config?.resources ?? [];
+});
+
+export const addResourceAtom = atom(
+	null,
+	async (get, _, resource: Resource) => {
+		const resources = get(resourcesAtom);
+
+		const updatedResources = [resource, ...resources];
+
+		await firestoreService.updateEventConfig({ resources: updatedResources });
+	},
+);
+
+export const deleteResourceAtom = atom(null, async (get, _, index: number) => {
+	const resources = get(resourcesAtom);
+	if (!resources) return;
+
+	const updatedResources = resources.filter((_, i) => i !== index);
+
+	await firestoreService.updateEventConfig({ resources: updatedResources });
+});
+
+export const setResourceAtom = atom(
+	null,
+	async (get, _, payload: { index: number; resource: Resource }) => {
+		const resources = get(resourcesAtom);
+		if (!resources) return;
+
+		const updatedResources = resources.map((res, i) =>
+			i === payload.index ? payload.resource : res,
 		);
 
-		const updatedConfig = {
-			announcements: updatedAnnouncements,
-		};
-
-		await firestoreService.updateEventConfig(updatedConfig);
+		await firestoreService.updateEventConfig({ resources: updatedResources });
 	},
 );

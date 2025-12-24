@@ -21,10 +21,25 @@ export const AnnouncementSchema = z.object({
 	timestamp: z.iso.datetime(),
 });
 
-export const ResourceSchema = z.object({
+export const BaseResourceSchema = z.object({
 	label: z.string(),
-	href: z.url(),
+	hidden: z.boolean().default(false),
 });
+
+export const LinkResourceSchema = BaseResourceSchema.extend({
+	type: z.literal("link"),
+	url: z.url(),
+});
+
+export const TextResourceSchema = BaseResourceSchema.extend({
+	type: z.literal("text"),
+	content: z.string(),
+});
+
+export const ResourceSchema = z.discriminatedUnion("type", [
+	LinkResourceSchema,
+	TextResourceSchema,
+]);
 
 export const EventConfigSchema = z.object({
 	hackingState: z.enum(["setup", "started", "judging", "ended"]),
