@@ -41,6 +41,21 @@ export const resourcesAtom = atom((get) => {
 	return config?.resources ?? [];
 });
 
+export const visibleResourcesAtom = atom((get) => {
+	const resources = get(resourcesAtom);
+	return resources.filter((res) => !res.hidden);
+});
+
+export const visibleTextResourcesAtom = atom((get) => {
+	const resources = get(visibleResourcesAtom);
+	return resources.filter((res) => res.type === "text");
+});
+
+export const visibleLinkResourcesAtom = atom((get) => {
+	const resources = get(visibleResourcesAtom);
+	return resources.filter((res) => res.type === "link");
+});
+
 export const addResourceAtom = atom(
 	null,
 	async (get, _, resource: Resource) => {

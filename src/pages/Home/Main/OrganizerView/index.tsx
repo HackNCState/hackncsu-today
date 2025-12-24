@@ -41,7 +41,56 @@ export default function OrganizerView() {
 				hackingEndTime: endTime.toISOString(),
 				schedules: [],
 				announcements: [],
-				resources: [],
+				resources: [
+					{
+						type: "text",
+						label: "Rules",
+						content: "Event rules go here.",
+						hidden: false,
+					},
+					{
+						type: "text",
+						label: "Tracks",
+						content: "Event tracks go here.",
+						hidden: true,
+					},
+					{
+						type: "text",
+						label: "FAQs",
+						content: "Event FAQs go here.",
+						hidden: false,
+					},
+					{
+						type: "text",
+						label: "Judging Criteria",
+						content: "Judging criteria go here.",
+						hidden: false,
+					},
+					{
+						type: "text",
+						label: "Prizes",
+						content: "Prizes information goes here.",
+						hidden: false,
+					},
+					{
+						type: "text",
+						label: "Catering Menu",
+						content: "Catering menu goes here.",
+						hidden: false,
+					},
+					{
+						type: "link",
+						label: "Opening Slides",
+						url: "https://example.com",
+						hidden: true,
+					},
+					{
+						type: "link",
+						label: "Discord",
+						url: "https://example.com",
+						hidden: false,
+					},
+				],
 			});
 
 			updateConfig(defaultConfig);

@@ -166,7 +166,7 @@ export default function ResourceEditor() {
 				</Dialog>
 			</div>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-2 overflow-y-auto max-h-128">
 				{resources.map((resource, index) => (
 					<div
 						key={index} // TODO: change if we will reorder resources

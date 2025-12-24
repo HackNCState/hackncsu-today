@@ -8,83 +8,17 @@ import {
 } from "@/components/ui/sheet";
 import Countdown from "./Countdown";
 import { MenuIcon } from "lucide-react";
-import ResourcesList from "./ResourcesList";
+import ResourcesList from "./NavList";
 import { authService } from "@/services/auth.service";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
+import {
+	visibleLinkResourcesAtom,
+	visibleTextResourcesAtom,
+} from "@/atoms/event";
+import NavList from "./NavList";
 
 export default function Nav() {
-	const user = useAtomValue(userAtom);
-	const debugSwitchRole = useSetAtom(debugSwitchUserRoleAtom);
-
-	const sampleResourcesSection = [
-		{
-			title: "Resources",
-			items: [
-				{
-					label: "Rules",
-					href: "#",
-				},
-				{
-					label: "Tracks",
-					href: "#",
-				},
-				{
-					label: "Opening Slides",
-					href: "#",
-				},
-				{
-					label: "Judging Criteria",
-					href: "#",
-				},
-			],
-		},
-		{
-			title: "Quick Links",
-			items: [
-				{
-					label: "Discord Server",
-					href: "#",
-				},
-				{
-					label: "Catering Menu",
-					href: "#",
-				},
-			],
-		},
-		{
-			title: "System",
-			items: [
-				...(import.meta.env.DEV && user?.role !== "organizer"
-					? [
-							{
-								label: "(dev) View as Organizer",
-								href: () => debugSwitchRole("organizer"),
-							},
-						]
-					: []),
-				...(import.meta.env.DEV && user?.role !== "participant"
-					? [
-							{
-								label: "(dev) View as Participant",
-								href: () => debugSwitchRole("participant"),
-							},
-						]
-					: []),
-				{
-					label: "Log out",
-					href: () => authService.logout(),
-				},
-				{
-					label: "About",
-					href: () => alert("HackNC 2024 - Powered by NC State University"),
-				},
-			],
-		},
-	];
-
-	const resourcesContent = <ResourcesList sections={sampleResourcesSection} />;
-
 	const sidebarFooter = (
 		<footer className="font-playfair text-sm text-muted-foreground select-none">
 			Hack_NCState Today
@@ -109,14 +43,16 @@ export default function Nav() {
 							</SheetDescription>
 						</SheetHeader>
 
-						{resourcesContent}
+						<NavList />
 
 						<div className="mt-auto">{sidebarFooter}</div>
 					</SheetContent>
 				</Sheet>
 			</div>
 
-			<div className="hidden sm:flex flex-col gap-6">{resourcesContent}</div>
+			<div className="hidden sm:flex flex-col gap-6">
+				<NavList />
+			</div>
 
 			{/* <p>(temporary) {user?.username}</p> */}
 
