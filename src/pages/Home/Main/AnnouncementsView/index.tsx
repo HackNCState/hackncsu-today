@@ -7,7 +7,6 @@ import { useAtomValue } from "jotai";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
