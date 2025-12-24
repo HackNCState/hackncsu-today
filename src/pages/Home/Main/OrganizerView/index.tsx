@@ -9,7 +9,7 @@ import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
 import { useAtomValue, useSetAtom } from "jotai";
 import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event";
-import { useBreakpoint } from "@/hooks/use-media-query";
+import { useBreakpoint } from "@/hooks/useMediaQuery";
 
 export default function OrganizerView() {
 	const config = useAtomValue(eventConfigAtom);
