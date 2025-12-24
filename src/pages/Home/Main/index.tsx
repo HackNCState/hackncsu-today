@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import FeedItem from "./FeedItem";
-import { userAtom } from "@/atoms/user";
+import { isOrganizerAtom } from "@/atoms/user";
 import OrganizerView from "./OrganizerView";
 import AnnouncementCard from "./AnnouncementsView/AnnouncementCard";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,11 @@ import { Maximize2 } from "lucide-react";
 import AnnouncementsView from "./AnnouncementsView";
 
 export default function Main() {
-	const user = useAtomValue(userAtom);
+	const isOrganizer = useAtomValue(isOrganizerAtom);
 
 	return (
 		<main className="flex-1 flex flex-col p-4 lg:p-8 gap-8 lg:overflow-y-auto border-y lg:border-y-0 lg:border-r border-border">
-			{user?.role === "organizer" && (
+			{isOrganizer && (
 				<>
 					<OrganizerView />
 

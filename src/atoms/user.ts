@@ -1,6 +1,6 @@
 /**
  * Atom to store user authentication and profile data.
- * 
+ *
  * (the atoms are read by components and other atoms)
  */
 
@@ -13,6 +13,11 @@ import { firestoreService } from "@/services/firestore.service";
 export const userAtom = atom<UserData | null | undefined>(undefined);
 
 export const firebaseUserAtom = atom<FirebaseUser | null>(null);
+
+export const isOrganizerAtom = atom((get) => {
+	const user = get(userAtom);
+	return user?.role === "organizer";
+});
 
 export const debugSwitchUserRoleAtom = atom(
 	null,

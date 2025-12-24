@@ -24,12 +24,12 @@ export const announcementsAtom = atom((get) => {
 
 export const deleteAnnouncementAtom = atom(
 	null,
-	async (get, _, index: string) => {
+	async (get, _, index: number) => {
 		const announcements = get(announcementsAtom);
 		if (!announcements) return;
 
 		const updatedAnnouncements = announcements.filter(
-			(_, i) => i.toString() !== index,
+			(_, i) => i !== index,
 		);
 
 		const updatedConfig = {

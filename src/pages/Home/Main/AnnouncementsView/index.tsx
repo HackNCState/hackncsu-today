@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import FeedItem from "../FeedItem";
 import { Maximize2 } from "lucide-react";
 import AnnouncementCard from "./AnnouncementCard";
-import { announcementsAtom } from "@/atoms/event";
-import { useAtomValue } from "jotai";
+import { announcementsAtom, deleteAnnouncementAtom } from "@/atoms/event";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
 	Dialog,
 	DialogContent,
@@ -18,6 +18,7 @@ import {
 	isToday,
 } from "date-fns";
 import { useEffect, useState } from "react";
+import { isOrganizerAtom } from "@/atoms/user";
 
 function formatAnnouncementTime(dateStr: string) {
 	const date = new Date(dateStr);
@@ -39,7 +40,10 @@ function formatAnnouncementTime(dateStr: string) {
 }
 
 export default function AnnouncementsView() {
+	const isOrganizer = useAtomValue(isOrganizerAtom);
+
 	const announcements = useAtomValue(announcementsAtom);
+	const deleteAnnouncement = useSetAtom(deleteAnnouncementAtom);
 	const [, setTick] = useState(0);
 
 	useEffect(() => {
@@ -72,7 +76,8 @@ export default function AnnouncementsView() {
 					/>
 				))}
 
-				{announcements.length > 3 && (
+				{(announcements.length > 3 ||
+					(announcements.length > 0 && isOrganizer)) && (
 					<Dialog>
 						<DialogTrigger asChild>
 							<Button
@@ -80,28 +85,44 @@ export default function AnnouncementsView() {
 								className="flex flex-row gap-2 lg:justify-start lg:w-min"
 							>
 								<Maximize2 />
-								View all {announcements.length} announcements
+								{isOrganizer
+									? "View and delete announcements"
+									: `View all ${announcements.length} announcements`}
 							</Button>
 						</DialogTrigger>
 						<DialogContent className="max-h-[80vh] flex flex-col">
 							<DialogHeader>
 								<DialogTitle>All Announcements</DialogTitle>
 							</DialogHeader>
+
 							<div className="flex flex-col gap-2 overflow-y-auto pr-2">
 								{announcements.map((announcement, index) => (
-									<p
+									<div
 										key={announcement.timestamp}
-										className={
-											index === 0
-												? "text-foreground font-medium"
-												: "text-muted-foreground"
-										}
+										className="flex flex-row gap-2 items-start"
 									>
-										<span className="font-mono text-xs mr-2 opacity-70">
-											{formatAnnouncementTime(announcement.timestamp)}
-										</span>
-										— {announcement.content}
-									</p>
+										{isOrganizer && (
+											<Button
+												variant="link"
+												className="p-0 h-auto text-destructive underline"
+												onClick={() => deleteAnnouncement(index)}
+											>
+												Delete
+											</Button>
+										)}
+										<p
+											className={
+												index === 0
+													? "text-foreground font-medium"
+													: "text-muted-foreground"
+											}
+										>
+											<span className="font-mono text-xs mr-2 opacity-70">
+												{formatAnnouncementTime(announcement.timestamp)}
+											</span>
+											— {announcement.content}
+										</p>
+									</div>
 								))}
 							</div>
 						</DialogContent>

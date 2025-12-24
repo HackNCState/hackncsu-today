@@ -16,21 +16,19 @@ export default function AnnouncementCard({
 			className={cn(
 				"rounded-xl flex flex-wrap gap-2 items-center p-6 transition-all",
 				recent
-					? "bg-white shadow-[0_0_25px_var(--tw-shadow-color)] shadow-primary/40 border border-primary/20"
+					? "bg-primary text-primary-foreground shadow-[0_0_25px_var(--tw-shadow-color)] shadow-primary/40 border border-primary/20"
 					: "border border-border",
 			)}
 		>
 			<p
-				className={cn(
-					recent ? "text-black font-bold text-xl" : "text-lg text-foreground",
-				)}
+				className={cn(recent ? "font-bold text-xl" : "text-lg text-foreground")}
 			>
 				{content}
 			</p>
 			<p
 				className={cn(
 					"ml-auto",
-					recent ? "text-muted" : "text-muted-foreground",
+					recent ? "text-primary-foreground/80" : "text-muted-foreground",
 				)}
 			>
 				{timestamp}
