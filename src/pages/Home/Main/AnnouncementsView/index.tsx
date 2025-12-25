@@ -2,7 +2,10 @@ import { Button } from "@/components/ui/button";
 import FeedItem from "../FeedItem";
 import { Maximize2 } from "lucide-react";
 import AnnouncementCard from "./AnnouncementCard";
-import { announcementsAtom, deleteAnnouncementAtom } from "@/atoms/event";
+import {
+	announcementsAtom,
+	deleteAnnouncementAtom,
+} from "@/atoms/event/announcements";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
 	Dialog,

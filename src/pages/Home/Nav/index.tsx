@@ -8,14 +8,6 @@ import {
 } from "@/components/ui/sheet";
 import Countdown from "./Countdown";
 import { MenuIcon } from "lucide-react";
-import ResourcesList from "./NavList";
-import { authService } from "@/services/auth.service";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
-import {
-	visibleLinkResourcesAtom,
-	visibleTextResourcesAtom,
-} from "@/atoms/event";
 import NavList from "./NavList";
 
 export default function Nav() {

@@ -8,7 +8,7 @@ import FeedItem from "../FeedItem";
 import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
 import { useAtomValue, useSetAtom } from "jotai";
-import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event";
+import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event/config";
 import { useBreakpoint } from "@/hooks/useMediaQuery";
 import {
 	Dialog,

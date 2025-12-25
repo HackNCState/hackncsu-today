@@ -3,7 +3,7 @@ import NavSection from "./NavSection";
 import {
 	visibleLinkResourcesAtom,
 	visibleTextResourcesAtom,
-} from "@/atoms/event";
+} from "@/atoms/event/resources";
 import { authService } from "@/services/auth.service";
 import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
 

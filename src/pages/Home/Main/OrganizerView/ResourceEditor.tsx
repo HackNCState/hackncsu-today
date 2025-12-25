@@ -3,7 +3,7 @@ import {
 	deleteResourceAtom,
 	resourcesAtom,
 	setResourceAtom,
-} from "@/atoms/event";
+} from "@/atoms/event/resources";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {

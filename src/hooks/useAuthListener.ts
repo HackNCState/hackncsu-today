@@ -1,7 +1,7 @@
 /**
  * A component that uses this hook will listen for authentication state changes
  * and update the user state in Jotai atoms accordingly.
- * 
+ *
  * (it is used globally in App.tsx so that all components have access to auth state)
  */
 
@@ -23,12 +23,12 @@ export function useAuthListener() {
 			if (firebaseUser) {
 				try {
 					const user = await firestoreService.fetchUser(firebaseUser.uid);
-					
-                    setUser(user);
 
-                    if (!user) {
-                        console.error("User document not found in Firestore");
-                    }
+					setUser(user);
+
+					if (!user) {
+						console.error("User document not found in Firestore");
+					}
 				} catch (error) {
 					console.error("Error fetching user data:", error);
 					setUser(null);

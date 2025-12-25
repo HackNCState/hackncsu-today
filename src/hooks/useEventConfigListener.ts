@@ -1,4 +1,4 @@
-import { eventConfigAtom } from "@/atoms/event";
+import { eventConfigAtom } from "@/atoms/event/config";
 import { firestoreService } from "@/services/firestore.service";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
