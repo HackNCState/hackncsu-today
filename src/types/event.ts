@@ -43,7 +43,6 @@ export const ResourceSchema = z.discriminatedUnion("type", [
 
 export const EventConfigSchema = z.object({
 	hackingState: z.enum(["setup", "started", "judging", "ended"]),
-	hackingStartTime: z.iso.datetime(),
 	hackingEndTime: z.iso.datetime(),
 	schedules: z.array(ScheduleSchema).default([]),
 	announcements: z.array(AnnouncementSchema).default([]),

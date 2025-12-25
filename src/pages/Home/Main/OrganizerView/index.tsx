@@ -37,7 +37,6 @@ export default function OrganizerView() {
 
 			const defaultConfig = EventConfigSchema.parse({
 				hackingState: "setup",
-				hackingStartTime: startTime.toISOString(),
 				hackingEndTime: endTime.toISOString(),
 				schedules: [],
 				announcements: [],
@@ -163,16 +162,6 @@ export default function OrganizerView() {
 				</h4>
 
 				<HackingDatesPicker
-					startDate={
-						config.hackingStartTime
-							? new Date(config.hackingStartTime)
-							: undefined
-					}
-					onStartDateChange={(date) =>
-						updateConfig({
-							hackingStartTime: date?.toISOString(),
-						})
-					}
 					endDate={
 						config.hackingEndTime ? new Date(config.hackingEndTime) : undefined
 					}

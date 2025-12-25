@@ -11,23 +11,16 @@ import { ChevronDownIcon } from "lucide-react";
 import { useId, useState } from "react";
 
 interface HackingDatesPickerProps {
-	startDate: Date | undefined;
-	onStartDateChange: (date: Date | undefined) => void;
 	endDate: Date | undefined;
 	onEndDateChange: (date: Date | undefined) => void;
 }
 
 export default function HackingDatesPicker({
-	startDate,
-	onStartDateChange,
 	endDate,
 	onEndDateChange,
 }: HackingDatesPickerProps) {
-	const [startOpen, setStartOpen] = useState(false);
 	const [endOpen, setEndOpen] = useState(false);
 
-	const hackingStartDateId = useId();
-	const hackingStartTimeId = useId();
 	const hackingEndDateId = useId();
 	const hackingEndTimeId = useId();
 
@@ -73,49 +66,6 @@ export default function HackingDatesPicker({
 
 	return (
 		<div className="flex flex-wrap gap-4">
-			<div className="flex flex-col gap-2">
-				<Label>Hacking Start</Label>
-
-				<div className="flex flex-row gap-2">
-					<Popover open={startOpen} onOpenChange={setStartOpen}>
-						<PopoverTrigger asChild>
-							<Button
-								variant="outline"
-								id={hackingStartDateId}
-								className="w-32 justify-between font-normal"
-							>
-								{startDate ? startDate.toLocaleDateString() : "Select date"}
-								<ChevronDownIcon />
-							</Button>
-						</PopoverTrigger>
-
-						<PopoverContent
-							className="w-auto overflow-hidden p-0"
-							align="start"
-						>
-							<Calendar
-								mode="single"
-								selected={startDate}
-								captionLayout="dropdown"
-								onSelect={(date) => {
-									handleDateSelect(date, startDate, onStartDateChange);
-									setStartOpen(false);
-								}}
-							/>
-						</PopoverContent>
-					</Popover>
-
-					<Input
-						type="time"
-						id={hackingStartTimeId}
-						step="1"
-						value={formatTime(startDate)}
-						onChange={(e) => handleTimeChange(e, startDate, onStartDateChange)}
-						className="w-min bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-					/>
-				</div>
-			</div>
-
 			<div className="flex flex-col gap-2">
 				<Label>Hacking End</Label>
 

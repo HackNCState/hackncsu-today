@@ -5,14 +5,21 @@ import { atom } from "jotai";
 // undefined = loading, null = no config (should create one i reckon), EventConfig = config
 export const eventConfigAtom = atom<EventConfig | null | undefined>(undefined);
 
-export const updateEventConfigAtom = atom(
-    null,
-    async (_, __, updatedConfig: Partial<EventConfig> | null) => {
-        if (updatedConfig === null) {
-            await firestoreService.clearEventConfig();
-            return;
-        }
+eventConfigAtom.onMount = (set) => {
+	const unsubscribe = firestoreService.onEventConfigChange((data) => {
+		set(data);
+	});
+	return () => unsubscribe();
+};
 
-        await firestoreService.updateEventConfig(updatedConfig);
-    },
+export const updateEventConfigAtom = atom(
+	null,
+	async (_, __, updatedConfig: Partial<EventConfig> | null) => {
+		if (updatedConfig === null) {
+			await firestoreService.clearEventConfig();
+			return;
+		}
+
+		await firestoreService.updateEventConfig(updatedConfig);
+	},
 );
