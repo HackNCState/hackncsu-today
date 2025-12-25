@@ -84,7 +84,7 @@ export default function OrganizerView() {
 						type: "text",
 						label: "Catering Menu",
 						content:
-							"Catering menu goes here. You can use markdown to bold, italicize, and add links and even images!",
+							"![borzoi](https://media1.tenor.com/m/J3sih0hnKLwAAAAC/borzoi-siren.gif	)",
 						hidden: false,
 					},
 					{
