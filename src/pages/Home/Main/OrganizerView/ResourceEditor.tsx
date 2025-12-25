@@ -106,7 +106,7 @@ function ResourceForm({
 						value={content}
 						className="h-48"
 						onChange={(e) => setContent(e.target.value)}
-						placeholder="Text content"
+						placeholder="You can use markdown (**bold**, _italic_, [links](https://example.com), etc.)"
 						required
 					/>
 				</div>

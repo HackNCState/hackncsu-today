@@ -6,6 +6,8 @@ import {
 } from "@/components/ui/dialog";
 import type { Resource } from "@/types/event";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export type FunctionNavItem = {
 	type: "function";
@@ -61,8 +63,12 @@ export default function NavSection({
 					<DialogHeader>
 						<DialogTitle>{selectedResource?.label}</DialogTitle>
 					</DialogHeader>
-					<div className="whitespace-pre-wrap">
-						{selectedResource?.type === "text" ? selectedResource.content : ""}
+					<div className="prose prose-slate dark:prose-invert max-w-none">
+						{selectedResource?.type === "text" ? (
+							<ReactMarkdown remarkPlugins={[remarkGfm]}>
+								{selectedResource.content}
+							</ReactMarkdown>
+						) : null}
 					</div>
 				</DialogContent>
 			</Dialog>

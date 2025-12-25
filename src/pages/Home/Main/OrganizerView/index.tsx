@@ -45,37 +45,46 @@ export default function OrganizerView() {
 					{
 						type: "text",
 						label: "Rules",
-						content: "Event rules go here.",
+						content: `- Rule 1
+- Rule 2
+- Rule 3
+- etc.
+						`,
 						hidden: false,
 					},
 					{
 						type: "text",
 						label: "Tracks",
-						content: "Event tracks go here.",
+						content:
+							"Event tracks go here. You can use markdown to bold, italicize, and add links and even images!",
 						hidden: true,
 					},
 					{
 						type: "text",
 						label: "FAQs",
-						content: "Event FAQs go here.",
+						content:
+							"Event FAQs go here. You can use markdown to bold, italicize, and add links and even images!",
 						hidden: false,
 					},
 					{
 						type: "text",
 						label: "Judging Criteria",
-						content: "Judging criteria go here.",
+						content:
+							"Judging criteria go here. You can use markdown to bold, italicize, and add links and even images!",
 						hidden: false,
 					},
 					{
 						type: "text",
 						label: "Prizes",
-						content: "Prizes information goes here.",
+						content:
+							"Prizes information goes here. You can use markdown to bold, italicize, and add links and even images!",
 						hidden: false,
 					},
 					{
 						type: "text",
 						label: "Catering Menu",
-						content: "Catering menu goes here.",
+						content:
+							"Catering menu goes here. You can use markdown to bold, italicize, and add links and even images!",
 						hidden: false,
 					},
 					{
