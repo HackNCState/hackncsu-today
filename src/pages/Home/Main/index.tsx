@@ -23,18 +23,19 @@ export default function Main() {
 			<AnnouncementsView />
 
 			<FeedItem
-				title="Your Team"
-				description="View and manage your team information here."
-			>
-				<p>Sample text within this space.</p>
-			</FeedItem>
+				title="// TODO"
+				description="Your team's checklist to stay on track."
+			></FeedItem>
 
 			<FeedItem
-				title="Checklist"
-				description="Your team's to-do list to stay on track."
-			>
-				<p>Sample text within this space. You will need a team.</p>
-			</FeedItem>
+				title="Your Team"
+				description="View and manage your team."
+			></FeedItem>
+
+			<FeedItem
+				title="Resume Upload"
+				description="Want to share your resume with our sponsors? Upload it here!"
+			></FeedItem>
 		</main>
 	);
 }
