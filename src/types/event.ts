@@ -41,7 +41,13 @@ export const ResourceSchema = z.discriminatedUnion("type", [
 	TextResourceSchema,
 ]);
 
+export const TrackSchema = z.object({
+	name: z.string(),
+	description: z.string().optional(),
+});
+
 export const EventConfigSchema = z.object({
+	tracks: z.array(TrackSchema).default([]),
 	hackingState: z.enum(["setup", "started", "judging", "ended"]),
 	hackingEndTime: z.iso.datetime(),
 	schedules: z.array(ScheduleSchema).default([]),
@@ -49,6 +55,7 @@ export const EventConfigSchema = z.object({
 	resources: z.array(ResourceSchema).default([]),
 });
 
+export type Track = z.infer<typeof TrackSchema>;
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
 export type Announcement = z.infer<typeof AnnouncementSchema>;

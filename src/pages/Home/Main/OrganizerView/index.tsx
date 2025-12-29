@@ -18,6 +18,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import ResourceEditor from "./ResourceEditor";
+import { TrackEditor } from "./TrackEditor";
 
 export default function OrganizerView() {
 	const config = useAtomValue(eventConfigAtom);
@@ -36,6 +37,11 @@ export default function OrganizerView() {
 			endTime.setDate(startTime.getDate() + 1);
 
 			const defaultConfig = EventConfigSchema.parse({
+				tracks: [
+					{ name: "Track 1", description: "Sample elite ball track" },
+					{ name: "Track 2", description: "Sample great ball track" },
+					{ name: "Track 3", description: "Sample poke ball track" },
+				],
 				hackingState: "setup",
 				hackingEndTime: endTime.toISOString(),
 				schedules: [],
@@ -55,7 +61,7 @@ export default function OrganizerView() {
 						type: "text",
 						label: "Tracks",
 						content:
-							"Event tracks go here. You can use markdown to bold, italicize, and add links and even images!",
+							"The Tracks resource is auto-generated based on the tracks you configure for the event.",
 						hidden: true,
 					},
 					{
@@ -175,11 +181,24 @@ export default function OrganizerView() {
 				<div className="flex flex-wrap gap-2">
 					<Dialog>
 						<DialogTrigger asChild>
+							<Button variant="outline">Edit tracks</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col">
+							<DialogHeader>
+								<DialogTitle>Configure Tracks</DialogTitle>
+							</DialogHeader>
+
+							<TrackEditor />
+						</DialogContent>
+					</Dialog>
+
+					<Dialog>
+						<DialogTrigger asChild>
 							<Button variant="outline">Edit resources</Button>
 						</DialogTrigger>
 						<DialogContent className="max-h-[80vh] flex flex-col">
 							<DialogHeader>
-								<DialogTitle>Manage Resources</DialogTitle>
+								<DialogTitle>Configure Resources</DialogTitle>
 							</DialogHeader>
 
 							<ResourceEditor />
@@ -187,6 +206,7 @@ export default function OrganizerView() {
 					</Dialog>
 
 					<Button variant="outline">Import schedule</Button>
+
 					<Button variant="destructive" onClick={() => updateConfig(null)}>
 						Reset event data
 					</Button>

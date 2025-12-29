@@ -60,6 +60,8 @@ function ResourceForm({
 		}
 	};
 
+	const isTracks = initialResource?.label === "Tracks";
+
 	return (
 		<form onSubmit={handleSubmit} className="flex flex-col gap-4">
 			<div className="flex flex-col gap-2">
@@ -67,6 +69,7 @@ function ResourceForm({
 				<Select
 					value={type}
 					onValueChange={(v) => setType(v as "link" | "text")}
+					disabled={isTracks}
 				>
 					<SelectTrigger>
 						<SelectValue />
@@ -85,6 +88,7 @@ function ResourceForm({
 					onChange={(e) => setLabel(e.target.value)}
 					placeholder="Resource Label"
 					required
+					disabled={isTracks}
 				/>
 			</div>
 
@@ -108,7 +112,14 @@ function ResourceForm({
 						onChange={(e) => setContent(e.target.value)}
 						placeholder="You can use markdown (**bold**, _italic_, [links](https://example.com), etc.)"
 						required
+						disabled={isTracks}
 					/>
+					{isTracks && (
+						<p className="text-xs text-muted-foreground">
+							This content is automatically generated from the Tracks
+							configuration.
+						</p>
+					)}
 				</div>
 			)}
 
@@ -215,6 +226,7 @@ export default function ResourceEditor() {
 								size="icon"
 								className="text-destructive hover:text-destructive"
 								onClick={() => deleteResource(index)}
+								disabled={resource.label === "Tracks"}
 							>
 								<Trash2 className="w-4 h-4" />
 							</Button>

@@ -5,7 +5,35 @@ import { eventConfigAtom } from "./config";
 
 export const resourcesAtom = atom((get) => {
 	const config = get(eventConfigAtom);
-	return config?.resources ?? [];
+	const resources = config?.resources ?? [];
+	const tracks = config?.tracks ?? [];
+
+	// straight up hardcoding the tracks resource here to always be in sync with tracksAtom 😭😭
+	const tracksContent = tracks
+		.map((t) => `**${t.name}**\\\n${t.description ?? ""}`)
+		.join("\n\n");
+
+	const tracksResourceIndex = resources.findIndex((r) => r.label === "Tracks");
+
+	if (tracksResourceIndex !== -1) {
+		const newResources = [...resources];
+		newResources[tracksResourceIndex] = {
+			...newResources[tracksResourceIndex],
+			type: "text",
+			content: tracksContent,
+		};
+		return newResources;
+	}
+
+	return [
+		...resources,
+		{
+			type: "text",
+			label: "Tracks",
+			content: tracksContent,
+			hidden: false,
+		} as Resource,
+	];
 });
 
 export const visibleResourcesAtom = atom((get) => {
