@@ -15,3 +15,4 @@ set_global_options(max_instances=10)
 initialize_app()
 
 from auth.oauth_callback import *
+from firestore.users import *

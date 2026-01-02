@@ -38,6 +38,13 @@ export const UserSchema = z.discriminatedUnion("role", [
 	ParticipantSchema,
 ]);
 
+/** The partial participant is the data of other users that participants can see */
+export const PartialParticipantSchema = ParticipantSchema.pick({
+	id: true,
+	username: true,
+});
+
+export type PartialParticipant = z.infer<typeof PartialParticipantSchema>;
 export type Organizer = z.infer<typeof OrganizerSchema>;
 export type Participant = z.infer<typeof ParticipantSchema>;
 export type UserData = z.infer<typeof UserSchema>;
