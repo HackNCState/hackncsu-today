@@ -2,9 +2,7 @@ import { useAtomValue } from "jotai";
 import FeedItem from "./FeedItem";
 import { isOrganizerAtom } from "@/atoms/user";
 import OrganizerView from "./OrganizerView";
-import AnnouncementCard from "./AnnouncementsView/AnnouncementCard";
-import { Button } from "@/components/ui/button";
-import { Maximize2 } from "lucide-react";
+import TeamView from "./TeamView";
 import AnnouncementsView from "./AnnouncementsView";
 
 export default function Main() {
@@ -24,13 +22,10 @@ export default function Main() {
 
 			<FeedItem
 				title="// TODO"
-				description="Your team's checklist to stay on track."
+				description="Use the checklist below as a guide to stay on track during the event."
 			></FeedItem>
 
-			<FeedItem
-				title="Your Team"
-				description="View and manage your team."
-			></FeedItem>
+			<TeamView />
 
 			<FeedItem
 				title="Resume Upload"

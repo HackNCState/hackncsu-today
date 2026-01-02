@@ -1,6 +1,6 @@
 interface FeedItemProps {
 	title: string;
-	description?: string;
+	description?: string | null;
 	children?: React.ReactNode;
 }
 
@@ -17,7 +17,7 @@ export default function FeedItem({
 					{description}
 				</h3>
 			)}
-			<div className="mt-2">{children}</div>
+			<div>{children}</div>
 		</article>
 	);
 }

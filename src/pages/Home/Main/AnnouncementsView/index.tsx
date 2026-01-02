@@ -61,9 +61,13 @@ export default function AnnouncementsView() {
 	return (
 		<FeedItem
 			title="Announcements"
-			description="Updates regarding the event will appear here."
+			description={
+				announcements.length === 0
+					? "Live updates about Hack_NCState will appear here."
+					: null
+			}
 		>
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-2 mt-2">
 				{announcements.slice(0, 3).map((announcement, index) => (
 					<AnnouncementCard
 						key={announcement.timestamp}
