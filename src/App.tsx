@@ -4,9 +4,11 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Auth from "./pages/Auth";
 import { useAuthListener } from "@/hooks/useAuthListener";
+import { useTeamListener } from "@/atoms/team";
 
 function App() {
 	useAuthListener();
+	useTeamListener();
 
 	return (
 		<BrowserRouter>

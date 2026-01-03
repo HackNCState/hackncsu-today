@@ -19,6 +19,11 @@ export const isOrganizerAtom = atom((get) => {
 	return user?.role === "organizer";
 });
 
+export const teamIdAtom = atom((get) => {
+	const user = get(userAtom);
+	return user?.role === "participant" ? user.teamId : null;
+});
+
 export const debugSwitchUserRoleAtom = atom(
 	null,
 	async (get, set, role: "organizer" | "participant") => {

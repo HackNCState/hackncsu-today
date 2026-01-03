@@ -26,13 +26,7 @@ import {
 } from "@/components/ui/select";
 import {
 	ArrowRight,
-	Check,
-	ChevronsUpDown,
-	Delete,
-	DeleteIcon,
-	Plus,
 	PlusIcon,
-	Search,
 	Trash2,
 	User,
 } from "lucide-react";
@@ -45,7 +39,6 @@ import {
 import {
 	Command,
 	CommandEmpty,
-	CommandGroup,
 	CommandInput,
 	CommandItem,
 	CommandList,
@@ -55,7 +48,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import {
 	Item,
 	ItemActions,

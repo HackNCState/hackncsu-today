@@ -1,5 +1,6 @@
 import { firestore } from "@/lib/firebase-config";
 import { EventConfigSchema, type EventConfig } from "@/types/event";
+import { TeamSchema, type Team } from "@/types/team";
 import { UserSchema } from "@/types/user";
 import {
 	deleteDoc,
@@ -13,6 +14,7 @@ import {
 const collections = {
 	users: "users",
 	event: "event",
+	teams: "teams",
 };
 
 export const firestoreService = {
@@ -29,7 +31,23 @@ export const firestoreService = {
 		return null;
 	},
 
-	onEventConfigChange: (callback: (config: EventConfig | null) => void) => {
+	onTeamSnapshot: (
+		teamId: string,
+		callback: (data: Team | null) => void,
+	) => {
+		const teamDocRef = doc(firestore, collections.teams, teamId);
+		return onSnapshot(teamDocRef, (snapshot) => {
+			if (snapshot.exists()) {
+				const data = TeamSchema.parse(snapshot.data());
+				callback(data);
+			}
+			else {
+				callback(null);
+			}
+		});
+	},
+
+	onEventConfigSnapshot: (callback: (config: EventConfig | null) => void) => {
 		const eventDocRef = doc(firestore, collections.event, "main");
 
 		return onSnapshot(eventDocRef, (snapshot) => {

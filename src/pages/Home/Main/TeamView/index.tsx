@@ -10,15 +10,31 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import UnregisteredView from "./UnregisteredView";
+import { teamAtom } from "@/atoms/team";
+import { useAtomValue } from "jotai";
+import UnapprovedView from "./UnapprovedView";
 
 export default function TeamView() {
+	const team = useAtomValue(teamAtom);
+
+	function buildView() {
+		if (team) {
+			if (team.status === "unverified") {
+				return <UnapprovedView />;
+			} else {
+				return <p>Unimplemented</p>
+			}
+		} else {
+			return <UnregisteredView />;
+		}
+	}
+
 	return (
 		<FeedItem
 			title="Your Team"
-			description="You're not part of a team yet! Once you have a team, please fill out the team formation form below.
-            Only one member of the team needs to complete this form."
+			description={!team ? "You'll need a team to help you during Hack_NCState! Once you have one, please fill out the team formation form below. Only one member of the team needs to complete this form." : null}
 		>
-			<UnregisteredView />
+			{buildView()}
 		</FeedItem>
 	);
 }

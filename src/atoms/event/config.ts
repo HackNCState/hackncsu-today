@@ -6,7 +6,7 @@ import { atom } from "jotai";
 export const eventConfigAtom = atom<EventConfig | null | undefined>(undefined);
 
 eventConfigAtom.onMount = (set) => {
-	const unsubscribe = firestoreService.onEventConfigChange((data) => {
+	const unsubscribe = firestoreService.onEventConfigSnapshot((data) => {
 		set(data);
 	});
 	return () => unsubscribe();
