@@ -81,8 +81,12 @@ export default function UnregisteredView() {
 		: invitedMembers;
 
 	const [selectedTrack, setSelectedTrack] = useState("");
+	const [teamName, setTeamName] = useState("");
+	const [mentoringHelp, setMentoringHelp] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 
-	// Search state
+	// search state
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const [searchResults, setSearchResults] = useState<PartialParticipant[]>([]);
@@ -126,6 +130,28 @@ export default function UnregisteredView() {
 		setInvitedMembers(invitedMembers.filter((m) => m.id !== userId));
 	};
 
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (members.length < 2) return;
+
+		setIsSubmitting(true);
+		setSubmitError(null);
+
+		try {
+			await functionsService.registerTeam({
+				name: teamName,
+				track: selectedTrack,
+				mentoringHelp,
+				members: members.map((m) => m.id),
+			});
+		} catch (error: any) {
+			console.error("Registration failed", error);
+			setSubmitError(error.message || "Failed to register team");
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -141,7 +167,7 @@ export default function UnregisteredView() {
 					</DialogDescription>
 				</DialogHeader>
 
-				<form>
+				<form onSubmit={handleSubmit}>
 					<FieldGroup className="py-4">
 						{/* Team Name */}
 						<Field>
@@ -149,7 +175,13 @@ export default function UnregisteredView() {
 							<FieldDescription>
 								If you can't think of a team name, just use your project name!
 							</FieldDescription>
-							<Input id="team-name" placeholder="Enter your team name" />
+							<Input
+								id="team-name"
+								placeholder="Enter your team name"
+								value={teamName}
+								onChange={(e) => setTeamName(e.target.value)}
+								required
+							/>
 						</Field>
 
 						{/* Track Selection */}
@@ -285,11 +317,32 @@ export default function UnregisteredView() {
 								)}
 							</div>
 						</Field>
+
+						{/* Mentoring Request */}
+						<Field>
+							<FieldLabel htmlFor="mentoring">
+								Do you need any mentoring on a specific subject?
+							</FieldLabel>
+							<FieldDescription>
+								If you don't have any specific mentoring needs, you can leave
+								this blank.
+							</FieldDescription>
+							<Input
+								id="mentoring"
+								placeholder="e.g. using GitHub, building UI, etc."
+								value={mentoringHelp}
+								onChange={(e) => setMentoringHelp(e.target.value)}
+							/>
+						</Field>
 					</FieldGroup>
 
+					{submitError && (
+						<div className="text-destructive text-sm mb-4">{submitError}</div>
+					)}
+
 					<DialogFooter>
-						<Button type="submit" disabled={members.length < 2}>
-							Submit Registration
+						<Button type="submit" disabled={members.length < 2 || isSubmitting}>
+							{isSubmitting ? "Registering..." : "Submit Registration"}
 						</Button>
 					</DialogFooter>
 				</form>

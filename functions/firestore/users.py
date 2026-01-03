@@ -18,7 +18,7 @@ def search_users(request: https_fn.CallableRequest) -> list[dict]:
     query = (
         users_ref.where(filter=FieldFilter("username", ">=", query_text))
         .where(filter=FieldFilter("username", "<=", query_text + "\uf8ff"))
-        .limit(10)
+        .limit(5)
     )
 
     results = query.stream()
