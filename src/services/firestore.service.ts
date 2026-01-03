@@ -1,7 +1,14 @@
 import { firestore } from "@/lib/firebase-config";
 import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { UserSchema } from "@/types/user";
-import { deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import {
+	deleteDoc,
+	doc,
+	getDoc,
+	onSnapshot,
+	setDoc,
+	updateDoc,
+} from "firebase/firestore";
 
 const collections = {
 	users: "users",
@@ -70,6 +77,33 @@ export const firestoreService = {
 					role: type,
 				};
 				await updateDoc(userDocRef, updatedData);
+			}
+		}
+	},
+	// for creating example users in debug mode
+	debugCreateSampleParticipants: async () => {
+		if (import.meta.env.DEV) {
+			const sampleUsers = Array.from({ length: 10 }).map((_, i) => ({
+				id: `sample-user-${i}`,
+				username: `sampleuser${i}`,
+				role: "participant" as const,
+				email: `sampleuser${i}@example.com`,
+				firstName: `Sample`,
+				lastName: `User ${i}`,
+				phone: "123-456-7890",
+				shirtSize: "M",
+				dietaryRestrictions: "None",
+				rfidUUID: `rfid-${i}`,
+				attendedEvents: [],
+				hadFirstLunch: false,
+				hadSecondLunch: false,
+				hadBreakfast: false,
+				hadDinner: false,
+			}));
+
+			for (const user of sampleUsers) {
+				const userDocRef = doc(firestore, collections.users, user.id);
+				await setDoc(userDocRef, user);
 			}
 		}
 	},

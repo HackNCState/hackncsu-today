@@ -6,6 +6,7 @@ import {
 } from "@/atoms/event/resources";
 import { authService } from "@/services/auth.service";
 import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
+import { firestoreService } from "@/services/firestore.service";
 
 export default function NavList() {
 	const textResources = useAtomValue(visibleTextResourcesAtom);
@@ -28,6 +29,14 @@ export default function NavList() {
 					{
 						label: "(dev) View as Participant",
 						onClick: () => debugSwitchRole("participant"),
+					},
+				]
+			: []),
+		...(import.meta.env.DEV
+			? [
+					{
+						label: "(dev) Create Sample Users",
+						onClick: () => firestoreService.debugCreateSampleParticipants(),
 					},
 				]
 			: []),
