@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Literal
 
 
 @dataclass
@@ -11,3 +12,5 @@ class Team:
     creatorId: str
     mentoringHelp: str
     """Do you need any mentoring on a specific subject?"""
+    status: Literal["unverified", "approved", "rejected"]
+    """The status of the team registration"""

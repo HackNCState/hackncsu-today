@@ -20,7 +20,7 @@ class User:
     rfidUUID: Optional[str] = None
 
     # init event info
-    # teamId: Optional[str] (this will be unset (undefined) until team assignment)
+    teamId: Optional[str] = None  # this will be unset (undefined) until team assignment
     attendedEvents: list[str] = field(default_factory=list)
     hadFirstLunch: bool = False
     hadSecondLunch: bool = False
