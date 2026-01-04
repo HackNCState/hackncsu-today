@@ -13,6 +13,7 @@ import UnregisteredView from "./UnregisteredView";
 import { teamAtom } from "@/atoms/team";
 import { useAtomValue } from "jotai";
 import UnapprovedView from "./UnapprovedView";
+import ApprovedView from "./ApprovedView";
 
 export default function TeamView() {
 	const team = useAtomValue(teamAtom);
@@ -22,7 +23,7 @@ export default function TeamView() {
 			if (team.status === "unverified") {
 				return <UnapprovedView />;
 			} else {
-				return <p>Unimplemented</p>
+				return <ApprovedView team={team} />;
 			}
 		} else {
 			return <UnregisteredView />;
