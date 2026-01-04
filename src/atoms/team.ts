@@ -11,7 +11,7 @@ export function useTeamListener() {
 	const teamId = useAtomValue(teamIdAtom);
 	const setTeam = useSetAtom(teamAtom);
 
-	useEffect(() => {
+	useEffect(() => {		
 		if (!teamId) {
 			setTeam(null);
 			return;

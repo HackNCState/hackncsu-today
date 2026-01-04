@@ -1,7 +1,7 @@
 import { firestore } from "@/lib/firebase-config";
 import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { TeamSchema, type Team } from "@/types/team";
-import { UserSchema } from "@/types/user";
+import { UserSchema, type UserData } from "@/types/user";
 import {
 	deleteDoc,
 	doc,
@@ -31,17 +31,28 @@ export const firestoreService = {
 		return null;
 	},
 
-	onTeamSnapshot: (
-		teamId: string,
-		callback: (data: Team | null) => void,
+	onUserSnapshot: (
+		userId: string,
+		callback: (data: UserData | null) => void,
 	) => {
+		const userDocRef = doc(firestore, collections.users, userId);
+		return onSnapshot(userDocRef, (snapshot) => {
+			if (snapshot.exists()) {
+				const data = UserSchema.parse(snapshot.data());
+				callback(data);
+			} else {
+				callback(null);
+			}
+		});
+	},
+
+	onTeamSnapshot: (teamId: string, callback: (data: Team | null) => void) => {
 		const teamDocRef = doc(firestore, collections.teams, teamId);
 		return onSnapshot(teamDocRef, (snapshot) => {
 			if (snapshot.exists()) {
 				const data = TeamSchema.parse(snapshot.data());
 				callback(data);
-			}
-			else {
+			} else {
 				callback(null);
 			}
 		});

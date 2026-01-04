@@ -17,27 +17,38 @@ export function useAuthListener() {
 	const setFirebaseUser = useSetAtom(firebaseUserAtom);
 
 	useEffect(() => {
-		const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+		let unsubscribeUser: (() => void) | undefined;
+
+		const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
 			setFirebaseUser(firebaseUser);
 
+			// unsubscribe from previous user listener if exists
+			if (unsubscribeUser) {
+				unsubscribeUser();
+				unsubscribeUser = undefined;
+			}
+
 			if (firebaseUser) {
-				try {
-					const user = await firestoreService.fetchUser(firebaseUser.uid);
-
-					setUser(user);
-
-					if (!user) {
-						console.error("User document not found in Firestore");
-					}
-				} catch (error) {
-					console.error("Error fetching user data:", error);
-					setUser(null);
-				}
+				// if logged in, listen to user document changes
+				unsubscribeUser = firestoreService.onUserSnapshot(
+					firebaseUser.uid,
+					(user) => {
+						setUser(user);
+						if (!user) {
+							console.error("User document not found in Firestore");
+						}
+					},
+				);
 			} else {
 				setUser(null);
 			}
 		});
 
-		return () => unsubscribe();
+		return () => {
+			unsubscribeAuth();
+			if (unsubscribeUser) {
+				unsubscribeUser();
+			}
+		};
 	}, [setUser, setFirebaseUser]);
 }

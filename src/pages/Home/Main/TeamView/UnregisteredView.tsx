@@ -24,12 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	ArrowRight,
-	PlusIcon,
-	Trash2,
-	User,
-} from "lucide-react";
+import { ArrowRight, PlusIcon, Trash2, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { functionsService } from "@/services/functions.service";
 import {
@@ -151,7 +146,7 @@ export default function UnregisteredView() {
 					<ArrowRight className="mr-2 h-4 w-4" /> Register Your Team
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px]">
+			<DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>Register Team</DialogTitle>
 					<DialogDescription>

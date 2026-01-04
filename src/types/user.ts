@@ -25,7 +25,7 @@ export const ParticipantSchema = BaseUserSchema.extend({
 	dietaryRestrictions: z.string(),
 	rfidUUID: z.string(),
 
-	teamId: z.string().optional(),
+	teamId: z.string().nullable().optional(),
 	attendedEvents: z.array(z.string()),
 	hadFirstLunch: z.boolean(),
 	hadSecondLunch: z.boolean(),
