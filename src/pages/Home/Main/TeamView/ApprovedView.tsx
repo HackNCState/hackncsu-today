@@ -85,7 +85,7 @@ export default function ApprovedView({ team }: ApprovedViewProps) {
 											: member.username}
 										{member.id === team.creatorId && (
 											<span className="ml-1 text-[10px] border border-current px-1 rounded-full opacity-50 font-sans align-top">
-												BOSS
+												LEADER
 											</span>
 										)}
 										{index < members.length - 1 && ", "}

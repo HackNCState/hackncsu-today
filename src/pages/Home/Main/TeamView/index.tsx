@@ -33,7 +33,7 @@ export default function TeamView() {
 	return (
 		<FeedItem
 			title="Your Team"
-			description={!team ? "You'll need a team to help you during Hack_NCState! Once you have one, please fill out the team formation form below. Only one member of the team needs to complete this form." : null}
+			description={!team ? "You'll need a team to help you during Hack_NCState! Once you have one, please fill out the team formation form below. Only the team leader needs to complete this form." : null}
 		>
 			{buildView()}
 		</FeedItem>

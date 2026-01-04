@@ -68,7 +68,7 @@ export default function AnnouncementsView() {
 			}
 		>
 			<div className="flex flex-col gap-2 mt-2">
-				{announcements.slice(0, 3).map((announcement, index) => (
+				{announcements.slice(0, 2).map((announcement, index) => (
 					<AnnouncementCard
 						key={announcement.timestamp}
 						content={announcement.content}
@@ -83,7 +83,7 @@ export default function AnnouncementsView() {
 					/>
 				))}
 
-				{(announcements.length > 3 ||
+				{(announcements.length > 2 ||
 					(announcements.length > 0 && isOrganizer)) && (
 					<Dialog>
 						<DialogTrigger asChild>
