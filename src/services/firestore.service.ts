@@ -3,9 +3,11 @@ import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { TeamSchema, type Team } from "@/types/team";
 import { UserSchema, type UserData } from "@/types/user";
 import {
+	collection,
 	deleteDoc,
 	doc,
 	getDoc,
+	getDocs,
 	onSnapshot,
 	setDoc,
 	updateDoc,
@@ -44,6 +46,52 @@ export const firestoreService = {
 				callback(null);
 			}
 		});
+	},
+
+	updateUser: async (userId: string, data: Partial<UserData>) => {
+		const userDocRef = doc(firestore, collections.users, userId);
+		await updateDoc(userDocRef, data);
+	},
+
+	fetchTeam: async (teamId: string) => {
+		const teamDocRef = doc(firestore, collections.teams, teamId);
+		const teamSnapshot = await getDoc(teamDocRef);
+
+		if (teamSnapshot.exists()) {
+			return TeamSchema.parse(teamSnapshot.data());
+		}
+		return null;
+	},
+
+	fetchAllTeams: async () => {
+		const teamsCollectionRef = collection(firestore, collections.teams);
+		const docs = await getDocs(teamsCollectionRef);
+
+		return docs.docs.map((doc) => TeamSchema.parse(doc.data()));
+	},
+
+	deleteTeam: async (teamId: string) => {
+		const team = await firestoreService.fetchTeam(teamId);
+
+		const teamDocRef = doc(firestore, collections.teams, teamId);
+
+		await deleteDoc(teamDocRef);
+
+		if (team) {
+			await firestoreService.updateUser(team.creatorId, { teamId: null });
+
+			if (team.status === "approved") {
+				// remove teamId from all members if approved (hence all members are associated, not just the creator)
+				for (const memberId of team.memberIds) {
+					await firestoreService.updateUser(memberId, { teamId: null });
+				}
+			}
+		}
+	},
+
+	updateTeam: async (teamId: string, data: Partial<Team>) => {
+		const teamDocRef = doc(firestore, collections.teams, teamId);
+		await updateDoc(teamDocRef, data);
 	},
 
 	onTeamSnapshot: (teamId: string, callback: (data: Team | null) => void) => {

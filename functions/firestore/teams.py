@@ -64,8 +64,10 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
             )
         
     teams_ref = db.collection("teams")
+    team_doc_ref = teams_ref.document()
     
     team = Team(
+        id=team_doc_ref.id,
         name=name,
         memberIds=member_ids,
         track=track,
@@ -74,7 +76,6 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
         status="unverified",
     )
 
-    team_doc_ref = teams_ref.document()
     team_doc_ref.set(team.__dict__)
 
     # Update creator's user document to include teamId

@@ -4,6 +4,7 @@ from typing import Literal
 
 @dataclass
 class Team:
+    id: str
     name: str
     """This shall be unique"""
     memberIds: list[str]

@@ -19,8 +19,11 @@ import {
 } from "@/components/ui/dialog";
 import ResourceEditor from "./ResourceEditor";
 import { TrackEditor } from "./TrackEditor";
+import { useNavigate } from "react-router-dom";
 
 export default function OrganizerView() {
+	const navigate = useNavigate();
+
 	const config = useAtomValue(eventConfigAtom);
 	const updateConfig = useSetAtom(updateEventConfigAtom);
 
@@ -160,7 +163,9 @@ export default function OrganizerView() {
 
 				<div className="flex flex-wrap gap-2">
 					<Button variant="outline">Manage Participants</Button>
-					<Button variant="outline">Manage & Approve Teams</Button>
+					<Button variant="outline" onClick={() => navigate("/admin/teams")}>
+						Manage Teams
+					</Button>
 				</div>
 
 				<h4 className="text-xl font-synemono">
