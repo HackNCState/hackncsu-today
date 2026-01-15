@@ -22,10 +22,6 @@ class User:
     # init event info
     teamId: Optional[str] = None  # this will be unset (undefined) until team assignment
     attendedEvents: list[str] = field(default_factory=list)
-    hadFirstLunch: bool = False
-    hadSecondLunch: bool = False
-    hadBreakfast: bool = False
-    hadDinner: bool = False
     isOrganizer: bool = False
 
     attrs: list[str] = field(default_factory=list)

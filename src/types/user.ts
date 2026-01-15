@@ -27,10 +27,6 @@ export const ParticipantSchema = BaseUserSchema.extend({
 
 	teamId: z.string().nullable().optional(),
 	attendedEvents: z.array(z.string()),
-	hadFirstLunch: z.boolean(),
-	hadSecondLunch: z.boolean(),
-	hadBreakfast: z.boolean(),
-	hadDinner: z.boolean(),
 });
 
 export const UserSchema = z.discriminatedUnion("role", [
