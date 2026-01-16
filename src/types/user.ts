@@ -27,6 +27,8 @@ export const ParticipantSchema = BaseUserSchema.extend({
 
 	teamId: z.string().nullable().optional(),
 	attendedEvents: z.array(z.string()),
+
+	resumeURL: z.string().nullable().optional(),
 });
 
 export const UserSchema = z.discriminatedUnion("role", [
