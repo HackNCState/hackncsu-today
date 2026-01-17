@@ -21,14 +21,16 @@ export default function Main() {
 
 			<AnnouncementsView />
 
-			<FeedItem
-				title="// TODO"
-				description="Use the checklist below as a guide to stay on track during the event."
-			></FeedItem>
+			{!isOrganizer && (
+				<FeedItem
+					title="// TODO"
+					description="Use the checklist below as a guide to stay on track during the event."
+				></FeedItem>
+			)}
 
-			<TeamView />
+			{!isOrganizer && <TeamView />}
 
-			<ResumeUploadView />
+			{!isOrganizer && <ResumeUploadView />}
 		</main>
 	);
 }

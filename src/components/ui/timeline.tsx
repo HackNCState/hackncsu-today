@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Play } from "lucide-react";
 import React from "react";
 
 interface TimelineItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -24,7 +25,7 @@ export const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
 						className={cn(
 							"w-full transition-all duration-300 ease-in-out bg-primary",
 							state === "passed" && "h-full",
-							state === "current" && "h-1/2",
+							state === "current" && "h-0",
 							state === "upcoming" && "h-0",
 						)}
 					/>
@@ -33,9 +34,16 @@ export const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
 				<div
 					className={cn(
 						"absolute left-0 top-2 h-3 w-3 rounded-full border-2 border-primary",
-						state !== "upcoming" ? "bg-primary" : "bg-background",
+						state === "passed" && "bg-primary",
+						state === "upcoming" && "bg-background",
+						state === "current" &&
+							"bg-primary shadow-[0_0_15px_2px_var(--tw-shadow-color)] shadow-primary",
 					)}
 				/>
+
+				{state === "current" && (
+					<Play className="absolute -left-5 top-2 h-3 w-3 fill-primary text-primary" />
+				)}
 
 				<div className="flex flex-col gap-1">
 					<span className="text-sm font-mono text-muted-foreground">

@@ -18,9 +18,6 @@ import { isOrganizerAtom } from "@/atoms/user";
 
 export default function TeamView() {
 	const team = useAtomValue(teamAtom);
-	const isOrganizer = useAtomValue(isOrganizerAtom);
-
-	if (isOrganizer) return null;
 
 	function buildView() {
 		if (team) {
