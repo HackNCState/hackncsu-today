@@ -4,6 +4,7 @@ import { isOrganizerAtom } from "@/atoms/user";
 import OrganizerView from "./OrganizerView";
 import TeamView from "./TeamView";
 import AnnouncementsView from "./AnnouncementsView";
+import ResumeUploadView from "./ResumeUploadView";
 
 export default function Main() {
 	const isOrganizer = useAtomValue(isOrganizerAtom);
@@ -27,10 +28,7 @@ export default function Main() {
 
 			<TeamView />
 
-			<FeedItem
-				title="Resume Upload"
-				description="Want to share your resume with our sponsors? Upload it here!"
-			></FeedItem>
+			<ResumeUploadView />
 		</main>
 	);
 }
