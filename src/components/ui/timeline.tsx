@@ -163,7 +163,7 @@ export const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
 								}}
 								className="text-primary underline hover:text-primary/80 cursor-pointer ml-auto"
 							>
-								reschedule
+								delay
 							</button>
 						)}
 						{isEditing && (

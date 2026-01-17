@@ -22,6 +22,7 @@ class ScheduleItem:
     description: str
     time: str
     state: Literal["upcoming", "ongoing", "ended"]
+    oldTime: str | None = None
 
 @dataclass
 class Schedule:

@@ -5,6 +5,7 @@ import {
 } from "@/atoms/event/schedule";
 import { isOrganizerAtom } from "@/atoms/user";
 import { Timeline, TimelineItem } from "@/components/ui/timeline";
+import { functionsService } from "@/services/functions.service";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef } from "react";
 
@@ -58,17 +59,29 @@ export default function Schedule() {
 
 	return (
 		<aside className="w-full lg:w-96 lg:overflow-hidden flex flex-col">
-			<div className="px-6 pt-6 pb-3 shrink-0 flex flex-row gap-2 items-center justify-between">
+			<div className="px-6 pt-6 pb-3 shrink-0 flex flex-row gap-4 items-center">
 				<h3 className="font-bold text-xl">Schedule</h3>
 
 				{isOrganizer && (
-					<button
-						type="button"
-						onClick={() => handleItemClick(-1, 0)}
-						className="text-primary underline hover:text-primary/80 cursor-pointer"
-					>
-						reset timeline
-					</button>
+					<>
+						<button
+							type="button"
+							onClick={() => functionsService.loadSchedule()}
+							className="text-primary underline hover:text-primary/80 cursor-pointer ml-auto"
+						>
+							{scheduleData.length === 0 ? "import from run of show" : "sync"}
+						</button>
+
+						{scheduleData.length !== 0 && (
+							<button
+								type="button"
+								onClick={() => handleItemClick(-1, 0)}
+								className="text-primary underline hover:text-primary/80 cursor-pointer"
+							>
+								reset
+							</button>
+						)}
+					</>
 				)}
 			</div>
 
@@ -78,14 +91,22 @@ export default function Schedule() {
 					className="flex-1 px-6 pb-6 flex flex-col gap-2 lg:overflow-y-auto"
 				>
 					{isOrganizer && (
-						<div className="mb-2 flex flex-col gap-1">
+						<div className="mb-2 flex flex-col gap-2">
 							<p className="text-sm text-muted-foreground">
-								Click on an event to move the timeline.
+								Click on an item to move the timeline.
 							</p>
 							<p className="text-sm text-muted-foreground">
-								You can also click 'reschedule' to change the time of an event.
+								Click 'delay' on an item to change the time of an event.
 								Participants will see the old time crossed out. Great for
-								delays!
+								delays! (e.g. late lunch or something)
+							</p>
+							<p className="text-sm text-muted-foreground">
+								'sync' will pull in any updates from the run-of-show spreadsheet
+								in the google drive. It will try to preserve the timeline for
+								minimal disruption to participants.
+							</p>
+							<p className="text-sm text-muted-foreground">
+								'reset' will set the timeline back to the start
 							</p>
 						</div>
 					)}

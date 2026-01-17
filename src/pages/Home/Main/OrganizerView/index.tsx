@@ -209,8 +209,6 @@ export default function OrganizerView() {
 						</DialogContent>
 					</Dialog>
 
-					<Button variant="outline" onClick={() => functionsService.loadSchedule()}>Import schedule</Button>
-
 					<Button variant="destructive" onClick={() => updateConfig(null)}>
 						Reset event data
 					</Button>
