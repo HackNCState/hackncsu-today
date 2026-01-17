@@ -14,9 +14,13 @@ import { teamAtom } from "@/atoms/team";
 import { useAtomValue } from "jotai";
 import UnapprovedView from "./UnapprovedView";
 import ApprovedView from "./ApprovedView";
+import { isOrganizerAtom } from "@/atoms/user";
 
 export default function TeamView() {
 	const team = useAtomValue(teamAtom);
+	const isOrganizer = useAtomValue(isOrganizerAtom);
+
+	if (isOrganizer) return null;
 
 	function buildView() {
 		if (team) {
@@ -33,7 +37,11 @@ export default function TeamView() {
 	return (
 		<FeedItem
 			title="Your Team"
-			description={!team ? "You'll need a team to help you during Hack_NCState! Once you have one, please fill out the team formation form below. Only the team leader needs to complete this form." : null}
+			description={
+				!team
+					? "You'll need a team to help you during Hack_NCState! Once you have one, please fill out the team formation form below. Only the team leader needs to complete this form."
+					: null
+			}
 		>
 			{buildView()}
 		</FeedItem>
