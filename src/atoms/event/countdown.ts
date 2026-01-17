@@ -8,6 +8,7 @@ interface Countdown {
 	minutes: number;
 	seconds: number;
 	totalSeconds: number;
+	isMoreThan24Hours: boolean;
 }
 
 export const countdownAtom = atom<Countdown | null>((get) => {
@@ -24,10 +25,19 @@ export const countdownAtom = atom<Countdown | null>((get) => {
 			minutes: 0,
 			seconds: 0,
 			totalSeconds: 0,
+			isMoreThan24Hours: false,
 		};
 	}
 
-	const diff = endTime.getTime() - now.getTime();
+	const realDiff = endTime.getTime() - now.getTime();
+	let diff = realDiff;
+	let isMoreThan24Hours = false;
+
+	if (realDiff > 24 * 60 * 60 * 1000) {
+		diff = realDiff - 24 * 60 * 60 * 1000;
+		isMoreThan24Hours = true;
+	}
+
 	const hours = Math.floor(diff / (1000 * 60 * 60));
 	const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 	const seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -37,6 +47,7 @@ export const countdownAtom = atom<Countdown | null>((get) => {
 		minutes,
 		seconds,
 		totalSeconds: Math.floor(diff / 1000),
+		isMoreThan24Hours,
 	};
 });
 
@@ -60,8 +71,10 @@ export const countdownMessageAtom = atom<string>((get) => {
 	switch (hackingState) {
 		case "setup":
 			return "STARTING SOON! PLEASE STAND BY";
-		case "started":
-			if (countdown.totalSeconds <= 0) {
+		case "countdown":
+			if (countdown.isMoreThan24Hours) {
+				return "START HACKING IN";
+			} else if (countdown.totalSeconds <= 0) {
 				return "TIME'S UP!";
 			} else if (countdown.totalSeconds <= 60) {
 				return "SUBMIT ASAP";
@@ -80,6 +93,44 @@ export const countdownMessageAtom = atom<string>((get) => {
 		case "judging":
 			return "JUDGING IN PROGRESS";
 		case "ended":
-			return "HACKING HAS ENDED";
+			return "THANK YOU FOR PARTICIPATING!";
 	}
+});
+
+// will be used to determine urgency-based UI changes
+type HackingUrgency =
+	| "notHacking"
+	| "startingSoon"
+	| "ongoing"
+	| "lastHour"
+	| "last10Minutes"
+	| "ended";
+
+export const hackingUrgencyAtom = atom<HackingUrgency>((get) => {
+	const hackingState = get(hackingStateAtom);
+	const countdown = get(countdownAtom);
+
+	if (!hackingState) return "notHacking";
+
+	if (hackingState !== "countdown") {
+		return "notHacking";
+	}
+
+	if (!countdown) return "ongoing";
+
+	if (countdown.isMoreThan24Hours) {
+		if (countdown.totalSeconds <= 15 * 60) {
+			return "startingSoon";
+		}
+		return "notHacking";
+	}
+
+	if (countdown.totalSeconds <= 600) {
+		return "last10Minutes";
+	}
+	if (countdown.totalSeconds <= 3600) {
+		return "lastHour";
+	}
+
+	return "ongoing";
 });

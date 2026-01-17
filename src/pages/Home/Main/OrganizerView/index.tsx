@@ -221,13 +221,15 @@ export default function OrganizerView() {
 						variant={config.hackingState === "setup" ? "default" : "outline"}
 						onClick={() => updateConfig({ hackingState: "setup" })}
 					>
-						Setup (pre hacking)
+						Starting soon
 					</Button>
 					<Button
-						variant={config.hackingState === "started" ? "default" : "outline"}
-						onClick={() => updateConfig({ hackingState: "started" })}
+						variant={
+							config.hackingState === "countdown" ? "default" : "outline"
+						}
+						onClick={() => updateConfig({ hackingState: "countdown" })}
 					>
-						In progress (show countdown)
+						Countdown
 					</Button>
 					<Button
 						variant={config.hackingState === "judging" ? "default" : "outline"}
@@ -242,6 +244,17 @@ export default function OrganizerView() {
 						Ended
 					</Button>
 				</ButtonGroup>
+
+				<p className="text-sm text-muted-foreground">
+					Starting soon: tells participants that hacking will start soon.
+					<br />
+					Countdown: counts down to the start of hacking or to the end of
+					hacking, depending on the current time.
+					<br />
+					Judging: indicates that hacking has ended and judging is in progress.
+					<br />
+					Ended: thanks participants for joining
+				</p>
 			</div>
 		</FeedItem>
 	);

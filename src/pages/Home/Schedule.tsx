@@ -69,7 +69,9 @@ export default function Schedule() {
 							onClick={() => functionsService.loadSchedule()}
 							className="text-primary underline hover:text-primary/80 cursor-pointer ml-auto"
 						>
-							{scheduleData.length === 0 ? "import from run of show" : "sync"}
+							{scheduleData.length === 0
+								? "import from spreadsheet"
+								: "sync spreadsheet"}
 						</button>
 
 						{scheduleData.length !== 0 && (
@@ -101,9 +103,9 @@ export default function Schedule() {
 								delays! (e.g. late lunch or something)
 							</p>
 							<p className="text-sm text-muted-foreground">
-								'sync' will pull in any updates from the run-of-show spreadsheet
-								in the google drive. It will try to preserve the timeline for
-								minimal disruption to participants.
+								'sync spreadsheet' will pull in any updates from the run-of-show
+								spreadsheet in the google drive. It will try to preserve the
+								timeline for minimal disruption to participants.
 							</p>
 							<p className="text-sm text-muted-foreground">
 								'reset' will set the timeline back to the start

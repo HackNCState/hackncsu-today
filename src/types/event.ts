@@ -49,7 +49,7 @@ export const TrackSchema = z.object({
 
 export const EventConfigSchema = z.object({
 	tracks: z.array(TrackSchema).default([]),
-	hackingState: z.enum(["setup", "started", "judging", "ended"]),
+	hackingState: z.enum(["setup", "countdown", "judging", "ended"]),
 	hackingEndTime: z.iso.datetime(),
 	schedules: z.array(ScheduleSchema).default([]),
 	announcements: z.array(AnnouncementSchema).default([]),

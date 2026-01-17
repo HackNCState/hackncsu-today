@@ -113,7 +113,7 @@ export const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
 						state === "ended" && "bg-primary",
 						state === "upcoming" && "bg-background",
 						state === "ongoing" &&
-							"bg-primary shadow-[0_0_15px_2px_var(--tw-shadow-color)] shadow-primary",
+							"bg-primary shadow-[0_0_15px_2px_var(--tw-shadow-color)] shadow-primary transition-all",
 					)}
 				/>
 
