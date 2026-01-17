@@ -1,3 +1,5 @@
+"""RFID Participant API functions."""
+
 import json
 from firebase_functions import https_fn
 from firebase_functions.params import SecretParam, StringParam

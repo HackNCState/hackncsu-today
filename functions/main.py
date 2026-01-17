@@ -17,4 +17,5 @@ initialize_app()
 from auth.oauth_callback import *
 from firestore.users import *
 from firestore.teams import *
+from firestore.schedule import *
 from api import *

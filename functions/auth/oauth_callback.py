@@ -28,7 +28,7 @@ FRONTEND_AUTH_URI = StringParam(
 )  # set to http://localhost:8080/auth in .env.local for local testing
 
 SPREADSHEET_URL = StringParam(
-    "SPREADSHEET_URL",
+    "REGISTRATION_SPREADSHEET_URL",
     default="https://docs.google.com/spreadsheets/d/160mQFRW4EXJpxHGi2QGIWsn0yqPNyMfmfXf5gxvYHCU/edit?gid=0#gid=0",
     description="The URL of the Google Spreadsheet containing participant registrations.",
 )

@@ -1,158 +1,25 @@
+import {
+	rescheduleItemAtom,
+	schedulesAtom,
+	setCurrentItemAtom,
+} from "@/atoms/event/schedule";
+import { isOrganizerAtom } from "@/atoms/user";
 import { Timeline, TimelineItem } from "@/components/ui/timeline";
-import { useEffect, useRef } from "react";
-
-type ScheduleItem = {
-	time: string;
-	title: string;
-	description: string;
-	state: "upcoming" | "current" | "passed";
-};
-
-type DaySchedule = {
-	day: string;
-	items: ScheduleItem[];
-};
-
-// temporary
-const scheduleData: DaySchedule[] = [
-	{
-		day: "Day 1",
-		items: [
-			{
-				time: "09:00 AM",
-				title: "Check-in Starts",
-				description: "Outside State Ballroom",
-				state: "passed",
-			},
-			{
-				time: "10:00 AM",
-				title: "Opening Ceremony",
-				description: "State Ballroom",
-				state: "passed",
-			},
-			{
-				time: "10:30 AM",
-				title: "Team Formation",
-				description: "State Ballroom",
-				state: "passed",
-			},
-			{
-				time: "11:00 AM",
-				title: "Competition Begins",
-				description: "All Venues",
-				state: "current",
-			},
-			{
-				time: "12:00 PM",
-				title: "Lunch",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "02:00 PM",
-				title: "Sponsor Workshop/Panel #1",
-				description: "Talley Conference Room",
-				state: "upcoming",
-			},
-			{
-				time: "03:00 PM",
-				title: "Sponsor Workshop/Panel #2",
-				description: "Talley Conference Room",
-				state: "upcoming",
-			},
-			{
-				time: "04:00 PM",
-				title: "Sponsor Workshop/Panel #3",
-				description: "Talley Conference Room",
-				state: "upcoming",
-			},
-			{
-				time: "06:00 PM",
-				title: "Dinner",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "06:05 PM",
-				title: "Sponsor-led Dinner Activity",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "07:00 PM",
-				title: "Sponsor Workshop/Panel #4",
-				description: "Talley Conference Room",
-				state: "upcoming",
-			},
-			{
-				time: "09:00 PM",
-				title: "Midnight Game Event",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-		],
-	},
-	{
-		day: "Day 2",
-		items: [
-			{
-				time: "12:00 AM",
-				title: "Overnight Work Time",
-				description: "Across Talley",
-				state: "upcoming",
-			},
-			{
-				time: "09:00 AM",
-				title: "Breakfast",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "11:00 AM",
-				title: "Project Submission",
-				description: "Through DevPost",
-				state: "upcoming",
-			},
-			{
-				time: "12:00 PM",
-				title: "Lunch",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "01:00 PM",
-				title: "Judging Starts",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "03:00 PM",
-				title: "Judging Ends",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "04:00 PM",
-				title: "Closing Ceremony",
-				description: "State Ballroom",
-				state: "upcoming",
-			},
-			{
-				time: "05:00 PM",
-				title: "Event Ends",
-				description: "All Venues",
-				state: "upcoming",
-			},
-		],
-	},
-];
+import { useAtomValue, useSetAtom } from "jotai";
+import { useCallback, useEffect, useRef } from "react";
 
 export default function Schedule() {
+	const scheduleData = useAtomValue(schedulesAtom);
+	const isOrganizer = useAtomValue(isOrganizerAtom);
+	const setCurrentItem = useSetAtom(setCurrentItemAtom);
+	const rescheduleItem = useSetAtom(rescheduleItemAtom);
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const currentItemRef = useRef<HTMLDivElement>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: necessary to only run when scheduleData changes
 	useEffect(() => {
-		// this use effect is ai generated
+		// this use effect is ai generated btw
 
 		if (currentItemRef.current && containerRef.current) {
 			// Check if screen is lg (1024px) or larger
@@ -180,39 +47,85 @@ export default function Schedule() {
 		}
 	}, [scheduleData]);
 
+	const handleItemClick = useCallback(
+		(dayIdx: number, itemIdx: number) => {
+			if (isOrganizer) {
+				setCurrentItem(dayIdx, itemIdx);
+			}
+		},
+		[isOrganizer, setCurrentItem],
+	);
+
 	return (
 		<aside className="w-full lg:w-96 lg:overflow-hidden flex flex-col">
-			<div className="px-6 pt-6 pb-3 shrink-0">
+			<div className="px-6 pt-6 pb-3 shrink-0 flex flex-row gap-2 items-center justify-between">
 				<h3 className="font-bold text-xl">Schedule</h3>
+
+				{isOrganizer && (
+					<button
+						type="button"
+						onClick={() => handleItemClick(-1, 0)}
+						className="text-primary underline hover:text-primary/80 cursor-pointer"
+					>
+						reset timeline
+					</button>
+				)}
 			</div>
 
-			<div
-				ref={containerRef}
-				className="flex-1 px-6 pb-6 flex flex-col gap-2 lg:overflow-y-auto"
-			>
-				{scheduleData.map((day, dayIndex) => (
-					<div key={day.day} className="flex flex-col gap-2">
-						<h4
-							className={
-								dayIndex > 0
-									? "mt-2 font-semibold text-muted-foreground"
-									: "font-semibold text-muted-foreground"
-							}
-						>
-							{day.day}
-						</h4>
-						<Timeline>
-							{day.items.map((item) => (
-								<TimelineItem
-									key={item.title}
-									ref={item.state === "current" ? currentItemRef : null}
-									{...item}
-								/>
-							))}
-						</Timeline>
-					</div>
-				))}
-			</div>
+			{scheduleData.length > 0 ? (
+				<div
+					ref={containerRef}
+					className="flex-1 px-6 pb-6 flex flex-col gap-2 lg:overflow-y-auto"
+				>
+					{isOrganizer && (
+						<div className="mb-2 flex flex-col gap-1">
+							<p className="text-sm text-muted-foreground">
+								Click on an event to move the timeline.
+							</p>
+							<p className="text-sm text-muted-foreground">
+								You can also click 'reschedule' to change the time of an event.
+								Participants will see the old time crossed out. Great for
+								delays!
+							</p>
+						</div>
+					)}
+
+					{scheduleData.map((day, dayIndex) => (
+						<div key={day.title} className="flex flex-col gap-2">
+							<h4
+								className={
+									dayIndex > 0
+										? "mt-2 font-semibold text-muted-foreground"
+										: "font-semibold text-muted-foreground"
+								}
+							>
+								{day.title}
+							</h4>
+							<Timeline>
+								{day.items.map((item, itemIndex) => (
+									<TimelineItem
+										clickable={isOrganizer}
+										oldTime={item.oldTime}
+										onClick={() => handleItemClick(dayIndex, itemIndex)}
+										onReschedule={(newTime) =>
+											rescheduleItem(dayIndex, itemIndex, newTime)
+										}
+										key={item.title}
+										ref={item.state === "ongoing" ? currentItemRef : null}
+										{...item}
+									/>
+								))}
+							</Timeline>
+						</div>
+					))}
+				</div>
+			) : (
+				<div className="flex-1 flex items-center justify-center px-6 pb-6 text-center">
+					<p className="text-muted-foreground">
+						You'll see the schedule here once it's available.
+					</p>
+				</div>
+			)}
 		</aside>
 	);
 }

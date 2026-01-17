@@ -38,3 +38,5 @@ export const setTrackAtom = atom(
 		await firestoreService.updateEventConfig({ tracks: updatedTracks });
 	},
 );
+
+// TODO: update to not use firestore service directly (bad practice)

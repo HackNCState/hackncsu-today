@@ -56,6 +56,13 @@
   --font-playfair: 'Playfair Display', serif;
   --font-synemono: 'Syne Mono', monospace;
   --font-splash: 'Splash', cursive;
+
+  --animate-caret-blink-reverse: caret-blink-reverse 0.75s ease-out infinite;
+}
+
+@keyframes caret-blink-reverse {
+  0%,70%,100% { opacity: 0; }
+  20%,50% { opacity: 1; }
 }
 
 :root {

@@ -7,8 +7,9 @@ import { z } from "zod";
 export const ScheduleItemSchema = z.object({
 	title: z.string(),
 	description: z.string().optional(),
-	location: z.string().optional(),
 	time: z.string(),
+	oldTime: z.string().optional(),
+	state: z.enum(["upcoming", "ongoing", "ended"]),
 });
 
 export const ScheduleSchema = z.object({

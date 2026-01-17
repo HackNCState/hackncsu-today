@@ -140,19 +140,19 @@ export default function ResumeUploadView() {
 						)}
 
 						{user.resumeURL && (
-							<div className="flex flex-row items-center justify-center gap-2">
+							<div className="flex flex-row items-center justify-center gap-2 mt-2">
 								<a
 									href={user.resumeURL}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="text-xs text-primary underline hover:text-primary/80 cursor-pointer mt-1"
+									className="text-xs text-primary underline hover:text-primary/80 cursor-pointer"
 								>
 									View submission
 								</a>
 
 								<button
 									type="button"
-									className="text-xs text-destructive underline hover:text-destructive/80 cursor-pointer mt-1"
+									className="text-xs text-destructive underline hover:text-destructive/80 cursor-pointer "
 									onClick={handleDelete}
 								>
 									Delete submission

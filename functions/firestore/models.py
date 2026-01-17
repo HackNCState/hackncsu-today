@@ -15,3 +15,15 @@ class Team:
     """Do you need any mentoring on a specific subject?"""
     status: Literal["unverified", "approved", "rejected"]
     """The status of the team registration"""
+
+@dataclass
+class ScheduleItem:
+    title: str
+    description: str
+    time: str
+    state: Literal["upcoming", "ongoing", "ended"]
+
+@dataclass
+class Schedule:
+    title: str
+    items: list[ScheduleItem]
