@@ -1,20 +1,9 @@
-import { Button } from "@/components/ui/button";
 import FeedItem from "../FeedItem";
-import { ArrowRight, BadgePlus } from "lucide-react";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
 import UnregisteredView from "./UnregisteredView";
 import { teamAtom } from "@/atoms/team";
 import { useAtomValue } from "jotai";
 import UnapprovedView from "./UnapprovedView";
 import ApprovedView from "./ApprovedView";
-import { isOrganizerAtom } from "@/atoms/user";
 
 export default function TeamView() {
 	const team = useAtomValue(teamAtom);

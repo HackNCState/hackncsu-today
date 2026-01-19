@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ClockIcon, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 interface TimelineItemProps

@@ -20,7 +20,6 @@ import {
 import ResourceEditor from "./ResourceEditor";
 import { TrackEditor } from "./TrackEditor";
 import { useNavigate } from "react-router-dom";
-import { functionsService } from "@/services/functions.service";
 
 export default function OrganizerView() {
 	const navigate = useNavigate();
