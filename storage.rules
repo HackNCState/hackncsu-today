@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+  // Helper function to check for organizer role
+    function isOrganizer() {
+      return request.auth.token.isOrganizer == true;
+    }
+
+    // Allow users to upload their own resumes
+    // Path: /resumes/{userId}/filename.pdf
+    match /resumes/{userId}/{fileName} {
+      allow read: if request.auth != null && (request.auth.uid == userId);
+      allow write: if request.auth != null 
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024 // Max 5MB
+        && request.resource.contentType == 'application/pdf'; // Only PDF
+    }
+
+    match /{allPaths=**} {
+      // Organizers have full admin access to EVERYTHING
+      allow read, write: if isOrganizer();
+    }
+  }
+}
