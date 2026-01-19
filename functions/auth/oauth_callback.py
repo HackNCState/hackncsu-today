@@ -26,6 +26,7 @@ FRONTEND_AUTH_URI = StringParam(
     default="https://today.hackncstate.org/auth",
     description="The frontend URI to redirect to after authentication is complete.",
 )  # set to http://localhost:8080/auth in .env.local for local testing
+# set to https://hackncsu-today--dev-maisszg5.web.app/auth for dev deploys
 
 SPREADSHEET_URL = StringParam(
     "REGISTRATION_SPREADSHEET_URL",
@@ -247,6 +248,7 @@ def _generate_login_token(uid: str, username: str) -> str:
     try:
         return auth.create_custom_token(uid, developer_claims=claims).decode("utf-8")
     except Exception as e:
+        print(f"could not create custom token for user {uid}: {e}")
         raise ValueError("token_creation_failed")
 
 
