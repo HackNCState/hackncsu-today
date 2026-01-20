@@ -40,7 +40,7 @@ i hope this all works if not let me know
 3. Install the required Python packages:
 
    ```bash
-    pip install -r requirements.txt
+    pip install -r functions/requirements.txt
     ```
 
 4. Install the required Node.js packages:
