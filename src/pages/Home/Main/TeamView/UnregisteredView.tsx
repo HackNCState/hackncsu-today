@@ -3,147 +3,40 @@ import { useAtomValue } from "jotai";
 import { tracksAtom } from "@/atoms/event/tracks";
 import { challengesAtom } from "@/atoms/event/challenges";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-	Field,
-	FieldGroup,
-	FieldLabel,
-	FieldDescription,
-	FieldContent,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { ArrowRight, PlusIcon, Trash2, User } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowRight } from "lucide-react";
 import { functionsService } from "@/services/functions.service";
 import {
 	PartialParticipantSchema,
 	type PartialParticipant,
 } from "@/types/user";
-import {
-	Command,
-	CommandEmpty,
-	CommandInput,
-	CommandItem,
-	CommandList,
-} from "@/components/ui/command";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-	Item,
-	ItemActions,
-	ItemContent,
-	ItemGroup,
-	ItemMedia,
-	ItemSeparator,
-	ItemTitle,
-} from "@/components/ui/item";
-import React from "react";
 import { userAtom } from "@/atoms/user";
+import TeamForm, { type TeamFormSubmitPayload } from "@/components/TeamForm";
 
 export default function UnregisteredView() {
 	const tracks = useAtomValue(tracksAtom);
 	const challenges = useAtomValue(challengesAtom);
 	const user = useAtomValue(userAtom);
 
-	const [invitedMembers, setInvitedMembers] = useState<PartialParticipant[]>(
-		[],
-	);
+	const initialMembers: PartialParticipant[] = user
+		? [PartialParticipantSchema.parse(user)]
+		: [];
 
-	const members = user
-		? [PartialParticipantSchema.parse(user), ...invitedMembers]
-		: invitedMembers;
-
-	const [selectedTrack, setSelectedTrack] = useState("");
-	const [selectedChallenge, setSelectedChallenge] = useState<string>("none");
-	const [teamName, setTeamName] = useState("");
-	const [mentoringHelp, setMentoringHelp] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [submitError, setSubmitError] = useState<string | null>(null);
-
-	// search state
-	const [open, setOpen] = useState(false);
-	const [query, setQuery] = useState("");
-	const [searchResults, setSearchResults] = useState<PartialParticipant[]>([]);
-	const [loading, setLoading] = useState(false);
-
-	const filteredSearchResults = searchResults.filter(
-		(u) => !members.some((m) => m.id === u.id),
-	);
-
-	useEffect(() => {
-		const searchUsers = async () => {
-			if (query.length < 2) {
-				setSearchResults([]);
-				return;
-			}
-
-			setLoading(true);
-			try {
-				const users = await functionsService.searchUsers(query);
-				setSearchResults(users.filter((u) => u.id !== user?.id));
-			} catch (error) {
-				console.error("Search failed", error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		const timeoutId = setTimeout(searchUsers, 300);
-		return () => clearTimeout(timeoutId);
-	}, [query, user]);
-
-	const addMember = (newMember: PartialParticipant) => {
-		if (members.length >= 4) return;
-		if (members.find((m) => m.id === newMember.id)) return;
-		setInvitedMembers([...invitedMembers, newMember]);
-		setOpen(false);
-		setQuery("");
-	};
-
-	const removeMember = (userId: string) => {
-		setInvitedMembers(invitedMembers.filter((m) => m.id !== userId));
-	};
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (members.length < 2) return;
-
-		setIsSubmitting(true);
-		setSubmitError(null);
-
-		try {
-			await functionsService.registerTeam({
-				name: teamName,
-				track: selectedTrack,
-				mentoringHelp,
-				members: members.map((m) => m.id),
-				challenges: selectedChallenge === "none" ? [] : [selectedChallenge],
-			});
-		} catch (error: any) {
-			console.error("Registration failed", error);
-			setSubmitError(error.message || "Failed to register team");
-		} finally {
-			setIsSubmitting(false);
-		}
+	const handleSubmit = async (payload: TeamFormSubmitPayload) => {
+		await functionsService.registerTeam({
+			name: payload.name,
+			track: payload.track,
+			mentoringHelp: payload.mentoringHelp,
+			members: payload.memberIds,
+			challenges: payload.challenges,
+		});
 	};
 
 	return (
@@ -161,232 +54,22 @@ export default function UnregisteredView() {
 					</DialogDescription>
 				</DialogHeader>
 
-				<form onSubmit={handleSubmit}>
-					<FieldGroup className="py-4">
-						{/* Team Name */}
-						<Field>
-							<FieldContent>
-								<FieldLabel htmlFor="team-name">Team Name</FieldLabel>
-								<FieldDescription>
-									If you can't think of a team name, just use your project name!
-								</FieldDescription>
-							</FieldContent>
-							<Input
-								id="team-name"
-								placeholder="Enter your team name"
-								value={teamName}
-								onChange={(e) => setTeamName(e.target.value)}
-								required
-							/>
-						</Field>
-
-						{/* Track Selection */}
-						<Field>
-							<FieldContent>
-								<FieldLabel htmlFor="track">Track</FieldLabel>
-								<FieldDescription>
-									Select the track your team will participate in.
-								</FieldDescription>
-							</FieldContent>
-							<Select value={selectedTrack} onValueChange={setSelectedTrack}>
-								<SelectTrigger id="track" className="w-full">
-									<SelectValue placeholder="Select a track">
-										{selectedTrack === "" ? undefined : selectedTrack}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent
-									position="popper"
-									className="w-[var(--radix-select-trigger-width)]"
-								>
-									{tracks.map((track) => (
-										<SelectItem key={track.name} value={track.name}>
-											<span className="flex flex-col items-start text-left">
-												<span className="font-medium">{track.name}</span>
-												<span className="text-sm text-muted-foreground whitespace-normal">
-													{track.description}
-												</span>
-											</span>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</Field>
-
-						{/* Challenge Selection */}
-						<Field>
-							<FieldContent>
-								<FieldLabel>Challenge (Optional)</FieldLabel>
-								<FieldDescription>
-									Select a challenge your team will participate in.
-								</FieldDescription>
-							</FieldContent>
-							<RadioGroup
-								value={selectedChallenge}
-								onValueChange={setSelectedChallenge}
-								variant="compact"
-								className="flex flex-col gap-3 py-2"
-							>
-								{challenges.map((challenge) => (
-									<Field key={challenge.name} orientation="horizontal">
-										<RadioGroupItem
-											value={challenge.name}
-											id={challenge.name}
-										/>
-										<FieldContent>
-											<FieldLabel htmlFor={challenge.name}>
-												{challenge.name}
-											</FieldLabel>
-											<FieldDescription>
-												{challenge.description}
-											</FieldDescription>
-										</FieldContent>
-									</Field>
-								))}
-								<Field orientation="horizontal">
-									<RadioGroupItem value="none" id="challenge-none" />
-									<FieldContent>
-										<FieldLabel htmlFor="challenge-none">
-											No specific challenge
-										</FieldLabel>
-									</FieldContent>
-								</Field>
-							</RadioGroup>
-						</Field>
-
-						{/* Members Section */}
-						<Field>
-							<div className="flex items-center justify-between">
-								<FieldLabel>Members ({members.length}/4)</FieldLabel>
-								<span className="text-xs text-muted-foreground">
-									Min 2 members required
-								</span>
-							</div>
-
-							<div className="flex flex-col gap-2">
-								<ItemGroup>
-									{members.map((member, index) => {
-										const isCurrentUser = member.id === user?.id;
-
-										return (
-											<React.Fragment key={member.id}>
-												{index > 0 && <ItemSeparator />}
-												<Item>
-													<ItemMedia variant="icon">
-														<User className="h-4 w-4" />
-													</ItemMedia>
-													<ItemContent>
-														<ItemTitle>
-															{isCurrentUser
-																? `${user?.username} (You)`
-																: member.username}
-														</ItemTitle>
-													</ItemContent>
-													{!isCurrentUser && (
-														<ItemActions>
-															<Button
-																variant="ghost"
-																size="icon"
-																onClick={() => removeMember(member.id)}
-																type="button"
-															>
-																<Trash2 className="h-4 w-4 text-destructive" />
-															</Button>
-														</ItemActions>
-													)}
-												</Item>
-											</React.Fragment>
-										);
-									})}
-								</ItemGroup>
-
-								{/* Search Input */}
-								{members.length < 4 && (
-									<Popover open={open} onOpenChange={setOpen}>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												role="combobox"
-												aria-expanded={open}
-												className=""
-											>
-												<span className="text-muted-foreground flex items-center gap-2">
-													<PlusIcon className="h-4 w-4" />
-													Add member to team
-												</span>
-											</Button>
-										</PopoverTrigger>
-
-										<PopoverContent className="w-[400px] p-0" align="start">
-											<Command shouldFilter={false}>
-												<CommandInput
-													placeholder="Search members by Discord username..."
-													value={query}
-													onValueChange={setQuery}
-												/>
-												<CommandList>
-													{loading && (
-														<div className="py-6 text-center text-sm text-muted-foreground">
-															Searching...
-														</div>
-													)}
-													{!loading && query.length < 2 && (
-														<div className="py-6 text-center text-sm text-muted-foreground">
-															Type at least 2 characters to see results
-														</div>
-													)}
-													{!loading &&
-														query.length >= 2 &&
-														filteredSearchResults.length === 0 && (
-															<CommandEmpty>No users found.</CommandEmpty>
-														)}
-													{!loading &&
-														filteredSearchResults.map((user) => (
-															<CommandItem
-																key={user.id}
-																value={user.username}
-																onSelect={() => addMember(user)}
-															>
-																{user.username}
-															</CommandItem>
-														))}
-												</CommandList>
-											</Command>
-										</PopoverContent>
-									</Popover>
-								)}
-							</div>
-						</Field>
-
-						{/* Mentoring Request */}
-						<Field>
-							<FieldContent>
-								<FieldLabel htmlFor="mentoring">
-									Do you need any mentoring on a specific subject?
-								</FieldLabel>
-								<FieldDescription>
-									If you don't have any specific mentoring needs, you can leave
-									this blank.
-								</FieldDescription>
-							</FieldContent>
-							<Input
-								id="mentoring"
-								placeholder="e.g. using GitHub, building UI, etc."
-								value={mentoringHelp}
-								onChange={(e) => setMentoringHelp(e.target.value)}
-							/>
-						</Field>
-					</FieldGroup>
-
-					{submitError && (
-						<div className="text-destructive text-sm mb-4">{submitError}</div>
-					)}
-
-					<DialogFooter>
-						<Button type="submit" disabled={members.length < 2 || isSubmitting}>
-							{isSubmitting ? "Registering..." : "Submit Registration"}
-						</Button>
-					</DialogFooter>
-				</form>
+				<TeamForm
+					tracks={tracks}
+					challenges={challenges}
+					initialValues={{
+						name: "",
+						track: "",
+						mentoringHelp: "",
+						challenges: [],
+						members: initialMembers,
+					}}
+					lockedMemberIds={user?.id ? [user.id] : []}
+					currentUserId={user?.id}
+					currentUserLabel={user?.username}
+					submitLabel="Submit Registration"
+					onSubmit={handleSubmit}
+				/>
 			</DialogContent>
 		</Dialog>
 	);

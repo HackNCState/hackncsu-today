@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button";
 import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import {
 	TableHeader,
 	TableRow,
 	TableHead,
@@ -7,13 +14,17 @@ import {
 	TableCell,
 	Table,
 } from "@/components/ui/table";
+import TeamForm, { type TeamFormSubmitPayload } from "@/components/TeamForm";
 import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
+import { challengesAtom } from "@/atoms/event/challenges";
+import { tracksAtom } from "@/atoms/event/tracks";
 import { firestoreService } from "@/services/firestore.service";
 import type { Team } from "@/types/team";
-import type { UserData } from "@/types/user";
+import type { PartialParticipant, UserData } from "@/types/user";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAtomValue } from "jotai";
 
 function TeamMembersList({ team }: { team: Team }) {
 	const [members, setMembers] = useState<UserData[]>([]);
@@ -58,8 +69,17 @@ function TeamMembersList({ team }: { team: Team }) {
 
 export default function TeamManager() {
 	const navigate = useNavigate();
+	const tracks = useAtomValue(tracksAtom);
+	const challenges = useAtomValue(challengesAtom);
 
 	const [teams, setTeams] = useState<Team[]>([]);
+	const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+	const [editingMembers, setEditingMembers] = useState<PartialParticipant[]>(
+		[],
+	);
+	const [isEditOpen, setIsEditOpen] = useState(false);
+	const [isEditLoading, setIsEditLoading] = useState(false);
+	const [editLoadError, setEditLoadError] = useState<string | null>(null);
 
 	const fetchTeams = useCallback(async () => {
 		const teams = await firestoreService.fetchAllTeams();
@@ -69,6 +89,73 @@ export default function TeamManager() {
 	useEffect(() => {
 		fetchTeams();
 	}, [fetchTeams]);
+
+	useEffect(() => {
+		const loadMembers = async () => {
+			if (!isEditOpen || !editingTeam) return;
+
+			setIsEditLoading(true);
+			setEditLoadError(null);
+			try {
+				const memberPromises = editingTeam.memberIds.map((id) =>
+					firestoreService.fetchUser(id),
+				);
+				const fetchedMembers = await Promise.all(memberPromises);
+				const partialMembers = fetchedMembers
+					.filter((m): m is UserData => m !== null)
+					.map((member) => ({ id: member.id, username: member.username }));
+				setEditingMembers(partialMembers);
+			} catch (error) {
+				console.error("Failed to load team members", error);
+				setEditLoadError("Failed to load team members");
+			} finally {
+				setIsEditLoading(false);
+			}
+		};
+
+		loadMembers();
+	}, [editingTeam, isEditOpen]);
+
+	const handleEditOpenChange = (open: boolean) => {
+		setIsEditOpen(open);
+		if (!open) {
+			setEditingTeam(null);
+			setEditingMembers([]);
+			setEditLoadError(null);
+		}
+	};
+
+	const handleUpdateTeam = async (payload: TeamFormSubmitPayload) => {
+		if (!editingTeam) return;
+
+		const updatedMemberIds = payload.memberIds;
+		const removedMemberIds = editingTeam.memberIds.filter(
+			(id) => !updatedMemberIds.includes(id),
+		);
+		const addedMemberIds = updatedMemberIds.filter(
+			(id) => !editingTeam.memberIds.includes(id),
+		);
+
+		await firestoreService.updateTeam(editingTeam.id, {
+			name: payload.name,
+			track: payload.track,
+			mentoringHelp: payload.mentoringHelp,
+			challenges: payload.challenges,
+			memberIds: updatedMemberIds,
+		});
+
+		if (editingTeam.status === "approved") {
+			for (const memberId of removedMemberIds) {
+				await firestoreService.updateUser(memberId, { teamId: null });
+			}
+
+			for (const memberId of addedMemberIds) {
+				await firestoreService.updateUser(memberId, { teamId: editingTeam.id });
+			}
+		}
+
+		fetchTeams();
+	};
 
 	function rowBuilder(team: Team) {
 		const isUnverified = team.status === "unverified";
@@ -90,10 +177,21 @@ export default function TeamManager() {
 				</TableCell>
 				<TableCell>{team.status}</TableCell>
 				<TableCell className="justify-end flex">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => {
+							setEditingTeam(team);
+							setIsEditOpen(true);
+						}}
+					>
+						Edit
+					</Button>
 					{team.status === "unverified" && (
 						<Button
 							variant="outline"
 							size="sm"
+							className="ml-2"
 							onClick={async () => {
 								await firestoreService.updateTeam(team.id, {
 									status: "approved",
@@ -175,6 +273,48 @@ export default function TeamManager() {
 					</TableBody>
 				</Table>
 			</main>
+
+			<Dialog open={isEditOpen} onOpenChange={handleEditOpenChange}>
+				<DialogContent className="sm:max-w-[520px] max-h-[85vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>Edit Team</DialogTitle>
+						<DialogDescription>
+							Update team details and members.
+						</DialogDescription>
+					</DialogHeader>
+
+					{editLoadError && (
+						<div className="text-destructive text-sm">{editLoadError}</div>
+					)}
+
+					{isEditLoading && (
+						<div className="text-sm text-muted-foreground">
+							Loading team members...
+						</div>
+					)}
+
+					{!isEditLoading && editingTeam && (
+						<TeamForm
+							tracks={tracks}
+							challenges={challenges}
+							initialValues={{
+								name: editingTeam.name,
+								track: editingTeam.track,
+								mentoringHelp: editingTeam.mentoringHelp,
+								challenges: editingTeam.challenges,
+								members: editingMembers,
+							}}
+							lockedMemberIds={[editingTeam.creatorId]}
+							submitLabel="Save Changes"
+							onSubmit={handleUpdateTeam}
+							onSuccess={() => {
+								setIsEditOpen(false);
+								setEditingTeam(null);
+							}}
+						/>
+					)}
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

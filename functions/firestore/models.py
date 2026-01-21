@@ -17,6 +17,7 @@ class Team:
     status: Literal["unverified", "approved", "rejected"]
     """The status of the team registration"""
 
+
 @dataclass
 class ScheduleItem:
     title: str
@@ -24,6 +25,7 @@ class ScheduleItem:
     time: str
     state: Literal["upcoming", "ongoing", "ended"]
     oldTime: str | None = None
+
 
 @dataclass
 class Schedule:

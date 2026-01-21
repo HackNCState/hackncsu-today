@@ -48,7 +48,7 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
         )
 
     challenges = [str(c).strip() for c in challenges if str(c).strip()]
-    
+
     # check if members are not already in a team (check their teamId field)
 
     db = firestore.client()
@@ -71,10 +71,10 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
                 code=https_fn.FunctionsErrorCode.NOT_FOUND,
                 message=f"User {member_id} not found.",
             )
-        
+
     teams_ref = db.collection("teams")
     team_doc_ref = teams_ref.document()
-    
+
     team = Team(
         id=team_doc_ref.id,
         name=name,
@@ -93,4 +93,3 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
 
     creator_ref = users_ref.document(creator_id)
     creator_ref.update({"teamId": team_doc_ref.id})
- 

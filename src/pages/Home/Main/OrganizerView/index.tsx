@@ -42,42 +42,19 @@ export default function OrganizerView() {
 
 			const defaultConfig = EventConfigSchema.parse({
 				tracks: [
-					{
-						name: "General",
-						description:
-							"Build whatever you want! This track is for projects that don't fit into any of the other specific tracks.",
-					},
-					{
-						name: "Sustainability",
-						description:
-							"Create a solution that helps the environment or promotes sustainable living.",
-					},
-					{
-						name: "Education",
-						description:
-							"Build a tool that improves the learning experience for students or teachers.",
-					},
-					{
-						name: "Health & Wellness",
-						description:
-							"Develop an application that promotes physical or mental health.",
-					},
+					{ name: "Track 1", description: "Sample elite ball track" },
+					{ name: "Track 2", description: "Sample great ball track" },
+					{ name: "Track 3", description: "Sample poke ball track" },
 				],
 				challenges: [
 					{
-						name: "Best UI/UX",
-						description:
-							"Awarded to the team with the most intuitive and visually appealing user interface.",
+						name: "Sample Challenge 1",
+						description: "This is a sample challenge description.",
 					},
 					{
-						name: "Best Use of Local AI",
+						name: "Sample Challenge 2",
 						description:
-							"Process AI models on-device without relying on external APIs.",
-					},
-					{
-						name: "Most Creative Solution",
-						description:
-							"For the team that comes up with the most out-of-the-box idea.",
+							"This is another sample challenge description. Perhaps this could be an API challenge?",
 					},
 				],
 				hackingState: "setup",

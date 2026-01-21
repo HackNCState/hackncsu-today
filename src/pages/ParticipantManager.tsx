@@ -27,6 +27,8 @@ export default function ParticipantManager() {
 	}, [fetchUsers]);
 
 	function rowBuilder(user: Participant) {
+		const resumeURL = user.resumeURL;
+
 		return (
 			<TableRow key={user.id}>
 				<TableCell>{user.username}</TableCell>
@@ -35,6 +37,17 @@ export default function ParticipantManager() {
 				<TableCell>{user.shirtSize}</TableCell>
 				<TableCell>{user.dietaryRestrictions || "None"}</TableCell>
 				<TableCell>{user.attendedEvents.join(", ") || "None"}</TableCell>
+				<TableCell className="justify-end flex">
+					{resumeURL && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => window.open(resumeURL, "_blank", "noopener")}
+						>
+							View Resume
+						</Button>
+					)}
+				</TableCell>
 			</TableRow>
 		);
 	}
@@ -70,6 +83,7 @@ export default function ParticipantManager() {
 							<TableHead>Shirt Size</TableHead>
 							<TableHead>Dietary Restrictions</TableHead>
 							<TableHead>Events Attended</TableHead>
+							<TableHead className="w-0">Actions</TableHead>
 						</TableRow>
 					</TableHeader>
 
