@@ -7,33 +7,62 @@ export const resourcesAtom = atom((get) => {
 	const config = get(eventConfigAtom);
 	const resources = config?.resources ?? [];
 	const tracks = config?.tracks ?? [];
+	const challenges = config?.challenges ?? [];
 
-	// straight up hardcoding the tracks resource here to always be in sync with tracksAtom 😭😭
-	const tracksContent = tracks
+	// straight up hardcoding the tracks and challenges resource here to always be in sync 😭😭
+	let tracksContent = tracks
 		.map((t) => `**${t.name}**\\\n${t.description ?? ""}`)
 		.join("\n\n");
+	tracksContent = `Select the track that best fits your project. You can only submit to one track.\\\n\\\n${tracksContent}`;
 
-	const tracksResourceIndex = resources.findIndex((r) => r.label === "Tracks");
+	let challengesContent = challenges
+		.map((c) => `**${c.name}**\\\n${c.description ?? ""}`)
+		.join("\n\n");
+	challengesContent = `Complete these additional challenges for extra prizes. You can only submit to one challenge.\\\n\\\n${challengesContent}`;
+
+	const newResources = [...resources];
+
+	// handle Tracks resource
+	const tracksResourceIndex = newResources.findIndex(
+		(r) => r.label === "Tracks",
+	);
 
 	if (tracksResourceIndex !== -1) {
-		const newResources = [...resources];
 		newResources[tracksResourceIndex] = {
 			...newResources[tracksResourceIndex],
 			type: "text",
 			content: tracksContent,
 		};
-		return newResources;
-	}
-
-	return [
-		...resources,
-		{
+	} else {
+		newResources.push({
 			type: "text",
 			label: "Tracks",
 			content: tracksContent,
 			hidden: false,
-		} as Resource,
-	];
+		} as Resource);
+	}
+
+	// handle Challenges resource
+	const challengesResourceIndex = newResources.findIndex(
+		(r) => r.label === "Challenges",
+	);
+
+	if (challengesResourceIndex !== -1) {
+		newResources[challengesResourceIndex] = {
+			...newResources[challengesResourceIndex],
+			type: "text",
+			content: challengesContent,
+		};
+	} else {
+		newResources.push({
+			type: "text",
+			label: "Challenges",
+			content: challengesContent,
+			hidden: false,
+		} as Resource);
+	}
+
+	return newResources;
 });
 
 export const visibleResourcesAtom = atom((get) => {

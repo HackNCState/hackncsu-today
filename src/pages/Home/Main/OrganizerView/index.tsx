@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import ResourceEditor from "./ResourceEditor";
 import { TrackEditor } from "./TrackEditor";
+import { ChallengeEditor } from "./ChallengeEditor";
 import { useNavigate } from "react-router-dom";
 
 export default function OrganizerView() {
@@ -41,9 +42,43 @@ export default function OrganizerView() {
 
 			const defaultConfig = EventConfigSchema.parse({
 				tracks: [
-					{ name: "Track 1", description: "Sample elite ball track" },
-					{ name: "Track 2", description: "Sample great ball track" },
-					{ name: "Track 3", description: "Sample poke ball track" },
+					{
+						name: "General",
+						description:
+							"Build whatever you want! This track is for projects that don't fit into any of the other specific tracks.",
+					},
+					{
+						name: "Sustainability",
+						description:
+							"Create a solution that helps the environment or promotes sustainable living.",
+					},
+					{
+						name: "Education",
+						description:
+							"Build a tool that improves the learning experience for students or teachers.",
+					},
+					{
+						name: "Health & Wellness",
+						description:
+							"Develop an application that promotes physical or mental health.",
+					},
+				],
+				challenges: [
+					{
+						name: "Best UI/UX",
+						description:
+							"Awarded to the team with the most intuitive and visually appealing user interface.",
+					},
+					{
+						name: "Best Use of Local AI",
+						description:
+							"Process AI models on-device without relying on external APIs.",
+					},
+					{
+						name: "Most Creative Solution",
+						description:
+							"For the team that comes up with the most out-of-the-box idea.",
+					},
 				],
 				hackingState: "setup",
 				hackingEndTime: endTime.toISOString(),
@@ -63,6 +98,13 @@ export default function OrganizerView() {
 						label: "Tracks",
 						content:
 							"The Tracks resource is auto-generated based on the tracks you configure for the event.",
+						hidden: true,
+					},
+					{
+						type: "text",
+						label: "Challenges",
+						content:
+							"The Challenges resource is auto-generated based on the challenges you configure for the event.",
 						hidden: true,
 					},
 					{
@@ -197,6 +239,19 @@ export default function OrganizerView() {
 							</DialogHeader>
 
 							<TrackEditor />
+						</DialogContent>
+					</Dialog>
+
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Edit challenges</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col">
+							<DialogHeader>
+								<DialogTitle>Configure Challenges</DialogTitle>
+							</DialogHeader>
+
+							<ChallengeEditor />
 						</DialogContent>
 					</Dialog>
 

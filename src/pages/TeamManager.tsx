@@ -80,6 +80,9 @@ export default function TeamManager() {
 				<TableCell>{team.name}</TableCell>
 				<TableCell>{team.track}</TableCell>
 				<TableCell>
+					{team.challenges.length > 0 ? team.challenges.join(", ") : "-"}
+				</TableCell>
+				<TableCell>
 					<TeamMembersList team={team} />
 				</TableCell>
 				<TableCell className="whitespace-pre-wrap">
@@ -151,6 +154,7 @@ export default function TeamManager() {
 						<TableRow>
 							<TableHead>Name</TableHead>
 							<TableHead>Track</TableHead>
+							<TableHead>Challenge</TableHead>
 							<TableHead>Members</TableHead>
 							<TableHead>Mentoring Help</TableHead>
 							<TableHead className="w-0">Status</TableHead>

@@ -39,6 +39,15 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
             code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
             message="Track selection is required.",
         )
+
+    challenges = request.data.get("challenges", [])
+    if not isinstance(challenges, list) or len(challenges) > 1:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+            message="Only one challenge may be selected.",
+        )
+
+    challenges = [str(c).strip() for c in challenges if str(c).strip()]
     
     # check if members are not already in a team (check their teamId field)
 
@@ -71,6 +80,7 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
         name=name,
         memberIds=member_ids,
         track=track,
+        challenges=challenges,
         creatorId=creator_id,
         mentoringHelp=request.data.get("mentoringHelp", "").strip(),
         status="unverified",

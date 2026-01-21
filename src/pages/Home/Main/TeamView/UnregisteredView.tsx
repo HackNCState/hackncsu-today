@@ -1,6 +1,9 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: unnecessary for hardcoded lines */
 import { useAtomValue } from "jotai";
 import { tracksAtom } from "@/atoms/event/tracks";
+import { challengesAtom } from "@/atoms/event/challenges";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
 	Dialog,
 	DialogContent,
@@ -15,6 +18,7 @@ import {
 	FieldGroup,
 	FieldLabel,
 	FieldDescription,
+	FieldContent,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -57,6 +61,7 @@ import { userAtom } from "@/atoms/user";
 
 export default function UnregisteredView() {
 	const tracks = useAtomValue(tracksAtom);
+	const challenges = useAtomValue(challengesAtom);
 	const user = useAtomValue(userAtom);
 
 	const [invitedMembers, setInvitedMembers] = useState<PartialParticipant[]>(
@@ -68,6 +73,7 @@ export default function UnregisteredView() {
 		: invitedMembers;
 
 	const [selectedTrack, setSelectedTrack] = useState("");
+	const [selectedChallenge, setSelectedChallenge] = useState<string>("none");
 	const [teamName, setTeamName] = useState("");
 	const [mentoringHelp, setMentoringHelp] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,6 +136,7 @@ export default function UnregisteredView() {
 				track: selectedTrack,
 				mentoringHelp,
 				members: members.map((m) => m.id),
+				challenges: selectedChallenge === "none" ? [] : [selectedChallenge],
 			});
 		} catch (error: any) {
 			console.error("Registration failed", error);
@@ -158,10 +165,12 @@ export default function UnregisteredView() {
 					<FieldGroup className="py-4">
 						{/* Team Name */}
 						<Field>
-							<FieldLabel htmlFor="team-name">Team Name</FieldLabel>
-							<FieldDescription>
-								If you can't think of a team name, just use your project name!
-							</FieldDescription>
+							<FieldContent>
+								<FieldLabel htmlFor="team-name">Team Name</FieldLabel>
+								<FieldDescription>
+									If you can't think of a team name, just use your project name!
+								</FieldDescription>
+							</FieldContent>
 							<Input
 								id="team-name"
 								placeholder="Enter your team name"
@@ -173,10 +182,12 @@ export default function UnregisteredView() {
 
 						{/* Track Selection */}
 						<Field>
-							<FieldLabel htmlFor="track">Track</FieldLabel>
-							<FieldDescription>
-								Select the track your team will participate in.
-							</FieldDescription>
+							<FieldContent>
+								<FieldLabel htmlFor="track">Track</FieldLabel>
+								<FieldDescription>
+									Select the track your team will participate in.
+								</FieldDescription>
+							</FieldContent>
 							<Select value={selectedTrack} onValueChange={setSelectedTrack}>
 								<SelectTrigger id="track" className="w-full">
 									<SelectValue placeholder="Select a track">
@@ -199,6 +210,47 @@ export default function UnregisteredView() {
 									))}
 								</SelectContent>
 							</Select>
+						</Field>
+
+						{/* Challenge Selection */}
+						<Field>
+							<FieldContent>
+								<FieldLabel>Challenge (Optional)</FieldLabel>
+								<FieldDescription>
+									Select a challenge your team will participate in.
+								</FieldDescription>
+							</FieldContent>
+							<RadioGroup
+								value={selectedChallenge}
+								onValueChange={setSelectedChallenge}
+								variant="compact"
+								className="flex flex-col gap-3 py-2"
+							>
+								{challenges.map((challenge) => (
+									<Field key={challenge.name} orientation="horizontal">
+										<RadioGroupItem
+											value={challenge.name}
+											id={challenge.name}
+										/>
+										<FieldContent>
+											<FieldLabel htmlFor={challenge.name}>
+												{challenge.name}
+											</FieldLabel>
+											<FieldDescription>
+												{challenge.description}
+											</FieldDescription>
+										</FieldContent>
+									</Field>
+								))}
+								<Field orientation="horizontal">
+									<RadioGroupItem value="none" id="challenge-none" />
+									<FieldContent>
+										<FieldLabel htmlFor="challenge-none">
+											No specific challenge
+										</FieldLabel>
+									</FieldContent>
+								</Field>
+							</RadioGroup>
 						</Field>
 
 						{/* Members Section */}
@@ -307,13 +359,15 @@ export default function UnregisteredView() {
 
 						{/* Mentoring Request */}
 						<Field>
-							<FieldLabel htmlFor="mentoring">
-								Do you need any mentoring on a specific subject?
-							</FieldLabel>
-							<FieldDescription>
-								If you don't have any specific mentoring needs, you can leave
-								this blank.
-							</FieldDescription>
+							<FieldContent>
+								<FieldLabel htmlFor="mentoring">
+									Do you need any mentoring on a specific subject?
+								</FieldLabel>
+								<FieldDescription>
+									If you don't have any specific mentoring needs, you can leave
+									this blank.
+								</FieldDescription>
+							</FieldContent>
 							<Input
 								id="mentoring"
 								placeholder="e.g. using GitHub, building UI, etc."

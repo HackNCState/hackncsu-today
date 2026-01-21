@@ -10,6 +10,7 @@ class Team:
     memberIds: list[str]
     """Min 2 max 4 members"""
     track: str
+    challenges: list[str]
     creatorId: str
     mentoringHelp: str
     """Do you need any mentoring on a specific subject?"""

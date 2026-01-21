@@ -23,6 +23,7 @@ export const functionsService = {
 		track: string;
 		mentoringHelp: string;
 		members: string[];
+		challenges: string[];
 	}) => {
 		const func = httpsCallable(fn, functions.registerTeam);
 		await func(teamData);
@@ -30,5 +31,5 @@ export const functionsService = {
 	loadSchedule: async () => {
 		const func = httpsCallable(fn, functions.loadSchedule);
 		await func();
-	}
+	},
 };

@@ -47,8 +47,14 @@ export const TrackSchema = z.object({
 	description: z.string().optional(),
 });
 
+export const ChallengeSchema = z.object({
+	name: z.string(),
+	description: z.string().optional(),
+});
+
 export const EventConfigSchema = z.object({
 	tracks: z.array(TrackSchema).default([]),
+	challenges: z.array(ChallengeSchema).default([]),
 	hackingState: z.enum(["setup", "countdown", "judging", "ended"]),
 	hackingEndTime: z.iso.datetime(),
 	schedules: z.array(ScheduleSchema).default([]),
@@ -57,6 +63,7 @@ export const EventConfigSchema = z.object({
 });
 
 export type Track = z.infer<typeof TrackSchema>;
+export type Challenge = z.infer<typeof ChallengeSchema>;
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
 export type Announcement = z.infer<typeof AnnouncementSchema>;
