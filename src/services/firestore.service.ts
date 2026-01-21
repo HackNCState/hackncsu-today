@@ -70,6 +70,13 @@ export const firestoreService = {
 		return docs.docs.map((doc) => TeamSchema.parse(doc.data()));
 	},
 
+	fetchAllUsers: async () => {
+		const usersCollectionRef = collection(firestore, collections.users);
+		const docs = await getDocs(usersCollectionRef);
+
+		return docs.docs.map((doc) => UserSchema.parse(doc.data()));
+	},
+
 	deleteTeam: async (teamId: string) => {
 		const team = await firestoreService.fetchTeam(teamId);
 

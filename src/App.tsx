@@ -6,6 +6,7 @@ import Auth from "./pages/Auth";
 import { useAuthListener } from "@/hooks/useAuthListener";
 import { useTeamListener } from "@/atoms/team";
 import TeamManager from "./pages/TeamManager";
+import ParticipantManager from "./pages/ParticipantManager";
 
 function App() {
 	useAuthListener();
@@ -28,6 +29,14 @@ function App() {
 						element={
 							<ProtectedRoute>
 								<TeamManager />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/admin/participants"
+						element={
+							<ProtectedRoute>
+								<ParticipantManager />
 							</ProtectedRoute>
 						}
 					/>

@@ -160,7 +160,12 @@ export default function OrganizerView() {
 				<h4 className="text-xl font-synemono">Management</h4>
 
 				<div className="flex flex-wrap gap-2">
-					<Button variant="outline">Manage Participants</Button>
+					<Button
+						variant="outline"
+						onClick={() => navigate("/admin/participants")}
+					>
+						Manage Participants
+					</Button>
 					<Button variant="outline" onClick={() => navigate("/admin/teams")}>
 						Manage Teams
 					</Button>
