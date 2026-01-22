@@ -7,6 +7,7 @@ import { useAuthListener } from "@/hooks/useAuthListener";
 import { useTeamListener } from "@/atoms/team";
 import TeamManager from "./pages/TeamManager";
 import ParticipantManager from "./pages/ParticipantManager";
+import NotificationListener from "./components/NotificationListener";
 
 function App() {
 	useAuthListener();
@@ -15,6 +16,8 @@ function App() {
 	return (
 		<BrowserRouter>
 			<div className="min-h-screen">
+				<NotificationListener />
+
 				<Routes>
 					<Route
 						path="/"

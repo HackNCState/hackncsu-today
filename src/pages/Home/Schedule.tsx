@@ -5,6 +5,7 @@ import {
 } from "@/atoms/event/schedule";
 import { isOrganizerAtom } from "@/atoms/user";
 import { Timeline, TimelineItem } from "@/components/ui/timeline";
+import { useBreakpoint } from "@/hooks/useMediaQuery";
 import { functionsService } from "@/services/functions.service";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef } from "react";
@@ -17,6 +18,8 @@ export default function Schedule() {
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const currentItemRef = useRef<HTMLDivElement>(null);
+
+	const isMobile = !useBreakpoint("lg");
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: necessary to only run when scheduleData changes
 	useEffect(() => {
@@ -93,23 +96,27 @@ export default function Schedule() {
 					className="flex-1 px-6 pb-6 flex flex-col gap-2 lg:overflow-y-auto"
 				>
 					{isOrganizer && (
-						<div className="mb-2 flex flex-col gap-2">
-							<p className="text-sm text-muted-foreground">
-								Click on an item to move the timeline.
-							</p>
-							<p className="text-sm text-muted-foreground">
+						<div className="mb-2 flex flex-col gap-2 text-sm text-muted-foreground">
+							{isMobile && (
+								<p className="text-destructive">
+									It appears that you may be on a mobile device. Please be
+									careful not to accidentally change the timeline when trying to
+									scroll. Some participants will have notifications on and they
+									WILL notice your oopsie.
+								</p>
+							)}
+							<p>Click on an item to move the timeline.</p>
+							<p>
 								Click 'delay' on an item to change the time of an event.
 								Participants will see the old time crossed out. Great for
 								delays! (e.g. late lunch or something)
 							</p>
-							<p className="text-sm text-muted-foreground">
+							<p>
 								'sync spreadsheet' will pull in any updates from the run-of-show
 								spreadsheet in the google drive. It will try to preserve the
 								timeline for minimal disruption to participants.
 							</p>
-							<p className="text-sm text-muted-foreground">
-								'reset' will set the timeline back to the start
-							</p>
+							<p>'reset' will set the timeline back to the start</p>
 						</div>
 					)}
 
