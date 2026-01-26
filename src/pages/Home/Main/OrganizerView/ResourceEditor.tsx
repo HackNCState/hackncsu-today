@@ -23,7 +23,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Resource } from "@/types/event";
+import type { Resource } from "@/types/event/event";
 import { useAtomValue, useSetAtom } from "jotai";
 import { Edit2, Plus, Trash2 } from "lucide-react";
 import { useId, useState } from "react";

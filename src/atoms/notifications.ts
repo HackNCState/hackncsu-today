@@ -1,7 +1,4 @@
-import type {
-	Announcement,
-	ScheduleItem,
-} from "@/types/event";
+import type { Announcement, ScheduleItem } from "@/types/event/event";
 import { notificationsService } from "@/services/notifications.service";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";

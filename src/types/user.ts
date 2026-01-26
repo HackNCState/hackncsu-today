@@ -14,6 +14,11 @@ export const OrganizerSchema = BaseUserSchema.extend({
 	role: z.literal("organizer"),
 });
 
+export const ChecklistItemStatusSchema = z.object({
+	id: z.string(),
+	completed: z.boolean(),
+});
+
 export const ParticipantSchema = BaseUserSchema.extend({
 	role: z.literal("participant"),
 
@@ -29,6 +34,7 @@ export const ParticipantSchema = BaseUserSchema.extend({
 	attendedEvents: z.array(z.string()),
 
 	resumeURL: z.string().nullable().optional(),
+	completedChecklistIds: z.array(ChecklistItemStatusSchema).default([]), // TODO: complete implementation
 });
 
 export const UserSchema = z.discriminatedUnion("role", [
@@ -44,5 +50,6 @@ export const PartialParticipantSchema = ParticipantSchema.pick({
 
 export type PartialParticipant = z.infer<typeof PartialParticipantSchema>;
 export type Organizer = z.infer<typeof OrganizerSchema>;
+export type ChecklistItemStatus = z.infer<typeof ChecklistItemStatusSchema>;
 export type Participant = z.infer<typeof ParticipantSchema>;
 export type UserData = z.infer<typeof UserSchema>;

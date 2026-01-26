@@ -1,5 +1,5 @@
 import { firestoreService } from "@/services/firestore.service";
-import type { Resource } from "@/types/event";
+import type { Resource } from "@/types/event/event";
 import { atom } from "jotai";
 import { eventConfigAtom } from "./config";
 

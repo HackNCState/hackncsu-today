@@ -1,4 +1,4 @@
-import type { EventConfig } from "@/types/event";
+import type { EventConfig } from "@/types/event/event";
 import { atom } from "jotai";
 import { eventConfigAtom } from "./config";
 

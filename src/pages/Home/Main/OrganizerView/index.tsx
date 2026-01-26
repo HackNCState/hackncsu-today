@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import { EventConfigSchema } from "@/types/event";
+import { EventConfigSchema } from "@/types/event/event";
 import { SendIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import FeedItem from "../FeedItem";
