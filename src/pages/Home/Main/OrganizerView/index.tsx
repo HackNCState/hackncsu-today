@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import { EventConfigSchema } from "@/types/event/event";
 import { SendIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import FeedItem from "../FeedItem";
 import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
@@ -21,6 +20,7 @@ import ResourceEditor from "./ResourceEditor";
 import { TrackEditor } from "./TrackEditor";
 import { ChallengeEditor } from "./ChallengeEditor";
 import { useNavigate } from "react-router-dom";
+import { functionsService } from "@/services/functions.service";
 
 export default function OrganizerView() {
 	const navigate = useNavigate();
@@ -31,107 +31,21 @@ export default function OrganizerView() {
 	const isDesktop = useBreakpoint("lg");
 
 	const [announcementText, setAnnouncementText] = useState("");
+	const [isInitializing, setIsInitializing] = useState(false);
+	const [initializeError, setInitializeError] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (config === null) {
-			// set config if none exists
-			const startTime = new Date();
-			startTime.setHours(11, 0, 0);
-			const endTime = new Date(startTime);
-			endTime.setDate(startTime.getDate() + 1);
-
-			const defaultConfig = EventConfigSchema.parse({
-				tracks: [
-					{ name: "Track 1", description: "Sample elite ball track" },
-					{ name: "Track 2", description: "Sample great ball track" },
-					{ name: "Track 3", description: "Sample poke ball track" },
-				],
-				challenges: [
-					{
-						name: "Sample Challenge 1",
-						description: "This is a sample challenge description.",
-					},
-					{
-						name: "Sample Challenge 2",
-						description:
-							"This is another sample challenge description. Perhaps this could be an API challenge?",
-					},
-				],
-				hackingState: "setup",
-				hackingEndTime: endTime.toISOString(),
-				resources: [
-					{
-						type: "text",
-						label: "Rules",
-						content: `- Rule 1
-- Rule 2
-- Rule 3
-- etc.
-						`,
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Tracks",
-						content:
-							"The Tracks resource is auto-generated based on the tracks you configure for the event.",
-						hidden: true,
-					},
-					{
-						type: "text",
-						label: "Challenges",
-						content:
-							"The Challenges resource is auto-generated based on the challenges you configure for the event.",
-						hidden: true,
-					},
-					{
-						type: "text",
-						label: "FAQs",
-						content:
-							"Event FAQs go here. You can use markdown to bold, italicize, and add links and even images!",
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Judging Criteria",
-						content:
-							"Judging criteria go here. You can use markdown to bold, italicize, and add links and even images!",
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Prizes",
-						content:
-							"Prizes information goes here. You can use markdown to bold, italicize, and add links and even images!",
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Catering Menu",
-						content:
-							"![borzoi](https://media1.tenor.com/m/J3sih0hnKLwAAAAC/borzoi-siren.gif	)",
-						hidden: false,
-					},
-					{
-						type: "link",
-						label: "Opening Slides",
-						url: "https://example.com",
-						hidden: true,
-					},
-					{
-						type: "link",
-						label: "Discord",
-						url: "https://example.com",
-						hidden: false,
-					},
-				],
-			});
-
-			updateConfig(defaultConfig);
-
-			console.log("No event config found, initializing default config");
+	const handleInitializeEvent = async () => {
+		setIsInitializing(true);
+		setInitializeError(null);
+		try {
+			await functionsService.initializeEvent();
+		} catch (error) {
+			console.error(error);
+			setInitializeError("Failed to initialize event data.");
+		} finally {
+			setIsInitializing(false);
 		}
-	}, [config, updateConfig]);
+	};
 
 	const handlePostAnnouncement = (e: React.FormEvent) => {
 		// should also handle sending to discord webhook
@@ -149,6 +63,22 @@ export default function OrganizerView() {
 		});
 		setAnnouncementText("");
 	};
+
+	if (config === null) {
+		return (
+			<FeedItem title="Organizer Settings">
+				<div className="flex flex-col gap-4">
+					<p className="text-lg font-synemono">Event data is uninitialized!</p>
+					<Button onClick={handleInitializeEvent} disabled={isInitializing}>
+						Create data
+					</Button>
+					{initializeError && (
+						<p className="text-sm text-destructive">{initializeError}</p>
+					)}
+				</div>
+			</FeedItem>
+		);
+	}
 
 	if (!config) return null;
 

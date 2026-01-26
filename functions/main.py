@@ -18,4 +18,5 @@ from auth.oauth_callback import *
 from firestore.users import *
 from firestore.teams import *
 from firestore.schedule import *
+from firestore.event import *
 from api import *
