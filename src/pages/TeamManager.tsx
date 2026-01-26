@@ -157,6 +157,35 @@ export default function TeamManager() {
 		fetchTeams();
 	};
 
+	const handleApproveTeam = async (team: Team) => {
+		await firestoreService.updateTeam(team.id, {
+			status: "approved",
+		});
+
+		for (const memberId of team.memberIds) {
+			const member = await firestoreService.fetchUser(memberId);
+			if (member?.role !== "participant") continue;
+
+			const existingStatuses = member.checklistItemStatuses || [];
+			const filteredStatuses = existingStatuses.filter(
+				(status) => status.id !== "create_team" && status.id !== "approve_team",
+			);
+
+			const checklistItemStatuses = [
+				...filteredStatuses,
+				{ id: "create_team", completed: true },
+				{ id: "approve_team", completed: true },
+			];
+
+			await firestoreService.updateUser(memberId, {
+				teamId: team.id,
+				checklistItemStatuses,
+			});
+		}
+
+		fetchTeams();
+	};
+
 	function rowBuilder(team: Team) {
 		const isUnverified = team.status === "unverified";
 		return (
@@ -192,19 +221,7 @@ export default function TeamManager() {
 							variant="outline"
 							size="sm"
 							className="ml-2"
-							onClick={async () => {
-								await firestoreService.updateTeam(team.id, {
-									status: "approved",
-								});
-
-								for (const memberId of team.memberIds) {
-									await firestoreService.updateUser(memberId, {
-										teamId: team.id,
-									});
-								}
-
-								fetchTeams();
-							}}
+							onClick={() => handleApproveTeam(team)}
 						>
 							Approve
 						</Button>

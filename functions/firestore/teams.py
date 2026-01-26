@@ -91,5 +91,23 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
     # Update creator's user document to include teamId
     # (the other members will be updated when the team is approved)
 
+    # auto check "create_team" checklist item for creator
+
     creator_ref = users_ref.document(creator_id)
-    creator_ref.update({"teamId": team_doc_ref.id})
+    creator_snapshot = creator_ref.get()
+    creator_data = creator_snapshot.to_dict() if creator_snapshot.exists else None
+
+    checklist_statuses = (
+        creator_data.get("checklistItemStatuses", []) if creator_data else []
+    )
+    checklist_statuses = [
+        status for status in checklist_statuses if status.get("id") != "create_team"
+    ]
+    checklist_statuses.append({"id": "create_team", "completed": True})
+
+    creator_ref.update(
+        {
+            "teamId": team_doc_ref.id,
+            "checklistItemStatuses": checklist_statuses,
+        }
+    )

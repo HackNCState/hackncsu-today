@@ -17,6 +17,11 @@ EVENTS_LIST = StringParam(
     description="Comma-separated list of event IDs mapped to event names (e.g. '1:breakfast,2:dinner')",
 )
 
+EXCLUDED_EVENT_IDS = StringParam(
+    name="EXCLUDED_EVENT_IDS",
+    description="Comma-separated list of event IDs to exclude from attendance tracking",
+)
+
 
 @https_fn.on_request(secrets=[ORGANIZER_API_TOKEN])
 def participant(request: https_fn.Request) -> https_fn.Response:
@@ -98,6 +103,12 @@ def set_user_attended(request: https_fn.Request) -> https_fn.Response:
     if not event_name:
         return https_fn.Response("Event not found", status=404)
 
+    excluded_ids = {
+        excluded.strip()
+        for excluded in EXCLUDED_EVENT_IDS.value.split(",")
+        if excluded.strip()
+    }
+
     db = firestore.client()
     users_ref = db.collection("users")
 
@@ -116,6 +127,18 @@ def set_user_attended(request: https_fn.Request) -> https_fn.Response:
     if event_name in attended_events:
         return https_fn.Response("User already attended event", status=420)
 
-    user_doc.reference.update({"attendedEvents": ArrayUnion([event_name])})
+    updates = {"attendedEvents": ArrayUnion([event_name])}
+
+    if str(event_id) not in excluded_ids:
+        checklist_statuses = user_data.get("checklistItemStatuses", [])
+        checklist_statuses = [
+            status
+            for status in checklist_statuses
+            if status.get("id") != "attend_workshop"
+        ]
+        checklist_statuses.append({"id": "attend_workshop", "completed": True})
+        updates["checklistItemStatuses"] = checklist_statuses
+
+    user_doc.reference.update(updates)
 
     return https_fn.Response("OK", status=200)

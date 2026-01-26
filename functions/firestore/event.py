@@ -113,6 +113,21 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
                 "autoCheck": True,
             },
             {
+                "id": "create_github_repo",
+                "title": "Create a GitHub repository",
+                "description": "Create a shared [GitHub](https://github.com) repo so your team can collaborate and track progress. "
+                "Set it to public so judges can view it after submission. New to GitHub? Check out this "
+                "[resource](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories) or ask a mentor for help.",
+                "autoCheck": False,
+            },
+            {
+                "id": "signup_devpost",
+                "title": "Register on Devpost",
+                "description": "Devpost is where projects are submitted for judging. Each team member should create an account and register for the hackathon at "
+                "[hackncstate2026.devpost.com](https://hackncstate2026.devpost.com). Register early so you're ready to submit later.",
+                "autoCheck": False,
+            },
+            {
                 "id": "approve_team",
                 "title": "Check in with a mentor and get your team approved",
                 "description": "After you've created your team, wait for the mentor check-in period. "
@@ -121,43 +136,41 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
                 "autoCheck": True,
             },
             {
-                "id": "create_github_repo",
-                "title": "Create a GitHub repository",
-                "description": "You'll need a [GitHub](https://github.com) repository for your project so your team can collaborate and track progress. "
-                "Make sure it's set to public so judges can view it after you submit! If you're new to GitHub, check out this "
-                "[resource](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories). "
-                "Don't hesitate to ask a mentor or look stuff up if you need help.",
-                "autoCheck": False,
-            },
-            {
-                "id": "signup_devpost",
-                "title": "Register on Devpost",
-                "description": "Devpost is where you'll submit your project for judging. To do this, all team members should create a Devpost account and register "
-                "at [hackncstate2026.devpost.com](https://hackncstate2026.devpost.com). You'll also be able to view your peers' projects from here. "
-                "Get this out of the way early so you don't forget later!",
-                "autoCheck": False,
-            },
-            {
                 "id": "attend_workshop",
                 "title": "Attend a workshop",
-                "description": "Our workshops are a great way to learn new skills and technologies that can help you build your project. Each attendance will count "
-                "as a raffle entry for prizes, so try to attend as many as you can! Refer to the schedule for workshop times and locations, and the Prizes section for more info on raffle prizes.",
+                "description": "Workshops are a fun way to learn new skills that can help your project. Each workshop you attend counts as a raffle entry. "
+                "Check the schedule for times and locations, and see the Prizes section for raffle details.",
                 "autoCheck": True,
+            },
+            {
+                "id": "sponsors_attend",
+                "title": "Check out our sponsors",
+                "description": "Our sponsors are tabling in Talley Ballroom and would love to meet you. "
+                "Stop by to learn about their companies and what they do—and feel free to pick up some swag.",
+                "autoCheck": False,
             },
             {
                 "id": "draft_submission",
                 "title": "Draft your Devpost submission",
-                "description": "One member of your team should draft the Devpost submission for your project. "
-                "From the project page, you'll be able to invite the other members of your team and periodically update your submission. "
-                "It is good practice to draft your submission early and update it as you make progress on your project, since you won't be able to make changes after the submission deadline.",
+                "description": "One team member should create the draft Devpost submission. "
+                "From the project page, invite teammates and update the submission as you make progress. "
+                "Draft early so you’re not rushed before the deadline.",
                 "autoCheck": False,
             },
             {
                 "id": "submit_project",
                 "title": "Submit your project",
-                "description": "Submit your project on Devpost before the deadline. Changes pushed to your repository after submission will not be considered for judging, "
-                "so make sure everything is ready beforehand! You may review judging criteria in the Resources section to ensure your project meets all requirements. "
-                "**Remember, only one member needs to submit on behalf of the team.**",
+                "description": "Submit your project on Devpost before the deadline. "
+                "Any repository changes after submission won’t be judged, so make sure everything is ready first. "
+                "Review the judging criteria in Resources if needed. "
+                "**Only one team member needs to submit.**",
+                "autoCheck": False,
+            },
+            {
+                "id": "project_demo",
+                "title": "Prepare a project demo",
+                "description": "You'll need to demo your project during the judging period. You get to decide how you want to present it, but "
+                "make sure it's under 5 minutes. Practice your demo to ensure it fits within the time limit and highlights your project's strengths.",
                 "autoCheck": False,
             },
         ],

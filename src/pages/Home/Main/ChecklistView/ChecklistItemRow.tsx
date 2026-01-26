@@ -54,7 +54,7 @@ export default function ChecklistItemRow({
 							<p>
 								{isChecked
 									? "We checked this one off for you."
-									: "We'll check this one off for you."}
+									: "We'll check this one off for you once you complete it."}
 							</p>
 						</TooltipContent>
 					</Tooltip>
@@ -69,7 +69,9 @@ export default function ChecklistItemRow({
 						aria-expanded={isOpen}
 						aria-controls={`checklist-desc-${item.id}`}
 					>
-						<FieldTitle>{item.title}</FieldTitle>
+						<FieldTitle className={cn(isChecked && "line-through")}>
+							{item.title}
+						</FieldTitle>
 						<ChevronDown
 							className={`size-4 text-muted-foreground transition ${
 								isOpen ? "rotate-180" : "rotate-0"
@@ -88,6 +90,7 @@ export default function ChecklistItemRow({
 								<ReactMarkdown
 									remarkPlugins={[remarkGfm]}
 									components={{
+										p: ({ children }) => <span>{children}</span>,
 										a: ({ children, href }) => (
 											<a
 												href={href}

@@ -22,9 +22,9 @@ export default function Main() {
 
 			<AnnouncementsView />
 
-			{!isOrganizer && <TeamView />}
-
 			{!isOrganizer && <ChecklistView />}
+
+			{!isOrganizer && <TeamView />}
 
 			{!isOrganizer && <ResumeUploadView />}
 		</main>
