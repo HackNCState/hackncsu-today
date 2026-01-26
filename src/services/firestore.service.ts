@@ -1,7 +1,7 @@
 import { firestore } from "@/lib/firebase-config";
 import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { TeamSchema, type Team } from "@/types/team";
-import { UserSchema, type UserData } from "@/types/user";
+import { ParticipantSchema, UserSchema, type UserData } from "@/types/user";
 import {
 	collection,
 	deleteDoc,
@@ -9,8 +9,10 @@ import {
 	getDoc,
 	getDocs,
 	onSnapshot,
+	query,
 	setDoc,
 	updateDoc,
+	where,
 } from "firebase/firestore";
 
 const collections = {
@@ -31,6 +33,27 @@ export const firestoreService = {
 		}
 
 		return null;
+	},
+
+	fetchUserByRFID: async (rfidUUID: string) => {
+		console.log("Fetching user by RFID:", rfidUUID);
+
+		const usersCollectionRef = collection(firestore, collections.users);
+		const usersQuery = query(
+			usersCollectionRef,
+			where("rfidUUID", "==", rfidUUID),
+		);
+		const docs = await getDocs(usersQuery);
+
+		if (docs.empty) {
+			return null;
+		}
+
+		if (docs.docs.length > 1) {
+			console.warn(`Multiple users found with the same RFID UUID: ${rfidUUID}`);
+		}
+
+		return ParticipantSchema.parse(docs.docs[0].data());
 	},
 
 	onUserSnapshot: (
@@ -189,6 +212,25 @@ export const firestoreService = {
 				const userDocRef = doc(firestore, collections.users, user.id);
 				await setDoc(userDocRef, user);
 			}
+
+			const userDocRef = doc(firestore, collections.users, "john-rfidsample");
+			await setDoc(userDocRef, {
+				id: "john-rfidsample",
+				username: "johnrfid",
+				role: "participant" as const,
+				email: "john@gnail.com",
+				firstName: "John",
+				lastName: "RFIDSample",
+				phone: "987-654-3210",
+				shirtSize: "L",
+				dietaryRestrictions: "Vegetarian",
+				rfidUUID: "f1dafe33-f6f3-4786-9f07-de15480b8dbf",
+				attendedEvents: [],
+				hadFirstLunch: false,
+				hadSecondLunch: false,
+				hadBreakfast: false,
+				hadDinner: false,
+			});
 		}
 	},
 };

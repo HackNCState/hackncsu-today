@@ -118,6 +118,9 @@ export default function OrganizerView() {
 					<Button variant="outline" onClick={() => navigate("/admin/teams")}>
 						Manage Teams
 					</Button>
+					<Button variant="outline" onClick={() => navigate("/admin/rfid")}>
+						RFID Reader
+					</Button>
 				</div>
 
 				<h4 className="text-xl font-synemono">

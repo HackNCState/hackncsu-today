@@ -8,6 +8,7 @@ import { useTeamListener } from "@/atoms/team";
 import TeamManager from "./pages/TeamManager";
 import ParticipantManager from "./pages/ParticipantManager";
 import NotificationListener from "./components/NotificationListener";
+import RFIDReader from "./pages/RFIDReader";
 
 function App() {
 	useAuthListener();
@@ -40,6 +41,14 @@ function App() {
 						element={
 							<ProtectedRoute>
 								<ParticipantManager />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/admin/rfid"
+						element={
+							<ProtectedRoute>
+								<RFIDReader />
 							</ProtectedRoute>
 						}
 					/>
