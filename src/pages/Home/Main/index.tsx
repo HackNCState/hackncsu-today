@@ -5,6 +5,7 @@ import OrganizerView from "./OrganizerView";
 import TeamView from "./TeamView";
 import AnnouncementsView from "./AnnouncementsView";
 import ResumeUploadView from "./ResumeUploadView";
+import ChecklistView from "./ChecklistView";
 
 export default function Main() {
 	const isOrganizer = useAtomValue(isOrganizerAtom);
@@ -21,14 +22,9 @@ export default function Main() {
 
 			<AnnouncementsView />
 
-			{!isOrganizer && (
-				<FeedItem
-					title="// TODO"
-					description="Use the checklist below as a guide to stay on track during the event."
-				></FeedItem>
-			)}
-
 			{!isOrganizer && <TeamView />}
+
+			{!isOrganizer && <ChecklistView />}
 
 			{!isOrganizer && <ResumeUploadView />}
 		</main>

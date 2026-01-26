@@ -1,5 +1,5 @@
 import { firestore } from "@/lib/firebase-config";
-import { EventConfigSchema, type EventConfig } from "@/types/event/event";
+import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { TeamSchema, type Team } from "@/types/team";
 import { UserSchema, type UserData } from "@/types/user";
 import {

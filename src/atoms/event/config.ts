@@ -1,5 +1,5 @@
 import { firestoreService } from "@/services/firestore.service";
-import type { EventConfig } from "@/types/event/event";
+import type { EventConfig } from "@/types/event";
 import { atom } from "jotai";
 
 // undefined = loading, null = no config (should create one i reckon), EventConfig = config

@@ -34,7 +34,7 @@ export const ParticipantSchema = BaseUserSchema.extend({
 	attendedEvents: z.array(z.string()),
 
 	resumeURL: z.string().nullable().optional(),
-	completedChecklistIds: z.array(ChecklistItemStatusSchema).default([]), // TODO: complete implementation
+	checklistItemStatuses: z.array(ChecklistItemStatusSchema).default([]), // TODO: complete implementation
 });
 
 export const UserSchema = z.discriminatedUnion("role", [

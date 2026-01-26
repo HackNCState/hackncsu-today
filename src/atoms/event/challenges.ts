@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { eventConfigAtom } from "./config";
 import { firestoreService } from "@/services/firestore.service";
-import type { Challenge } from "@/types/event/event";
+import type { Challenge } from "@/types/event";
 
 export const challengesAtom = atom((get) => {
 	const config = get(eventConfigAtom);

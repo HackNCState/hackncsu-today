@@ -24,6 +24,12 @@ export const teamIdAtom = atom((get) => {
 	return user?.role === "participant" ? user.teamId : null;
 });
 
+export const completedChecklistStatusesAtom = atom((get) => {
+	const user = get(userAtom);
+	if (user?.role !== "participant") return [];
+	return user.checklistItemStatuses;
+});
+
 export const debugSwitchUserRoleAtom = atom(
 	null,
 	async (get, set, role: "organizer" | "participant") => {

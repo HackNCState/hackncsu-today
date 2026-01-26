@@ -52,6 +52,13 @@ export const ChallengeSchema = z.object({
 	description: z.string().optional(),
 });
 
+export const ChecklistItemSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	description: z.string(),
+	autoChecked: z.boolean().optional(), // whether this item is auto checked by the system
+});
+
 export const EventConfigSchema = z.object({
 	tracks: z.array(TrackSchema).default([]),
 	challenges: z.array(ChallengeSchema).default([]),
@@ -60,6 +67,7 @@ export const EventConfigSchema = z.object({
 	schedules: z.array(ScheduleSchema).default([]),
 	announcements: z.array(AnnouncementSchema).default([]),
 	resources: z.array(ResourceSchema).default([]),
+	checklistItems: z.array(ChecklistItemSchema).default([]),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
@@ -68,4 +76,5 @@ export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
 export type Announcement = z.infer<typeof AnnouncementSchema>;
 export type Resource = z.infer<typeof ResourceSchema>;
+export type ChecklistItem = z.infer<typeof ChecklistItemSchema>;
 export type EventConfig = z.infer<typeof EventConfigSchema>;

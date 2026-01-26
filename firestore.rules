@@ -29,11 +29,6 @@ service cloud.firestore {
     match /event/{eventId} {
       // Anyone can read event data.
       allow read: if true;
-
-      // Anyone can read checklist items.
-      match /checklist/{checklistItemId} {
-        allow read: if true;
-      }
     }
   }
 }

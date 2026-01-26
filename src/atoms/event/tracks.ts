@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { eventConfigAtom } from "./config";
 import { firestoreService } from "@/services/firestore.service";
-import type { Track } from "@/types/event/event";
+import type { Track } from "@/types/event";
 
 export const tracksAtom = atom((get) => {
 	const config = get(eventConfigAtom);
