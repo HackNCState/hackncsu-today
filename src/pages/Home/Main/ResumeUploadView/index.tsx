@@ -80,9 +80,9 @@ export default function ResumeUploadView() {
 			<div
 				{...getRootProps()}
 				className={cn(
-					"mt-2 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 transition-colors duration-200 w-full outline-none",
+					"mt-2 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 transition-all duration-200 w-full outline-none",
 					isDragActive
-						? "border-primary bg-primary/10"
+						? "border-primary bg-primary/10 shadow-[0_0_25px_var(--tw-shadow-color)] shadow-primary/20"
 						: "border-muted-foreground/25",
 				)}
 			>

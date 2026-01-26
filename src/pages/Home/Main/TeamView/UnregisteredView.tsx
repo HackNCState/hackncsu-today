@@ -42,7 +42,10 @@ export default function UnregisteredView() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button size="lg" className="mt-2 w-full sm:w-auto">
+				<Button
+					size="lg"
+					className="mt-2 w-full sm:w-auto shadow-[0_0_15px_var(--tw-shadow-color)] shadow-primary/40"
+				>
 					<ArrowRight className="mr-2 h-4 w-4" /> Register Your Team
 				</Button>
 			</DialogTrigger>
