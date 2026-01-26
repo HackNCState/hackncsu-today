@@ -1,6 +1,9 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import FeedItem from "../FeedItem";
-import { completedChecklistStatusesAtom } from "@/atoms/user";
+import {
+	completedChecklistStatusesAtom,
+	setChecklistStatusAtom,
+} from "@/atoms/user";
 import { checklistItemsAtom } from "@/atoms/event/checklistItems";
 import { FieldGroup } from "@/components/ui/field";
 import ChecklistItemRow from "./ChecklistItemRow";
@@ -9,10 +12,16 @@ export default function ChecklistView() {
 	const checklistItemStatuses = useAtomValue(completedChecklistStatusesAtom);
 	const checklistItems = useAtomValue(checklistItemsAtom);
 
+	const setChecklistStatus = useSetAtom(setChecklistStatusAtom);
+
+	function handleToggle(id: string, checked: boolean) {
+		setChecklistStatus(id, checked);
+	}
+
 	return (
 		<FeedItem
 			title="Checklist"
-			description="Use the checklist below as a guide to stay on track during the event."
+			description="Use the checklist below as a guide to stay on track during the event. Click an item to view more details."
 		>
 			<FieldGroup className="gap-1">
 				{checklistItems.map((item) => {
@@ -20,7 +29,12 @@ export default function ChecklistView() {
 					const isChecked = status?.completed || false;
 
 					return (
-						<ChecklistItemRow key={item.id} item={item} isChecked={isChecked} />
+						<ChecklistItemRow
+							key={item.id}
+							item={item}
+							isChecked={isChecked}
+							onToggle={handleToggle}
+						/>
 					);
 				})}
 			</FieldGroup>

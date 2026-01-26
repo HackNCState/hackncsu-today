@@ -10,6 +10,12 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ChevronDown } from "lucide-react";
 import type { ChecklistItem } from "@/types/event";
+import { cn } from "@/lib/utils";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ChecklistItemRowProps {
 	item: ChecklistItem;
@@ -24,33 +30,44 @@ export default function ChecklistItemRow({
 }: ChecklistItemRowProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
-	const handleCardClick = () => {
-		setIsOpen((prev) => !prev);
-	};
-
-	const handleCheckboxClick = (e: React.MouseEvent) => {
-		e.stopPropagation();
-	};
-
-	const handleCheckboxChange = (checked: boolean) => {
-		onToggle?.(item.id, checked);
-	};
+	function checkboxBuilder() {
+		return (
+			<Checkbox
+				id={`checklist-${item.id}`}
+				name={`checklist-${item.id}`}
+				checked={isChecked}
+				disabled={item.autoCheck}
+				onClick={(e) => e.stopPropagation()}
+				onCheckedChange={(checked: boolean) => onToggle?.(item.id, checked)}
+				className={cn(item.autoCheck && "border-dashed")}
+			/>
+		);
+	}
 
 	return (
 		<div>
 			<Field orientation="horizontal">
-				<Checkbox
-					id={`checklist-${item.id}`}
-					name={`checklist-${item.id}`}
-					checked={isChecked}
-					disabled={item.autoChecked}
-					onClick={handleCheckboxClick}
-					onCheckedChange={handleCheckboxChange}
-				/>
+				{item.autoCheck ? (
+					<Tooltip>
+						<TooltipTrigger asChild>{checkboxBuilder()}</TooltipTrigger>
+						<TooltipContent side="right">
+							<p>
+								{isChecked
+									? "We checked this one off for you."
+									: "We'll check this one off for you."}
+							</p>
+						</TooltipContent>
+					</Tooltip>
+				) : (
+					checkboxBuilder()
+				)}
 				<FieldContent className="gap-1">
-					<div
-						className="flex items-center justify-between gap-2 cursor-pointer"
-						onClick={handleCardClick}
+					<button
+						type="button"
+						className="flex items-center justify-between gap-2 text-left cursor-pointer w-full"
+						onClick={() => setIsOpen((prev) => !prev)}
+						aria-expanded={isOpen}
+						aria-controls={`checklist-desc-${item.id}`}
 					>
 						<FieldTitle>{item.title}</FieldTitle>
 						<ChevronDown
@@ -58,7 +75,7 @@ export default function ChecklistItemRow({
 								isOpen ? "rotate-180" : "rotate-0"
 							}`}
 						/>
-					</div>
+					</button>
 					<div
 						className={`grid transition-[grid-template-rows,opacity] duration-200 ${
 							isOpen
@@ -66,7 +83,7 @@ export default function ChecklistItemRow({
 								: "grid-rows-[0fr] opacity-0"
 						}`}
 					>
-						<div className="overflow-hidden">
+						<div id={`checklist-desc-${item.id}`} className="overflow-hidden">
 							<FieldDescription className="prose prose-slate dark:prose-invert max-w-none">
 								<ReactMarkdown
 									remarkPlugins={[remarkGfm]}

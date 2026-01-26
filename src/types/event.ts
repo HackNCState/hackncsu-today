@@ -56,7 +56,7 @@ export const ChecklistItemSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	description: z.string(),
-	autoChecked: z.boolean().optional(), // whether this item is auto checked by the system
+	autoCheck: z.boolean().optional(), // whether this item is auto checked by the system
 });
 
 export const EventConfigSchema = z.object({
