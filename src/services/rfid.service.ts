@@ -1,5 +1,6 @@
 export const rfidService = {
 	reader: null as ReadableStreamDefaultReader<string> | null,
+	port: null as any,
 
 	openPort: async () => {
 		const port = await (navigator as any).serial.requestPort();
@@ -8,14 +9,15 @@ export const rfidService = {
 			// Only open if not already open
 			await port.open({ baudRate: 9600 }); // Match your Pico's baud rate!
 		}
-		return port;
+
+		rfidService.port = port;
 	},
 
-	startListening: async (port: any, onScan: (uuid: string) => void) => {
-		if (!port.readable) return;
+	startListening: async (onScan: (uuid: string) => void, onError: (error: any) => void) => {
+		if (!rfidService.port.readable) return;
 
 		const textDecoder = new TextDecoderStream();
-		port.readable.pipeTo(textDecoder.writable);
+		rfidService.port.readable.pipeTo(textDecoder.writable);
 		const reader = textDecoder.readable.getReader();
 		rfidService.reader = reader;
 
@@ -43,13 +45,14 @@ export const rfidService = {
 			}
 		} catch (error) {
 			console.error("Reading error", error);
+			onError(error);
 		} finally {
 			reader.releaseLock();
 		}
 	},
 
-	closePort: async (port: any) => {
-		if (!port) return;
+	closePort: async () => {
+		if (!rfidService.port) return;
 
 		// cancel the reader if active
 		if (rfidService.reader) {
@@ -68,9 +71,11 @@ export const rfidService = {
 		// sometimes there is a race condition...
 		await new Promise((resolve) => setTimeout(resolve, 100));
 
-		if (port.readable) {
-			await port.close();
+		if (rfidService.port.readable) {
+			await rfidService.port.close();
 		}
+
+		rfidService.port = null;
 	},
 
 	isSupported: () => {

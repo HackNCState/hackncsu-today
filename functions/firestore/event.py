@@ -174,6 +174,24 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
                 "autoCheck": False,
             },
         ],
+        "activities": [
+            {
+                "name": "lunch_day_1",
+                "eligibleForRaffle": False,
+            },
+            {
+                "name": "dinner_day_1",
+                "eligibleForRaffle": False,
+            },
+            {
+                "name": "breakfast_day_2",
+                "eligibleForRaffle": False,
+            },
+            {
+                "name": "lunch_day_2",
+                "eligibleForRaffle": False,
+            },
+        ],
     }
 
     doc_ref.set(default_config)

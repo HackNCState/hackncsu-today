@@ -36,8 +36,6 @@ export const firestoreService = {
 	},
 
 	fetchUserByRFID: async (rfidUUID: string) => {
-		console.log("Fetching user by RFID:", rfidUUID);
-
 		const usersCollectionRef = collection(firestore, collections.users);
 		const usersQuery = query(
 			usersCollectionRef,

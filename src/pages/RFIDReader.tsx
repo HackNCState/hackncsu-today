@@ -1,39 +1,55 @@
+import { activitiesAtom } from "@/atoms/event/activities";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { cn } from "@/lib/utils";
 import { firestoreService } from "@/services/firestore.service";
 import { rfidService } from "@/services/rfid.service";
+import type { Team } from "@/types/team";
 import type { Participant } from "@/types/user";
+import { useAtomValue } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function RFIDReader() {
 	const navigate = useNavigate();
 
-	// TODO: add setting event stuff
-
 	const [isReaderConnected, setIsReaderConnected] = useState(false);
 	const [rfidData, setRfidData] = useState<string | null>(null);
 	const [rfidParticipant, setRfidParticipant] = useState<
 		Participant | null | undefined
 	>(undefined);
+	const [team, setTeam] = useState<Team | null>(null);
 	const [showUnsupportedWarning, setShowUnsupportedWarning] = useState(false);
 
-	const port = useRef<any | null>(null);
+	const activities = useAtomValue(activitiesAtom);
+	const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+	const selectedActivityRef = useRef(selectedActivity);
+
+	useEffect(() => {
+		selectedActivityRef.current = selectedActivity;
+	}, [selectedActivity]);
+
+	const [showActivityAssignedToast, setShowActivityAssignedToast] =
+		useState(false);
 
 	useEffect(() => {
 		if (!rfidService.isSupported()) {
 			setShowUnsupportedWarning(true);
 		}
+
+		if (rfidService.port) {
+			setIsReaderConnected(true);
+		}
 	}, []);
 
 	async function connect() {
-		const p = await rfidService.openPort();
+		await rfidService.openPort();
 		setIsReaderConnected(true);
 
-		port.current = p;
-
 		try {
-			await rfidService.startListening(p, onRFIDScan);
+			await rfidService.startListening(onRFIDScan, (_) => {
+				setIsReaderConnected(false);
+			});
 		} catch (error) {
 			console.error("Error starting RFID listening:", error);
 			setIsReaderConnected(false);
@@ -41,22 +57,48 @@ export default function RFIDReader() {
 	}
 
 	async function disconnect() {
-		await rfidService.closePort(port.current);
+		await rfidService.closePort();
 		setIsReaderConnected(false);
 	}
 
 	async function onRFIDScan(uuid: string) {
+		setShowActivityAssignedToast(false);
 		setRfidData(uuid);
+
+		setRfidParticipant(undefined);
+		setTeam(null);
 
 		const participant = await firestoreService.fetchUserByRFID(uuid);
 
-		console.log("Fetched participant:", participant);
-
 		if (participant) {
 			setRfidParticipant(participant);
+
+			if (selectedActivityRef.current) {
+				await rewardAttendance(participant, selectedActivityRef.current);
+				setShowActivityAssignedToast(true);
+			}
+
+			if (participant.teamId) {
+				const teamData = await firestoreService.fetchTeam(participant.teamId);
+				setTeam(teamData);
+			} else {
+				setTeam(null);
+			}
 		} else {
 			setRfidParticipant(null);
 		}
+	}
+
+	async function rewardAttendance(user: Participant, activityName: string) {
+		const attendance = user.attendedEvents || [];
+
+		if (!attendance.includes(activityName)) {
+			attendance.push(activityName);
+		}
+
+		await firestoreService.updateUser(user.id, {
+			attendedEvents: attendance,
+		});
 	}
 
 	return (
@@ -73,7 +115,7 @@ export default function RFIDReader() {
 				<Button
 					onClick={() => {
 						if (isReaderConnected) {
-							rfidService.closePort(port.current);
+							rfidService.closePort();
 						}
 						navigate(-1);
 					}}
@@ -85,7 +127,7 @@ export default function RFIDReader() {
 			</header>
 
 			<main>
-				<div className="h-full flex flex-col justify-center items-center gap-1">
+				<div className="flex flex-col">
 					{!isReaderConnected ? (
 						<>
 							<p>RFID Scanner is not connected.</p>
@@ -97,29 +139,95 @@ export default function RFIDReader() {
 					) : (
 						<>
 							<p>RFID Scanner is connected.</p>
-							<p>Tap a card on the scanner...</p>
+
+							<p className="mt-4">
+								Choose whether the user should receive attendance for an
+								activity when they tap their card. No need to use this for
+								check-in.
+								<br />* means this activity is not eligible for the raffle.
+							</p>
+
+							<ButtonGroup orientation="horizontal" className="mt-2">
+								<Button
+									variant={!selectedActivity ? "default" : "outline"}
+									onClick={() => setSelectedActivity(null)}
+								>
+									No
+								</Button>
+								{activities.map((activity) => (
+									<Button
+										key={activity.name}
+										variant={
+											selectedActivity === activity.name ? "default" : "outline"
+										}
+										onClick={() => {
+											setShowActivityAssignedToast(false);
+											setSelectedActivity(activity.name);
+										}}
+									>
+										{activity.name}
+										{!activity.eligibleForRaffle && "*"}
+									</Button>
+								))}
+							</ButtonGroup>
+
+							{showActivityAssignedToast && (
+								<p className="mt-2 text-green-500">
+									Attendance has been recorded!
+								</p>
+							)}
+
+							<p className="mt-4">Scan a card to see its data.</p>
+
 							{rfidData && (
 								<>
-									<p className="mt-4">Read RFID Data:</p>
-									<p className="font-mono text-lg">{rfidData}</p>
+									<p className="mt-4">The card has the following ID:</p>
+									<p className="font-mono text-lg text-muted-foreground">
+										{rfidData}
+									</p>
 								</>
 							)}
 							{rfidParticipant ? (
 								<>
 									<p className="mt-4">Participant Info:</p>
-									<p>
+									<p className="text-muted-foreground">
 										Name: {rfidParticipant.firstName} {rfidParticipant.lastName}
-									</p>
-									<p>Discord Username: {rfidParticipant.username}</p>
-									<p>
-										Events attended: {rfidParticipant.attendedEvents.join(", ")}
+										<br />
+										Email: {rfidParticipant.email || "N/A"}
+										<br />
+										Phone: {rfidParticipant.phone || "N/A"}
+										<br />
+										Dietary Restrictions:{" "}
+										{rfidParticipant.dietaryRestrictions || "N/A"}
+										<br />
+										Shirt Size: {rfidParticipant.shirtSize || "N/A"}
+										<br />
+										Attended Events:{" "}
+										{rfidParticipant.attendedEvents.join(", ") || "None"}
+										<br />
+										ID: {rfidParticipant.id}
 									</p>
 								</>
 							) : rfidParticipant === null ? (
 								<p className="mt-4 text-destructive">
-									No participant found for this RFID.
+									No participant found for this RFID. If this is unexpected,
+									please check the database.
 								</p>
 							) : null}
+							{team && (
+								<>
+									<p className="mt-4">Team Info:</p>
+									<p className="text-muted-foreground">
+										Name: {team.name}
+										<br />
+										Track: {team.track}
+										<br />
+										Challenges: {team.challenges.join(", ") || "N/A"}
+										<br />
+										ID: {team.id}
+									</p>
+								</>
+							)}
 						</>
 					)}
 
@@ -130,7 +238,7 @@ export default function RFIDReader() {
 								Google Chrome, Opera GX, or Microsoft Edge.
 							</p>
 						) : (
-							<Button className="mt-2" onClick={connect}>
+							<Button className="mt-2 w-fit" onClick={connect}>
 								Connect
 							</Button>
 						))}

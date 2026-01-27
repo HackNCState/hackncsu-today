@@ -69,7 +69,11 @@ export default function OrganizerView() {
 			<FeedItem title="Organizer Settings">
 				<div className="flex flex-col gap-4">
 					<p className="text-lg font-synemono">Event data is uninitialized!</p>
-					<Button onClick={handleInitializeEvent} disabled={isInitializing}>
+					<Button
+						onClick={handleInitializeEvent}
+						disabled={isInitializing}
+						className="w-fit"
+					>
 						Create data
 					</Button>
 					{initializeError && (
