@@ -18,7 +18,7 @@ export default function Nav() {
 	);
 
 	return (
-		<nav className="flex flex-col gap-6 p-6 sm:w-55 sm:overflow-y-auto">
+		<nav className="flex flex-col gap-6 p-6 sm:w-56 sm:overflow-y-auto">
 			<div className="flex flex-row w-full justify-between items-start">
 				<Countdown />
 

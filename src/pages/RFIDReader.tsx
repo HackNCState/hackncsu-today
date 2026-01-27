@@ -29,8 +29,9 @@ export default function RFIDReader() {
 		selectedActivityRef.current = selectedActivity;
 	}, [selectedActivity]);
 
-	const [showActivityAssignedToast, setShowActivityAssignedToast] =
-		useState(false);
+	const [showActivityAssignedToast, setShowActivityAssignedToast] = useState<
+		"hidden" | "success" | "alreadyAttended"
+	>("hidden");
 
 	useEffect(() => {
 		if (!rfidService.isSupported()) {
@@ -62,7 +63,7 @@ export default function RFIDReader() {
 	}
 
 	async function onRFIDScan(uuid: string) {
-		setShowActivityAssignedToast(false);
+		setShowActivityAssignedToast("hidden");
 		setRfidData(uuid);
 
 		setRfidParticipant(undefined);
@@ -75,7 +76,6 @@ export default function RFIDReader() {
 
 			if (selectedActivityRef.current) {
 				await rewardAttendance(participant, selectedActivityRef.current);
-				setShowActivityAssignedToast(true);
 			}
 
 			if (participant.teamId) {
@@ -94,6 +94,10 @@ export default function RFIDReader() {
 
 		if (!attendance.includes(activityName)) {
 			attendance.push(activityName);
+			setShowActivityAssignedToast("success");
+		} else {
+			setShowActivityAssignedToast("alreadyAttended");
+			return;
 		}
 
 		await firestoreService.updateUser(user.id, {
@@ -127,6 +131,20 @@ export default function RFIDReader() {
 			</header>
 
 			<main>
+				{showActivityAssignedToast !== "hidden" && (
+					<div
+						className={cn(
+							"absolute bottom-0 right-0 m-16 p-12 text-white text-[10rem]",
+							showActivityAssignedToast === "success"
+								? "bg-green-600"
+								: "bg-red-600 ",
+							"hover:opacity-25",
+						)}
+					>
+						{showActivityAssignedToast === "success" ? "OK" : "STOP"}
+					</div>
+				)}
+
 				<div className="flex flex-col">
 					{!isReaderConnected ? (
 						<>
@@ -161,7 +179,7 @@ export default function RFIDReader() {
 											selectedActivity === activity.name ? "default" : "outline"
 										}
 										onClick={() => {
-											setShowActivityAssignedToast(false);
+											setShowActivityAssignedToast("hidden");
 											setSelectedActivity(activity.name);
 										}}
 									>
@@ -171,9 +189,15 @@ export default function RFIDReader() {
 								))}
 							</ButtonGroup>
 
-							{showActivityAssignedToast && (
+							{showActivityAssignedToast === "success" && (
 								<p className="mt-2 text-green-500">
 									Attendance has been recorded!
+								</p>
+							)}
+
+							{showActivityAssignedToast === "alreadyAttended" && (
+								<p className="mt-2 text-destructive">
+									User has already attended this activity.
 								</p>
 							)}
 

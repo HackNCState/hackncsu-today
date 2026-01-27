@@ -31,7 +31,7 @@ export const ParticipantSchema = BaseUserSchema.extend({
 	rfidUUID: z.string(),
 
 	teamId: z.string().nullable().optional(),
-	attendedEvents: z.array(z.string()),
+	attendedEvents: z.array(z.string()).default([]),
 
 	resumeURL: z.string().nullable().optional(),
 	checklistItemStatuses: z.array(ChecklistItemStatusSchema).default([]), // TODO: complete implementation

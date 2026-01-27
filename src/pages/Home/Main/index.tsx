@@ -1,5 +1,4 @@
 import { useAtomValue } from "jotai";
-import FeedItem from "./FeedItem";
 import { isOrganizerAtom } from "@/atoms/user";
 import OrganizerView from "./OrganizerView";
 import TeamView from "./TeamView";
