@@ -20,7 +20,7 @@ export default function ChecklistView() {
 
 	return (
 		<FeedItem
-			title="Checklist"
+			title="Your Hack_NCState Checklist"
 			description="Use the checklist below as a guide to stay on track during the event. Click an item to view more details."
 		>
 			<FieldGroup className="gap-1">

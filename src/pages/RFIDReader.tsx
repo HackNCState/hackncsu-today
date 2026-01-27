@@ -153,6 +153,11 @@ export default function RFIDReader() {
 								Please plug it in and click connect. Then, select the scanner
 								from the list.
 							</p>
+							<p>
+								If the page breaks (especially if you disconnect the reader
+								while connected), try refreshing the page to reset the
+								connection.
+							</p>
 						</>
 					) : (
 						<>

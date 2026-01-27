@@ -4,6 +4,7 @@ import {
 	setCurrentItemAtom,
 } from "@/atoms/event/schedule";
 import { isOrganizerAtom } from "@/atoms/user";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Timeline, TimelineItem } from "@/components/ui/timeline";
 import { useBreakpoint } from "@/hooks/useMediaQuery";
 import { functionsService } from "@/services/functions.service";
@@ -28,8 +29,12 @@ export default function Schedule() {
 		if (currentItemRef.current && containerRef.current) {
 			// Check if screen is lg (1024px) or larger
 			if (window.matchMedia("(min-width: 1024px)").matches) {
-				const container = containerRef.current;
+				const container = containerRef.current.querySelector(
+					'[data-slot="scroll-area-viewport"]',
+				);
 				const item = currentItemRef.current;
+
+				if (!container) return;
 
 				const containerRect = container.getBoundingClientRect();
 				const itemRect = item.getBoundingClientRect();
@@ -91,64 +96,63 @@ export default function Schedule() {
 			</div>
 
 			{scheduleData.length > 0 ? (
-				<div
-					ref={containerRef}
-					className="flex-1 px-6 pb-6 flex flex-col gap-2 lg:overflow-y-auto"
-				>
-					{isOrganizer && (
-						<div className="mb-2 flex flex-col gap-2 text-sm text-muted-foreground">
-							{isMobile && (
-								<p className="text-destructive">
-									It appears that you may be on a mobile device. Please be
-									careful not to accidentally change the timeline when trying to
-									scroll. Some participants will have notifications on and they
-									WILL notice your oopsie.
+				<ScrollArea ref={containerRef} className="flex-1 lg:overflow-hidden">
+					<div className="px-6 pb-6 flex flex-col gap-2">
+						{isOrganizer && (
+							<div className="mb-2 flex flex-col gap-2 text-sm text-muted-foreground">
+								{isMobile && (
+									<p className="text-destructive">
+										It appears that you may be on a mobile device. Please be
+										careful not to accidentally change the timeline when trying
+										to scroll. Some participants will have notifications on and
+										they WILL notice your oopsie.
+									</p>
+								)}
+								<p>Click on an item to move the timeline.</p>
+								<p>
+									Click 'delay' on an item to change the time of an event.
+									Participants will see the old time crossed out. Great for
+									delays! (e.g. late lunch or something)
 								</p>
-							)}
-							<p>Click on an item to move the timeline.</p>
-							<p>
-								Click 'delay' on an item to change the time of an event.
-								Participants will see the old time crossed out. Great for
-								delays! (e.g. late lunch or something)
-							</p>
-							<p>
-								'sync spreadsheet' will pull in any updates from the run-of-show
-								spreadsheet in the google drive. It will try to preserve the
-								timeline for minimal disruption to participants.
-							</p>
-							<p>'reset' will set the timeline back to the start</p>
-						</div>
-					)}
+								<p>
+									'sync spreadsheet' will pull in any updates from the
+									run-of-show spreadsheet in the google drive. It will try to
+									preserve the timeline for minimal disruption to participants.
+								</p>
+								<p>'reset' will set the timeline back to the start</p>
+							</div>
+						)}
 
-					{scheduleData.map((day, dayIndex) => (
-						<div key={day.title} className="flex flex-col gap-2">
-							<h4
-								className={
-									dayIndex > 0
-										? "mt-2 font-semibold text-muted-foreground"
-										: "font-semibold text-muted-foreground"
-								}
-							>
-								{day.title}
-							</h4>
-							<Timeline>
-								{day.items.map((item, itemIndex) => (
-									<TimelineItem
-										clickable={isOrganizer}
-										oldTime={item.oldTime}
-										onClick={() => handleItemClick(dayIndex, itemIndex)}
-										onReschedule={(newTime) =>
-											rescheduleItem(dayIndex, itemIndex, newTime)
-										}
-										key={item.title}
-										ref={item.state === "ongoing" ? currentItemRef : null}
-										{...item}
-									/>
-								))}
-							</Timeline>
-						</div>
-					))}
-				</div>
+						{scheduleData.map((day, dayIndex) => (
+							<div key={day.title} className="flex flex-col gap-2">
+								<h4
+									className={
+										dayIndex > 0
+											? "mt-2 font-semibold text-muted-foreground"
+											: "font-semibold text-muted-foreground"
+									}
+								>
+									{day.title}
+								</h4>
+								<Timeline>
+									{day.items.map((item, itemIndex) => (
+										<TimelineItem
+											clickable={isOrganizer}
+											oldTime={item.oldTime}
+											onClick={() => handleItemClick(dayIndex, itemIndex)}
+											onReschedule={(newTime) =>
+												rescheduleItem(dayIndex, itemIndex, newTime)
+											}
+											key={item.title}
+											ref={item.state === "ongoing" ? currentItemRef : null}
+											{...item}
+										/>
+									))}
+								</Timeline>
+							</div>
+						))}
+					</div>
+				</ScrollArea>
 			) : (
 				<div className="flex-1 flex items-center justify-center px-6 pb-6 text-center">
 					<p className="text-muted-foreground">

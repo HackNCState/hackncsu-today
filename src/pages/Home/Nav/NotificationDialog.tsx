@@ -129,9 +129,9 @@ export default function NotificationDialog({
 						}
 					/>
 					<FieldContent className="gap-0.5">
-						<FieldLabel htmlFor={notifyTimerId}>Timer updates</FieldLabel>
+						<FieldLabel htmlFor={notifyTimerId}>Timer reminders</FieldLabel>
 						<FieldDescription>
-							Get notified when the event timer changes.
+							Get timer reminders halfway through and close to submission.
 						</FieldDescription>
 					</FieldContent>
 				</Field>
@@ -148,9 +148,11 @@ export default function NotificationDialog({
 						}
 					/>
 					<FieldContent className="gap-0.5">
-						<FieldLabel htmlFor={notifyScheduleId}>Schedule changes</FieldLabel>
+						<FieldLabel htmlFor={notifyScheduleId}>
+							Schedule
+						</FieldLabel>
 						<FieldDescription>
-							Get notified when the schedule is updated.
+							Get notified when activities are starting.
 						</FieldDescription>
 					</FieldContent>
 				</Field>

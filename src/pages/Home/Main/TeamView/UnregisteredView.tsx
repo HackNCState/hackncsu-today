@@ -11,6 +11,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowRight } from "lucide-react";
 import { functionsService } from "@/services/functions.service";
 import {
@@ -49,30 +50,34 @@ export default function UnregisteredView() {
 					<ArrowRight className="mr-2 h-4 w-4" /> Register Your Team
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
-				<DialogHeader>
-					<DialogTitle>Register Team</DialogTitle>
-					<DialogDescription>
-						Only one member of your team needs to fill out this form.
-					</DialogDescription>
-				</DialogHeader>
+			<DialogContent className="sm:max-w-[500px] max-h-[85vh] p-0 overflow-hidden">
+				<ScrollArea className="max-h-[85vh]">
+					<div className="p-6 grid gap-4">
+						<DialogHeader>
+							<DialogTitle>Register Team</DialogTitle>
+							<DialogDescription>
+								Only one member of your team needs to fill out this form.
+							</DialogDescription>
+						</DialogHeader>
 
-				<TeamForm
-					tracks={tracks}
-					challenges={challenges}
-					initialValues={{
-						name: "",
-						track: "",
-						mentoringHelp: "",
-						challenges: [],
-						members: initialMembers,
-					}}
-					lockedMemberIds={user?.id ? [user.id] : []}
-					currentUserId={user?.id}
-					currentUserLabel={user?.username}
-					submitLabel="Submit Registration"
-					onSubmit={handleSubmit}
-				/>
+						<TeamForm
+							tracks={tracks}
+							challenges={challenges}
+							initialValues={{
+								name: "",
+								track: "",
+								mentoringHelp: "",
+								challenges: [],
+								members: initialMembers,
+							}}
+							lockedMemberIds={user?.id ? [user.id] : []}
+							currentUserId={user?.id}
+							currentUserLabel={user?.username}
+							submitLabel="Submit Registration"
+							onSubmit={handleSubmit}
+						/>
+					</div>
+				</ScrollArea>
 			</DialogContent>
 		</Dialog>
 	);
