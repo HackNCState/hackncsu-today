@@ -52,10 +52,6 @@ export default function NavList() {
 			label: "Log out",
 			onClick: () => authService.logout(),
 		},
-		{
-			label: "About",
-			onClick: () => alert("HackNC 2024 - Powered by NC State University"),
-		},
 	];
 
 	return (

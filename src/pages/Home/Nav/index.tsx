@@ -10,11 +10,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Countdown from "./Countdown";
 import { MenuIcon } from "lucide-react";
 import NavList from "./NavList";
+import packageJson from "../../../../package.json";
 
 export default function Nav() {
 	const sidebarFooter = (
-		<footer className="font-playfair text-sm text-muted-foreground select-none">
-			Hack_NCState Today
+		<footer className="text-sm text-muted-foreground select-none">
+			<p className="font-playfair">Hack_NCState Today</p>
+			<p className="font-synemono">v{packageJson.version} (Urban Noir)</p>
 		</footer>
 	);
 

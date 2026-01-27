@@ -22,6 +22,7 @@ import {
 } from "date-fns";
 import { useEffect, useState } from "react";
 import { isOrganizerAtom } from "@/atoms/user";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function formatAnnouncementTime(dateStr: string) {
 	const date = new Date(dateStr);
@@ -102,7 +103,7 @@ export default function AnnouncementsView() {
 								<DialogTitle>All Announcements</DialogTitle>
 							</DialogHeader>
 
-							<div className="flex flex-col gap-2 overflow-y-auto pr-2">
+							<ScrollArea className="flex flex-col gap-2 overflow-y-auto pr-2">
 								{announcements.map((announcement, index) => (
 									<div
 										key={announcement.timestamp}
@@ -131,7 +132,7 @@ export default function AnnouncementsView() {
 										</p>
 									</div>
 								))}
-							</div>
+							</ScrollArea>
 						</DialogContent>
 					</Dialog>
 				)}
