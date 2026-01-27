@@ -83,4 +83,5 @@ export type Schedule = z.infer<typeof ScheduleSchema>;
 export type Announcement = z.infer<typeof AnnouncementSchema>;
 export type Resource = z.infer<typeof ResourceSchema>;
 export type ChecklistItem = z.infer<typeof ChecklistItemSchema>;
+export type Activity = z.infer<typeof ActivitySchema>;
 export type EventConfig = z.infer<typeof EventConfigSchema>;

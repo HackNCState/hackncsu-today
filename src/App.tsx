@@ -9,6 +9,7 @@ import TeamManager from "./pages/TeamManager";
 import ParticipantManager from "./pages/ParticipantManager";
 import NotificationListener from "./components/NotificationListener";
 import RFIDReader from "./pages/RFIDReader";
+import Raffle from "./pages/Raffle";
 
 function App() {
 	useAuthListener();
@@ -52,6 +53,15 @@ function App() {
 							</ProtectedRoute>
 						}
 					/>
+					<Route
+						path="/admin/raffle"
+						element={
+							<ProtectedRoute>
+								<Raffle />
+							</ProtectedRoute>
+						}
+					/>
+
 					<Route path="/login" element={<Login />} />
 					<Route path="/auth" element={<Auth />} />
 					<Route path="*" element={<Navigate to="/" replace />} />

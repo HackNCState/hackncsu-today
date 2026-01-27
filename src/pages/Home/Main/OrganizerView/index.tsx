@@ -12,6 +12,7 @@ import { useBreakpoint } from "@/hooks/useMediaQuery";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -19,6 +20,7 @@ import {
 import ResourceEditor from "./ResourceEditor";
 import { TrackEditor } from "./TrackEditor";
 import { ChallengeEditor } from "./ChallengeEditor";
+import ActivityEditor from "./ActivityEditor";
 import { useNavigate } from "react-router-dom";
 import { functionsService } from "@/services/functions.service";
 
@@ -125,7 +127,7 @@ export default function OrganizerView() {
 					<Button variant="outline" onClick={() => navigate("/admin/teams")}>
 						Manage Teams
 					</Button>
-					<Button variant="outline" onClick={() => navigate("/admin/teams")}>
+					<Button variant="outline" onClick={() => navigate("/admin/raffle")}>
 						Draw Raffle Winners
 					</Button>
 				</div>
@@ -182,6 +184,24 @@ export default function OrganizerView() {
 							</DialogHeader>
 
 							<ResourceEditor />
+						</DialogContent>
+					</Dialog>
+
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Edit activities</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col">
+							<DialogHeader>
+								<DialogTitle>Configure Activities</DialogTitle>
+								<DialogDescription>
+									Try not to edit the name of an activity once its attendance
+									has been recorded, because that can lead to inconsistent data.
+									(I did NOT implement an ID system 💔💔)
+								</DialogDescription>
+							</DialogHeader>
+
+							<ActivityEditor />
 						</DialogContent>
 					</Dialog>
 

@@ -111,11 +111,7 @@ export default function RFIDReader() {
 				<h1 className="font-playfair font-semibold text-xl sm:text-3xl">
 					RFID Reader
 				</h1>
-				{isReaderConnected && (
-					<Button className="ml-auto" onClick={disconnect}>
-						Disconnect
-					</Button>
-				)}
+
 				<Button
 					onClick={() => {
 						if (isReaderConnected) {
@@ -124,10 +120,11 @@ export default function RFIDReader() {
 						navigate(-1);
 					}}
 					variant="destructive"
-					className={cn(!isReaderConnected && "ml-auto")}
+					className="ml-auto"
 				>
 					go back
 				</Button>
+				{isReaderConnected && <Button onClick={disconnect}>Disconnect</Button>}
 			</header>
 
 			<main>
