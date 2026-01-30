@@ -32,18 +32,19 @@ const SlotReel = ({
 	winner: string;
 	onComplete: () => void;
 }) => {
-	const itemHeight = 120; // Height of each name in pixels
-	const windowHeight = itemHeight * 5; // Show 5 items
+	const itemHeight = 120;
+	const windowHeight = itemHeight * 5;
 
-	// Store onComplete in a ref so changes to the function identity
-	// don't restart the effect mid-spin.
 	const onCompleteRef = useRef(onComplete);
 	useEffect(() => {
 		onCompleteRef.current = onComplete;
 	}, [onComplete]);
 
-	const reel = useMemo(() => {
-		// Create a long list of dummy candidates
+	// FIX: Use useState with an initializer function.
+	// This runs exactly ONCE when the component mounts.
+	// Even if 'candidates' or 'winner' props change mid-spin,
+	// this state will NOT update, preventing the flicker.
+	const [reel] = useState(() => {
 		const pool =
 			candidates.length > 0
 				? candidates
@@ -60,23 +61,19 @@ const SlotReel = ({
 						"Berners-Lee",
 					];
 
-		// Generator to avoid immediate adjacent duplicates and cycle through pool
 		const generateSequence = (length: number) => {
 			const result: string[] = [];
 
-			// If pool is very small, we can't avoid repeats
 			if (pool.length < 2) {
 				return Array.from({ length }).map(() => pool[0]);
 			}
 
-			// Shuffle pool initially (using original simple sort)
+			// Shuffle pool initially
 			let currentPool = [...pool].sort(() => Math.random() - 0.5);
 
 			for (let i = 0; i < length; i++) {
 				if (currentPool.length === 0) {
-					// Reshuffle when empty
 					currentPool = [...pool].sort(() => Math.random() - 0.5);
-					// If the first item of new pool is same as last item of result, swap it
 					if (
 						result.length > 0 &&
 						currentPool[0] === result[result.length - 1]
@@ -91,25 +88,21 @@ const SlotReel = ({
 		};
 
 		const head = generateSequence(60);
-		const tail = generateSequence(10); // More buffer for taller window
+		const tail = generateSequence(10);
+		return [...head, winner, ...tail];
+	});
 
-		const final = [...head, winner, ...tail];
-		return final;
-	}, [candidates, winner]);
-
-	const winnerIndex = 60; // The index of the winner in our 'reel' array
+	const winnerIndex = 60;
 	const y = useMotionValue(0);
 
 	useEffect(() => {
 		const targetOffset =
 			-(winnerIndex * itemHeight) + (windowHeight - itemHeight) / 2;
 
-		// Initial animation setup
 		const controls = animate(y, targetOffset, {
-			duration: 4, // Reduced to 4 seconds
-			ease: [0.1, 0.9, 0.2, 1.0], // "Cubic-bezier" style easing
+			duration: 4,
+			ease: [0.1, 0.9, 0.2, 1.0],
 			onComplete: () => {
-				// Hold for a moment of suspense before revealing detail view
 				setTimeout(() => {
 					onCompleteRef.current?.();
 				}, 800);
@@ -124,7 +117,6 @@ const SlotReel = ({
 			className="relative overflow-hidden border-y-2 border-zinc-800 bg-zinc-950/50 backdrop-blur-sm"
 			style={{ height: windowHeight }}
 		>
-			{/* Selection Box / Payline */}
 			<div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 z-20 h-[120px] border-y border-white/20 bg-white/5 shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none">
 				<div className="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 font-mono text-2xl">
 					▶
@@ -134,22 +126,20 @@ const SlotReel = ({
 				</div>
 			</div>
 
-			{/* The Moving Tape */}
 			<motion.div style={{ y }} className="w-full">
 				{reel.map((name, i) => (
 					<div
-						key={i}
+						key={i} // Index key is safe here because the list is static after generation
 						className="flex items-center justify-center font-playfair font-bold text-white crt-flicker"
 						style={{ height: itemHeight }}
 					>
-						<span className="text-4xl md:text-5xl drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
+						<span className="text-4xl md:text-5xl drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] capitalize">
 							{name}
 						</span>
 					</div>
 				))}
 			</motion.div>
 
-			{/* Smooth overlay gradients to fade top/bottom */}
 			<div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-zinc-950 to-transparent z-10 pointer-events-none" />
 			<div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-zinc-950 to-transparent z-10 pointer-events-none" />
 		</div>
@@ -205,7 +195,7 @@ const ScrollingColumn = ({
 				{duplicated.map((name, i) => (
 					<span
 						key={i}
-						className="whitespace-nowrap font-mono text-sm md:text-xl"
+						className="whitespace-nowrap font-mono text-sm md:text-xl capitalize"
 					>
 						{name}
 					</span>
@@ -527,7 +517,7 @@ export default function RaffleAnimation({
 											WINNER {currentIndex + 1} / {winners.length}
 										</motion.div>
 
-										<h1 className="mb-6 font-playfair text-6xl text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] md:text-8xl lg:text-9xl">
+										<h1 className="mb-6 font-playfair text-6xl text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] md:text-8xl lg:text-9xl capitalize">
 											{currentWinner.name}
 										</h1>
 
