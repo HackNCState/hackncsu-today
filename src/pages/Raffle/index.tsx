@@ -735,7 +735,7 @@ const participants = tempParticipants.map((name) => ({
 	teamName: teams[Math.floor(Math.random() * teams.length)],
 	activitiesAttended: Math.floor(Math.random() * 4) + 1,
 }));
-const tempWinners = participants.slice(0, 20);
+const tempWinners = participants.slice(0, 3);
 
 export default function Raffle() {
 	const navigate = useNavigate();

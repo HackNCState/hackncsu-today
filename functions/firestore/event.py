@@ -139,6 +139,7 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
                 "id": "attend_workshop",
                 "title": "Attend a workshop",
                 "description": "Workshops are a fun way to learn new skills that can help your project. Each workshop you attend counts as a raffle entry. "
+                "The more workshops you attend, the better your chances of winning prizes! "
                 "Check the schedule for times and locations, and see the Prizes section for raffle details.",
                 "autoCheck": True,
             },
