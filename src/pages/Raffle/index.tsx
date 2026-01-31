@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import RaffleAnimation from "./AnimationGrid";
+import RaffleAnimation from "./RaffleAnimation";
 
 const tempParticipants = [
 	"John Pork",

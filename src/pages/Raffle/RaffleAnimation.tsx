@@ -1,3 +1,14 @@
+/** 
+ * ok i vibecoded this over the course of two or so days 
+ * because i didnt know how to do animations like this beforehand
+ * and i had to use like 15% of my free github copilot premium requests allowance 
+ * because i wanted it exactly how i envisioned it
+ * and i think it turned out pretty good ngl
+ * 
+ * just ignore the shitty comments from gemini
+ * also if youre john webdev reading this, go easy on me
+*/
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
