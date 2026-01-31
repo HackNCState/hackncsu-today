@@ -425,6 +425,20 @@ export default function RaffleAnimation({
 							))}
 						</motion.div>
 
+						<AnimatePresence>
+							{!isRolling && !hasStarted ? (
+								<motion.div
+									className="absolute top-24 text-center font-synemono text-xl tracking-[0.5em] uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]"
+									initial={{ opacity: 1 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+								>
+									<p className="mb-4 ">Hack_NCState 2026</p>
+									<p className="font-bold">Raffle Selection System</p>
+								</motion.div>
+							) : null}
+						</AnimatePresence>
+
 						{/* Mode: Winner Display */}
 						<div className="relative z-20 flex flex-col items-center w-full max-w-6xl px-8">
 							<AnimatePresence mode="wait">
@@ -564,9 +578,11 @@ export default function RaffleAnimation({
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
 										exit={{ opacity: 0 }}
-										className="font-playfair text-6xl text-white md:text-8xl "
+										className=" text-white text-center"
 									>
-										It's <span className="italic">raffle</span> time.
+										<span className="font-playfair text-6xl md:text-8xl ">
+											It's <span className="italic">raffle</span> time!
+										</span>
 									</motion.div>
 								) : null}
 							</AnimatePresence>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import RaffleAnimation from "./AnimationGrid";
 
 const tempParticipants = [
-	"John Pork Schizophren Jocollaginan Dynamoman",
+	"John Pork",
 	"Nick Cunard",
 	"Aryan Tapkire",
 	"Ahmed Hassan",
@@ -723,10 +723,11 @@ const tempParticipants = [
 
 const teams = [
 	"Skibidi Adventures",
-	"Crab RanGOON",
-	"Einstein Files",
-	"Wankerphilia",
-	"Cuck",
+	"Hardcore Gaming",
+	"Tencent (腾讯)",
+	"quagmire",
+	"Boris Johnson",
+	"UNC students💔💔",
 ];
 
 const participants = tempParticipants.map((name) => ({
@@ -734,7 +735,7 @@ const participants = tempParticipants.map((name) => ({
 	teamName: teams[Math.floor(Math.random() * teams.length)],
 	activitiesAttended: Math.floor(Math.random() * 4) + 1,
 }));
-const tempWinners = participants.slice(0, 3);
+const tempWinners = participants.slice(0, 20);
 
 export default function Raffle() {
 	const navigate = useNavigate();
