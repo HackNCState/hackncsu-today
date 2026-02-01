@@ -18,14 +18,14 @@ CLIENT_SECRET = SecretParam(
 )  # set this via command: firebase functions:secrets:set CLIENT_SECRET
 REDIRECT_URI = StringParam(
     "REDIRECT_URI",
-    default="https://us-central1-hackncsu-today.cloudfunctions.net/oauth_callback",
+    default="http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback",
     description="The redirect URI for Discord OAuth2.",
-)  # set to http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback in .env.local for local testing
+)  # set to https://us-central1-hackncsu-today.cloudfunctions.net/oauth_callback for prod deploys
 FRONTEND_AUTH_URI = StringParam(
     "FRONTEND_AUTH_URI",
-    default="https://today.hackncstate.org/auth",
+    default="http://localhost:8080/auth ",
     description="The frontend URI to redirect to after authentication is complete.",
-)  # set to http://localhost:8080/auth in .env.local for local testing
+)  # set to https://today.hackncstate.org/auth for prod deploys
 # set to https://hackncsu-today--dev-maisszg5.web.app/auth for dev deploys
 
 SPREADSHEET_URL = StringParam(
