@@ -74,6 +74,7 @@ export const EventConfigSchema = z.object({
 	resources: z.array(ResourceSchema).default([]),
 	checklistItems: z.array(ChecklistItemSchema).default([]),
 	activities: z.array(ActivitySchema).default([]),
+	webhookURL: z.url().optional(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
