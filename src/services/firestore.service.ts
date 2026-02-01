@@ -188,7 +188,10 @@ export const firestoreService = {
 	// for creating example users in debug mode
 	debugCreateSampleParticipants: async () => {
 		if (import.meta.env.DEV) {
-			const sampleUsers = Array.from({ length: 10 }).map((_, i) => ({
+			const config = await firestoreService.fetchEventConfig();
+			const availableActivities = config?.activities.map((a) => a.name) || [];
+
+			const sampleUsers = Array.from({ length: 99 }).map((_, i) => ({
 				id: `sample-user-${i}`,
 				username: `sampleuser${i}`,
 				role: "participant" as const,
@@ -199,7 +202,7 @@ export const firestoreService = {
 				shirtSize: "M",
 				dietaryRestrictions: "None",
 				rfidUUID: `rfid-${i}`,
-				attendedEvents: [],
+				attendedEvents: availableActivities.filter(() => Math.random() > 0.5),
 				hadFirstLunch: false,
 				hadSecondLunch: false,
 				hadBreakfast: false,
@@ -223,7 +226,7 @@ export const firestoreService = {
 				shirtSize: "L",
 				dietaryRestrictions: "Vegetarian",
 				rfidUUID: "f1dafe33-f6f3-4786-9f07-de15480b8dbf",
-				attendedEvents: [],
+				attendedEvents: availableActivities.filter(() => Math.random() > 0.5),
 				hadFirstLunch: false,
 				hadSecondLunch: false,
 				hadBreakfast: false,

@@ -1,775 +1,202 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { firestoreService } from "@/services/firestore.service";
+import type { Participant, UserData } from "@/types/user";
+import { useAtomValue } from "jotai";
+import { eventConfigAtom } from "@/atoms/event/config";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import RaffleAnimation from "./RaffleAnimation";
 
-const tempParticipants = [
-	"John Pork",
-	"Nick Cunard",
-	"Aryan Tapkire",
-	"Ahmed Hassan",
-	"Udita Pericharla",
-	"Sabah Afroz",
-	"Trish Nguyen",
-	"Aadhir Sandeep",
-	"Gaurinath Subash",
-	"Sagnik Saha",
-	"Tanvin Kalra",
-	"Anish Mulay",
-	"Sohini Das",
-	"Chaitralee Datar",
-	"Nirvan Reddy Anumandla",
-	"Akhil Chawla",
-	"Sushil Bhattarai",
-	"Tristan Curtis",
-	"Nolan Witt",
-	"Advait Pandey",
-	"Ani Arvind",
-	"Nitesh Kanamarlapudi",
-	"Abhinav Avasarala",
-	"Saaketh Solasa",
-	"Siddhant Borkar",
-	"Will Gunter",
-	"Malik Wensman",
-	"Marwan Abdelgawad",
-	"Nicholas Sutton",
-	"Jayani Sivakumar",
-	"Nora Cam",
-	"Arjun Mamidala",
-	"Kushal Gautam",
-	"Rohit Shinde",
-	"Adit Jigneshbhai Shah",
-	"Patrik Parkkila",
-	"Aaron Harbaugh",
-	"Sanskar Lamsal",
-	"Sai Moe Hein",
-	"Anuj Bhattarai",
-	"Sparsh Koyambreth",
-	"Suzan Thapaliya",
-	"Joe Joseph",
-	"Abhinav Konidena",
-	"Akhil Penumudy",
-	"Dania Swelam",
-	"Taylor Clemmons",
-	"Mina Abdel-Masih",
-	"Swathi Dwarampudi",
-	"Aditya Jha",
-	"Ansh Ganatra",
-	"Suyesh Jadhav",
-	"Kerols Tobia",
-	"Saniddhya Dubey",
-	"Shubham Kakade",
-	"Anandteertha Rao",
-	"Lincoln Jones",
-	"Steven Ibrahim",
-	"Justin Lin",
-	"Ankit Kantheti",
-	"Anish Poosa",
-	"Brendan Apple",
-	"Juan Perdomo",
-	"Tzu Tang Liu",
-	"Joshua Jones",
-	"Jagruthi Haresamudhra",
-	"Saketh Pabolu",
-	"John Chavez",
-	"Dmytro Markey",
-	"Andrew Barber",
-	"Waleston Trinh",
-	"Bavish Mattaparthy",
-	"Will Butler",
-	"sanjana dalal",
-	"NIWANT SALUNKE",
-	"PALLAVI BICHPURIYA",
-	"Sanjana Nanjangud Shreenivas",
-	"Onkar Shinde",
-	"Aditya Ashok Lagad",
-	"Dante Paradis",
-	"Erik Bryk",
-	"Daniel Bakalov",
-	"Jason Li",
-	"Gloria Sukidi",
-	"Smit Sunilkumar Raval",
-	"Pranav Gadiraju",
-	"Kelvon Dixon",
-	"Manaka Green",
-	"Kaw Thang Bu",
-	"Sydney Hart",
-	"Nathan Potter",
-	"Brooke Wu",
-	"Jeremiah Shelton",
-	"Jacob King",
-	"Praveen Bannaiah",
-	"Keoni Reynolds",
-	"Marx Ekomba",
-	"Rithvik Kasarla",
-	"Andrea Garrido Menacho",
-	"Maithili Bhoop",
-	"Zachary Nurkiewicz",
-	"Jheel Gala",
-	"Garv Atri",
-	"Vallab Karanam",
-	"Dheeraj Kumar Narsani",
-	"Asa Huang",
-	"Abhinav Barat",
-	"Andre Batista",
-	"Spencer Trivette",
-	"Vatsalkumar Patel",
-	"Aidan van Hengel",
-	"Kenan Sanu",
-	"Kelechi Otiocha",
-	"Nicole Abdullaeva",
-	"Suhani Gulati",
-	"Anjum Anis Khandeshi",
-	"Dreese Abdelilah",
-	"Arya Venkatesan",
-	"Abhimanyu Agashe",
-	"Vidur Shah",
-	"Nicolas Asanov",
-	"Javier Sedano Marin",
-	"Darsh Arvindkumar Rank",
-	"Annabel Balami",
-	"Navyatej Tummala",
-	"Ravi Chandu Bollepalli",
-	"Luciano Scarpaci",
-	"Mina Ly-Hang",
-	"Aditya Potharlanka",
-	"Sai Kiran Yarramasu",
-	"Jonathan Duran-Ortiz",
-	"Kunal Krishna",
-	"Caleb Han",
-	"Sarayu Kondaveeti",
-	"Sai Nelluri",
-	"Krish Kathpalia",
-	"Daksh Pratap Singh",
-	"Yogya Koneru",
-	"Manish Katel",
-	"Manu Jayachandran",
-	"Rameez Malik",
-	"Jason Lu",
-	"Vanaja Agarwal",
-	"Daniel Briceno",
-	"Devyash Shah",
-	"Moe Ko",
-	"Shrey Shingala",
-	"Deepak Sai Pendyala",
-	"Md Ubayeid Ullah",
-	"han lee",
-	"Ethan Xu",
-	"Aadee Chheda",
-	"Rohin Vivek Arivudainambi",
-	"Vaibhav Dandala",
-	"Joe Maloney",
-	"Aiden Christmas",
-	"Melina Seng",
-	"Aaqel Shaik",
-	"Arnav Shergill",
-	"Oluwaferanmi Oyelude",
-	"Sufiyan Shariff",
-	"Erik Svanes",
-	"Sophia Nunez",
-	"Abel Lu",
-	"Samip Paudel",
-	"Aditya Pawar",
-	"Dheeraj Jagadeesh",
-	"May Yamanaka",
-	"Harish Ramasamy",
-	"khanh cao",
-	"Pranay Kakkar",
-	"Jago Stokes",
-	"Tejas Sukesh",
-	"Jason Pereira",
-	"Afraz Mohammad",
-	"Brendon Hablutzel",
-	"Harish Chandran",
-	"Ramcharan Reddy Kottam",
-	"Viho Huang",
-	"Joseph Phelps",
-	"Muhammad Shoaib Gondal",
-	"Dia Shah",
-	"Mahil Manoharan",
-	"Nidhi Grover",
-	"Vikram Krishnakumar",
-	"Tristan Hawkins",
-	"Arnav Gupta Arnav Gupta",
-	"Jordan Salagala",
-	"Rishi Rai",
-	"Vaishvi Patel",
-	"Sharath Kumar Rameshbabu",
-	"Samuel Firmansyah",
-	"Michael Taylor",
-	"Mohammed Umar Gattu",
-	"Dylan White",
-	"Yash Parakh",
-	"Namit Kalpesh Patel",
-	"Anton Saenko",
-	"Misael J",
-	"RaviKumar Bhuvanagiri",
-	"Me Rahman",
-	"Patrick Kengsoontra",
-	"Sarthak Barde",
-	"Parinita Das",
-	"Stirling Gould",
-	"Khush Patel",
-	"Christopher Hall",
-	"Arnav Murthi",
-	"Brandon Wroblewski",
-	"Chandra Surakanti",
-	"Kashyap Subramanian",
-	"sachi vyas",
-	"Aum Pandya",
-	"Sharnesha Brentley",
-	"Rajanya Lahiri",
-	"Nikhil Tirunagiri",
-	"Princy Maheshwari",
-	"Sai Manvija Cherukuri",
-	"Adam Le",
-	"Reewaj Adhikari",
-	"Sayed Hayat Ahmad",
-	"Robert Yin",
-	"Louie Yin",
-	"Taylor Thomas",
-	"Tristan Hall",
-	"Sai Donepudi",
-	"Amodh Dhakal",
-	"Isaac Mylabathula",
-	"Shrinav Loka",
-	"Paridhi Saxena",
-	"Vivienne Hnin",
-	"Abhi Ramtel",
-	"Naveen Vellaturi",
-	"Arya Sharma",
-	"Jane Munsell",
-	"Zander Modaress-Razavi",
-	"Bela Gupta",
-	"Fillip Cutiuba",
-	"Annafy Hossain",
-	"Adith Venkatesh",
-	"Ashwin Mahesh",
-	"Jason Nguyen",
-	"Arsal Khan",
-	"Naseerah Kani",
-	"Sanchusri kavitha babu",
-	"Brian Su",
-	"Krish Piryani",
-	"Gokulakannan Sakthivel",
-	"Zimo Chen",
-	"Felicia Hwag",
-	"Ayush Sagar",
-	"Vihaan Kerekatte",
-	"Arwa Ali",
-	"Ben Tong",
-	"Henry Salkever",
-	"Anuva Nuzhat",
-	"Sreenidhi Kannan",
-	"Sreenidhi Kumba Sathia Saravana",
-	"Arjun Bhonsle",
-	"Amritaraj Nair",
-	"Rachel Lin",
-	"Lev Marushevskyi",
-	"Saber Khourdaji",
-	"Danil Bogdanov de Carvalho",
-	"Minyoung Park",
-	"Saif Alshalabi",
-	"Abhinav Karumudi",
-	"Setornam Sam-Anyormi",
-	"Jacob Davis",
-	"Sreekar Edula",
-	"Jibran Adil",
-	"srinath vaggu",
-	"Sahil Jain",
-	"Trevor Joncich",
-	"Lukas Snyder",
-	"Tanisha Ravindran",
-	"Piragith Bahiradhan",
-	"Anubhuti Mittal",
-	"Kurtis Lin",
-	"Brittany Lawhead",
-	"Alex Gundrum",
-	"Archit Gupta",
-	"Sean Branigan",
-	"Gabriel Steele",
-	"Arnav Chauhan",
-	"Leah Nikhil",
-	"Vanisha Swabhanam",
-	"Harsha Sirigina",
-	"Oluwatomisin Oyaniyi",
-	"Rohan Rajnish Khandare",
-	"ananya h",
-	"Fayaz Shaikh",
-	"Johnson Ameyaw",
-	"Aniruddh Sanjeev Bhagwat",
-	"Avhaan Narang",
-	"Tatnaiyah Bowers",
-	"William Vo",
-	"Benjamin Barrera-Altuna",
-	"Colin Volpe",
-	"Zane Helton",
-	"Nelson Kwesi Xedzro",
-	"Jason Yin",
-	"Taran Saini",
-	"Ashwattha Phatak",
-	"Serenity Buckner",
-	"Dhruv Soni",
-	"Aryan Inguva",
-	"Janam Ajay Patel",
-	"Vihan Singh",
-	"Krisha Sanjaykumar Darji",
-	"Dharani Guda",
-	"Sairaj Gunda",
-	"Samyak Jain",
-	"Mulya Patel",
-	"Brian Crouse",
-	"Ananya Patankat",
-	"Hruday Yerramareddy",
-	"Paula Contreras",
-	"Avleen Mehal",
-	"Ahmad Siddique",
-	"Ayush Prakash",
-	"Joy Niranjan",
-	"Syed Ra'ed Ali Shah",
-	"Michael Spencer",
-	"Prithish Samanta",
-	"Mannaseh Merakanapalli",
-	"Roshaan Ameer",
-	"Manish Chepuri",
-	"Alp Niksarli",
-	"Sameer Dalal",
-	"Solomon Oduro",
-	"Fadeel Darkwa",
-	"Sweekar Burji",
-	"Archismita Ghosh",
-	"Florence Cheung",
-	"Leslie Arthur",
-	"Durga Krishna Sai Nikhita Maguluri",
-	"Emily Jon",
-	"Rajasri Bhagam",
-	"Nayan Taori",
-	"Prathamesh Thakur",
-	"Elijah Bridges",
-	"Sanjyot Sathe",
-	"Douglas Parker",
-	"Jacob Phillips",
-	"Ishwarya Gandamsetty",
-	"YSamuel Enuol",
-	"Alyssa Gebhardt",
-	"Adrian Garcia",
-	"Huzaifa Siddiqui",
-	"Issam Alzouby",
-	"Aditya Bhardwaj",
-	"Sarthak Acharya",
-	"Jack McCotter",
-	"Sanika Surose",
-	"Danielle Brown",
-	"Tim Boettinger",
-	"Shivani Arunkumar",
-	"Giovanni Smith",
-	"Nikhil Ambavaram",
-	"Luca Palamenti",
-	"Cephas Osei-Bonsu",
-	"Mayank Roy",
-	"Allen Ayyankulankara Solomon",
-	"Francis Adom",
-	"Narim Lee",
-	"Eleanor Kelton",
-	"Shiva Koppol",
-	"Devarsh Karthik Sarika",
-	"Rajil Vembe Sajila",
-	"Aditya Gulati",
-	"Jared Attard",
-	"Sunny Masten",
-	"Prem Gandhi",
-	"Sandhiya Shunmugavel",
-	"Anahi Flores-Zavala",
-	"Michael Lauf",
-	"Vikram Malik",
-	"Aarfa Bano Sheikh",
-	"Devanshi Jariwala",
-	"Eli Reed",
-	"Onkar Dhaigude",
-	"Sisir Pynda",
-	"Micah Carson",
-	"Preeti Joshi",
-	"Vindya Prasad",
-	"Finn Sheng",
-	"Makarand Pundlik",
-	"Broseth Bun",
-	"Varun Khalate",
-	"Nishchal Singi",
-	"Srivathsa Mantrala",
-	"smeet nagda",
-	"Rujul Waval",
-	"John Salapantan",
-	"Bereket Wolderufael",
-	"Achyuta Anandakrishnan",
-	"Aadhya Mittapalli",
-	"Prajwal Neupane",
-	"Miles Daly",
-	"Samarth Shah",
-	"Aryaman Kachroo",
-	"Ramchandra Chawla",
-	"Ashutosh Modi",
-	"Srinivas Dengle",
-	"KAMRUL ISLAM",
-	"Anvita Pullangari",
-	"Sid Tewari",
-	"Rithish Sivakumar",
-	"Blake Brandon",
-	"Nisarg Jasani",
-	"Arjun Singh",
-	"Abhinav Sharma",
-	"Gaurav Kulkarni",
-	"Arjun Makadia",
-	"Michael Puerto",
-	"Moyinoluwa Ogunjobi",
-	"Abhijit Somala",
-	"Devanshi Thakkar",
-	"Parsa Khodabandehlou",
-	"Jordan Sentosa",
-	"Sanchit Shah",
-	"Maxim Semukhin",
-	"Varshini Kaleru",
-	"Shounak Deshmukh",
-	"Suhas chandan Yaramala",
-	"Mahika Patil",
-	"Neelesh Yaddanapudi",
-	"Ayub Hussein",
-	"Victor Hernandez",
-	"Harsh Vora",
-	"Bhavishya Tarun",
-	"Tejasv Agarwal",
-	"Parth Patel",
-	"Devanshi Thakkar",
-	"Hung Nguyen",
-	"Divya Srinivasan",
-	"Abishek R",
-	"Aiden Fine",
-	"Everett Tucker",
-	"James Wright",
-	"Sophia Lee",
-	"Nathan Jiang",
-	"Tobore Takpor",
-	"Sankalp Bansal",
-	"Promit Saha",
-	"Tram Nguyen",
-	"Pratham Patel",
-	"Mokshagna Kadiyala",
-	"Sai Nagamalla",
-	"Jay Shah",
-	"Vedant Chaudhari",
-	"William Gamino",
-	"Dang Dinh",
-	"Austin Chang",
-	"Evin Bento",
-	"Ashwinkumar Manickam Vaithiyanathan",
-	"Greydon Sarvis",
-	"Niharika Maruvanahalli Suresh",
-	"Hasid Garcia",
-	"Walker Manuel",
-	"Shrey Vasisht",
-	"Andrei Metgher",
-	"Michael Vargas",
-	"tuan dinh",
-	"Harsh Manoj More",
-	"Abhishek Anand",
-	"Jqainesh Lad",
-	"Mahika Kalra",
-	"Srushti Thakar",
-	"Bryan Perez",
-	"Mykie Xiong",
-	"Mahek Viradiya",
-	"Aayushi Masurekar",
-	"Rujuta Palimkar",
-	"Priyal Doctor",
-	"Anusha Upadhyay",
-	"Swasti Sadanand",
-	"Atharva Ajit Waingankar",
-	"Kyle Morrow",
-	"Sarah Hyatt",
-	"Joy Su",
-	"Ryan Ganzke",
-	"Ramya Konduru",
-	"Bhavya Jain",
-	"Raphael Phillips",
-	"Vladislav Vetroff",
-	"Shourya Nanda Kumar",
-	"GOPESH BAHETI",
-	"Roman Myers",
-	"Devin Li",
-	"Deepshul Pradeep",
-	"Dinesh Karnati",
-	"Steven Chen",
-	"Sharmeen Momin",
-	"Aryan Kumar",
-	"Gavin Leano",
-	"Aida Fatima",
-	"MUHAMMAD NADEEM",
-	"Ranvir Chennupalli",
-	"Abhishek Potdar",
-	"Yudi Zheng",
-	"Sultanus Salehin",
-	"Priyanshu Dongre",
-	"Praneel Magapu",
-	"Rishi Mohandas",
-	"Fawazullah Kidwai",
-	"Vaishnav Puram",
-	"Aniruddha Shivananda",
-	"Rutvik Kulkarni",
-	"Nikhilesh Ramkumar",
-	"Miku Makaio",
-	"Connery Tran",
-	"Atharva Gupta",
-	"Divya Kannan",
-	"Soham Deshpande",
-	"Amos Abdulai",
-	"Jaida Dorsey",
-	"Anish Narang",
-	"Michelle Varghese",
-	"Hari Prasad Pulibandla",
-	"Mahmood Kidwai",
-	"Anant Patel",
-	"Sai Vyshnavi Gudipalli",
-	"Harsha Vardhan Puvvadi",
-	"Shashank Ajit Walke",
-	"Savannah Nichols",
-	"Shaun Jacob",
-	"Aroudra",
-	"Syamantak Thakur",
-	"Raghunandan Mante",
-	"Shubham Tidke",
-	"Noah Donkor",
-	"Venkat Vulava",
-	"Erik Modesto Reyes",
-	"Sinchana Kandiga",
-	"Emre Yilmazer",
-	"Sumeet Khillare",
-	"Vicky Wang",
-	"Digvijay Sanjeev Sonvane",
-	"Joseph Kaskel",
-	"Tyler Swanson",
-	"Pranshav Ketal Patel",
-	"Ratan Gundami",
-	"Anurag Gorkar",
-	"Vivek Kishorkumar Vanera",
-	"Manali Teke",
-	"Pranav Akki",
-	"Daniel Dong",
-	"Talha Ahmed",
-	"Rishitha Shobha Ramesh",
-	"Shriya Atluri",
-	"Luqman Kabiru",
-	"Shreyas Raviprasad",
-	"Jayneel Shah",
-	"Smiti Kothari",
-	"Arturo Serdan",
-	"Rudra Patel",
-	"Swara Belur",
-	"Mili Jolly",
-	"Rakshita Tantry",
-	"Aditya Basarkar",
-	"Purva Jagtap",
-	"Varad Paradkar",
-	"Hawon Cho",
-	"Braudy Barcena Gil",
-	"Kaavya Murugan",
-	"Giovanni Yanny",
-	"Fuzail Ahmed Razeen Safiulla",
-	"Shreyas Devaraj",
-	"Nishad Tardalkar",
-	"Tianna Spears",
-	"Eric Fackelman",
-	"Keyur Gondhalekar",
-	"Isaac Wabela",
-	"Sabal Poudel",
-	"Lavanya Middha",
-	"Ethan Le",
-	"Dustin Staub",
-	"Brandon Walters",
-	"Aditya Deshpande",
-	"Bala thanush reddy Bhumi reddy",
-	"Rishik Pavani",
-	"Nirmit Deliwala",
-	"Rishi Senthil Kumar",
-	"Rahul Rajkumar",
-	"Victor Liu",
-	"Bipin Gowda",
-	"Mahim Dashora",
-	"Srujan Ponnapalli",
-	"Faris Faizal",
-	"Liam Yeager",
-	"Yash Dhavale",
-	"Supraj Gijre",
-	"Narasimhareddy Dilip Kumar Irala",
-	"Maximus Lang",
-	"James Xiao",
-	"Justin Huang",
-	"Arjun Saha Choudhury",
-	"Isaiah Virgil",
-	"Mohamed Elhiber",
-	"Nikhil Marisetty",
-	"Swetha Manivasagam",
-	"Sidharth Shambu",
-	"Maulik Verma",
-	"Sarvesh Pandiarajan",
-	"Johaan Kathilankal Jis",
-	"Claire Farmer",
-	"Khalid Hamedelneel",
-	"Akshay Dongare",
-	"Pearl Guglani",
-	"Henry Lin",
-	"Callum Guan",
-	"Ryon Peddapalli",
-	"Zou Wague",
-	"Jeffrey Yu",
-	"Quocnghia Truong",
-	"Toby Cox",
-	"Ruhan Upadhyaya",
-	"Louis Ton",
-	"Emilie Athanas",
-	"Prednya Ramesh Ramesh Kumar",
-	"Bhoomi Mehta",
-	"Sydney Ermongkonchai",
-	"Srishti Rastogi",
-	"Varun Pravin Singh",
-	"Yash Dive",
-	"Arjun Kancharla",
-	"Siddharth Malireddi",
-	"Erin Xiang",
-	"Uddharsh Vasili",
-	"Dhanush Gowdhaman",
-	"Olivia Farra",
-	"Himanshu Singh",
-	"Anmol Koul",
-	"Sahil Kharel",
-	"Zia Ullah Khan",
-	"Shashwat Vanapamala",
-	"Rainul Hakim",
-	"Rohit Ranjithkumar",
-	"Jaya Patel",
-	"Derek Beck",
-	"Anjana Vedantam",
-	"Keshav Bali",
-	"Gowtham Krishna Tadikamalla",
-	"Aashna Anand Shetty",
-	"Aditi Gopikrishna",
-	"Ronel Xavier",
-	"Karolaine Nunes dos Reis",
-	"Sidy Ndiaye",
-	"Ibrahim Khan",
-	"Eric Li",
-	"Houston Culpepper",
-	"Kristika Sedai",
-	"Eric Lin",
-	"Demaris Keleta",
-	"Ariel Rutenberg",
-	"Taylor Griggs",
-	"Ahmed Goubar",
-	"Sagith Bahiradhan",
-	"Sharvesh Prabhakaran",
-	"Tom Then",
-	"Shruti Kulkarni",
-	"Rohan Manami",
-	"Pranav Pradhan",
-	"Deekshith Anantha",
-	"Srinidhi Shivashankar",
-	"Rohit Basagondappa Hebbi",
-	"Brendan Swanson",
-	"Aiden Lapp",
-	"Kabilan Kothukaranpudur Kumaresan",
-	"Alex Carranza",
-	"Collin Rey",
-	"Smiti Thapa",
-	"Nithya reddy Billa",
-	"Ananth Pal Reddy Kandhala",
-	"Nikhil Jagannathan",
-	"Malkaan Mehdi",
-	"Jake McDavitt",
-	"Luis Martinez Aguirre",
-	"Venkata Shaurya Mantrala",
-	"Arianna Nugent-Freeman",
-	"Shashwat Vanapamala",
-	"Rishvandh Kalaivani Prabu",
-	"Rafay Ahmad",
-	"Danish Yaqub",
-	"nahed abu zaid",
-	"Philip Teague",
-	"Shishir Bhimavarapu",
-	"Venkata Kanishk Sura",
-	"Urvi Haval",
-	"Siddharth Ramanathan",
-	"Aditya Kulkarni",
-	"Vaibhav Hawaldar",
-	"William Keffer",
-	"Markandeya Yalamanchi",
-	"Adrian Hito",
-	"Erik Keitz",
-	"William Mathews",
-	"Srinivasa Karthikeya Reddy Kovvuri",
-	"Nathaniel Ramirez",
-	"Michael Eisenberg",
-	"Cory Saylor",
-	"kevin anderson",
-	"Vaishakh Balu",
-	"Amree Barbour",
-	"Aastha Gaudani",
-	"Smit Sunilkumar Raval",
-	"Nihar Rai",
-	"Priyal Mangla",
-	"Hrishikesh Prashant Salway",
-	"Semih Tan Pala",
-	"Dakota Hamilton",
-	"Mohammad Agha Mohammadi",
-	"Prince Aglonoo",
-];
-
-const teams = [
-	"Skibidi Adventures",
-	"Hardcore Gaming",
-	"Tencent (腾讯)",
-	"quagmire",
-	"Boris Johnson",
-	"UNC students💔💔",
-];
-
-const participants = tempParticipants.map((name) => ({
-	name,
-	teamName: teams[Math.floor(Math.random() * teams.length)],
-	activitiesAttended: Math.floor(Math.random() * 4) + 1,
-}));
-const tempWinners = participants.slice(0, 3);
+interface RaffleParticipant {
+	name: string;
+	activitiesAttended: number;
+	teamName?: string;
+}
 
 export default function Raffle() {
 	const navigate = useNavigate();
-	const [mode, setMode] = useState<"config" | "animation">("config");
+	const eventConfig = useAtomValue(eventConfigAtom);
+
+	const [users, setUsers] = useState<UserData[]>([]);
+	const [numWinners, setNumWinners] = useState(3);
+	const [showAnimation, setShowAnimation] = useState(false);
+	const [winners, setWinners] = useState<RaffleParticipant[]>([]);
+
+	useEffect(() => {
+		firestoreService.fetchAllUsers().then(setUsers);
+	}, []);
+
+	const eligibleActivities = useMemo(() => {
+		return (
+			eventConfig?.activities
+				?.filter((a) => a.eligibleForRaffle)
+				.map((a) => a.name) || []
+		);
+	}, [eventConfig]);
+
+	const participants = useMemo(() => {
+		return users
+			.filter((u): u is Participant => u.role === "participant")
+			.map((p) => {
+				const score = p.attendedEvents.filter((e) =>
+					eligibleActivities.includes(e),
+				).length;
+				return {
+					...p,
+					score,
+				};
+			});
+	}, [users, eligibleActivities]);
+
+	const formattedParticipants = useMemo<RaffleParticipant[]>(() => {
+		return participants.map((p) => ({
+			name: `${p.firstName} ${p.lastName}`,
+			activitiesAttended: p.score,
+		}));
+	}, [participants]);
+
+	const handleStartRaffle = () => {
+		if (numWinners <= 0) return;
+
+		// Create a weighted pool
+		const pool: Participant[] = [];
+		for (const p of participants) {
+			for (let i = 0; i < p.score; i++) {
+				pool.push(p);
+			}
+		}
+
+		if (pool.length === 0) {
+			alert("No eligible participants found (score > 0)");
+			return;
+		}
+
+		const selectedWinners: Participant[] = [];
+		let currentPool = [...pool];
+
+		for (let i = 0; i < numWinners; i++) {
+			if (currentPool.length === 0) break;
+
+			const randomIndex = Math.floor(Math.random() * currentPool.length);
+			const winner = currentPool[randomIndex];
+			selectedWinners.push(winner);
+
+			// Remove this winner from the pool completely to avoid duplicate wins
+			currentPool = currentPool.filter((p) => p.id !== winner.id);
+		}
+
+		const formattedWinners = selectedWinners.map((p) => ({
+			name: `${p.firstName} ${p.lastName}`,
+			activitiesAttended: p.attendedEvents.filter((e) =>
+				eligibleActivities.includes(e),
+			).length,
+		}));
+
+		setWinners(formattedWinners);
+	};
+
+	if (showAnimation) {
+		return (
+			<RaffleAnimation
+				winners={winners}
+				participants={formattedParticipants}
+				onEnd={() => setShowAnimation(false)}
+			/>
+		);
+	}
 
 	return (
-		<>
-			{mode === "config" ? (
-				<div className="p-8 flex flex-col gap-4">
-					<header className="flex flex-row items-center gap-2">
-						<h1 className="font-playfair font-semibold text-xl sm:text-3xl">
-							Draw Raffle Winners
-						</h1>
-						<Button
-							onClick={() => {
-								navigate(-1);
-							}}
-							variant="destructive"
-							className="ml-auto"
-						>
-							go back
-						</Button>
-						<Button onClick={() => setMode("animation")}>Start Raffle</Button>
-					</header>
+		<div className="p-8 flex flex-col gap-4">
+			<header className="flex flex-row items-center gap-2">
+				<h1 className="font-playfair font-semibold text-xl sm:text-3xl">
+					Raffle Setup
+				</h1>
+				<Button
+					onClick={() => navigate(-1)}
+					variant="destructive"
+					className="ml-auto"
+				>
+					go back
+				</Button>
+			</header>
 
-					<main></main>
+			<main className="flex flex-col gap-8 max-w-lg">
+				<div className="flex flex-col gap-4">
+					<p className="text-muted-foreground">
+						Select the number of winners. Participants are weighted by their
+						eligible activity attendance.
+					</p>
+
+					<div className="flex flex-col gap-2">
+						<Label htmlFor="numWinners">Number of Winners</Label>
+						<Input
+							id="numWinners"
+							type="number"
+							min={1}
+							value={numWinners}
+							onChange={(e) => setNumWinners(parseInt(e.target.value) || 0)}
+						/>
+					</div>
+
+					<div className="bg-muted p-4 rounded-lg text-sm space-y-2">
+						<div className="flex justify-between">
+							<span className="text-muted-foreground">Total Participants:</span>
+							<span>{participants.length}</span>
+						</div>
+						<div className="flex justify-between">
+							<span className="text-muted-foreground">
+								Total Entries (Weighted):
+							</span>
+							<span>{participants.reduce((acc, p) => acc + p.score, 0)}</span>
+						</div>
+						<div className="flex justify-between">
+							<span className="text-muted-foreground">User Data Loaded:</span>
+							<span>{users.length > 0 ? "Yes" : "No"}</span>
+						</div>
+						<div className="flex justify-between">
+							<span className="text-muted-foreground">
+								Eligible Activities:
+							</span>
+							<span>{eligibleActivities.length}</span>
+						</div>
+					</div>
+
+					<div className="flex flex-row gap-2">
+						<Button onClick={handleStartRaffle} disabled={users.length === 0}>
+							Calculate Winners
+						</Button>
+
+						{winners.length > 0 && (
+							<Button
+								onClick={() => setShowAnimation(true)}
+								variant="secondary"
+							>
+								Start Raffle Animation
+							</Button>
+						)}
+					</div>
 				</div>
-			) : (
-				<RaffleAnimation
-					onEnd={() => setMode("config")}
-					winners={tempWinners}
-					participants={participants}
-				/>
-			)}
-		</>
+
+				{winners.length > 0 && (
+					<div className="flex flex-col gap-2">
+						<h2 className="font-semibold text-xl">Selected Winners</h2>
+						<div className="bg-muted p-4 rounded-lg space-y-2">
+							{winners.map((winner, i) => (
+								<div key={i} className="flex justify-between items-center">
+									<div className="font-medium">
+										{i + 1}. {winner.name}
+									</div>
+									<div className="text-sm text-muted-foreground">
+										{winner.activitiesAttended} activities
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
+			</main>
+		</div>
 	);
 }
