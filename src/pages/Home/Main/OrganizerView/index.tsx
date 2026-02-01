@@ -6,8 +6,9 @@ import { useState } from "react";
 import FeedItem from "../FeedItem";
 import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event/config";
+import { webhookURLAtom, setWebhookURLAtom, deleteWebhookURLAtom } from "@/atoms/event/webhookURL";
 import { useBreakpoint } from "@/hooks/useMediaQuery";
 import {
 	Dialog,
@@ -23,12 +24,22 @@ import { ChallengeEditor } from "./ChallengeEditor";
 import ActivityEditor from "./ActivityEditor";
 import { useNavigate } from "react-router-dom";
 import { functionsService } from "@/services/functions.service";
+import { webhookService } from "@/services/webhook.service";
+import { set } from "zod";
 
 export default function OrganizerView() {
 	const navigate = useNavigate();
 
 	const config = useAtomValue(eventConfigAtom);
 	const updateConfig = useSetAtom(updateEventConfigAtom);
+
+	const [webhookURL] = useAtom(webhookURLAtom);
+	const [localWebhookURL, setLocalWebhookURL] = useState(webhookURL ?? "");
+	const [validWebhook, setValidWebhook] = useState(true);
+	const setWebhookURL = useSetAtom(setWebhookURLAtom);
+	const deleteWebhookURL = useSetAtom(deleteWebhookURLAtom);
+	// TODO: make this configurable
+	const roleIDToPing = "1467638050774585492";
 
 	const isDesktop = useBreakpoint("lg");
 
@@ -49,9 +60,16 @@ export default function OrganizerView() {
 		}
 	};
 
-	const handlePostAnnouncement = (e: React.FormEvent) => {
-		// should also handle sending to discord webhook
+	const handleSaveWebhookURL = async () => {
+		if ( webhookService.isValidDiscordWebhook(localWebhookURL) ) {
+			setValidWebhook(true);
+await setWebhookURL(localWebhookURL || undefined);
+		}
+		else
+			setValidWebhook(false);
+	};
 
+	const handlePostAnnouncement = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!config || !announcementText.trim()) return;
 
@@ -63,6 +81,8 @@ export default function OrganizerView() {
 		updateConfig({
 			announcements: [newAnnouncement, ...config.announcements],
 		});
+
+		webhookService.postMessage(config.webhookURL, `<@&${roleIDToPing}> ${announcementText}`);
 		setAnnouncementText("");
 	};
 
@@ -205,6 +225,46 @@ export default function OrganizerView() {
 						</DialogContent>
 					</Dialog>
 
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Edit Webhook URL</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col gap-4">
+							<DialogHeader>
+								<DialogTitle>Configure Webhook URL</DialogTitle>
+							</DialogHeader>
+						<div className="flex flex-col gap-4">
+							<div className="flex gap-2">
+								<Input
+									placeholder="Discord Webhook URL"
+									value={localWebhookURL}
+									onChange={(e) => setLocalWebhookURL(e.target.value)}
+								/>
+								<Button
+									onClick={() => handleSaveWebhookURL()}
+								>
+									Save
+								</Button>
+								<Button
+									variant="destructive"
+									onClick={() => {
+										deleteWebhookURL();
+										setLocalWebhookURL("");
+									}}
+								>
+									Clear
+								</Button>
+								<div>
+									{!validWebhook && (
+										<p className="text-sm text-destructive">
+											Please enter a valid Discord Webhook URL.
+										</p>
+									)}
+								</div>
+							</div>
+						</div>
+						</DialogContent>
+					</Dialog>
 					<Button variant="destructive" onClick={() => updateConfig(null)}>
 						Reset event data
 					</Button>

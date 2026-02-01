@@ -7,11 +7,11 @@ export const webhookURLAtom = atom((get) => {
     return config?.webhookURL ?? undefined;
 });
 
-export const setWebhookURLAtom = atom(null, async (get, _, url:  | undefined) => {
+export const setWebhookURLAtom = atom(null, async (_get, _, url: string | undefined) => {
     await firestoreService.updateEventConfig({ webhookURL: url });
 });
 
-export const deleteWebhookURLAtom = atom(null, async (get, _) => {
+export const deleteWebhookURLAtom = atom(null, async (get) => {
     const webhookURL = get(webhookURLAtom);
     if (!webhookURL) return;
 
