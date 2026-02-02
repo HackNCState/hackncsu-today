@@ -33,7 +33,7 @@ export default function OrganizerView() {
 	const config = useAtomValue(eventConfigAtom);
 	const updateConfig = useSetAtom(updateEventConfigAtom);
 
-	const [webhookURL] = useAtom(webhookURLAtom);
+	const webhookURL = useAtomValue(webhookURLAtom);
 	const [localWebhookURL, setLocalWebhookURL] = useState(webhookURL ?? "");
 	const [validWebhook, setValidWebhook] = useState(true);
 	const setWebhookURL = useSetAtom(setWebhookURLAtom);
