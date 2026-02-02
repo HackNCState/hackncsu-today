@@ -4,6 +4,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Resource } from "@/types/event";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -63,13 +64,27 @@ export default function NavSection({
 					<DialogHeader>
 						<DialogTitle>{selectedResource?.label}</DialogTitle>
 					</DialogHeader>
-					<div className="prose prose-slate dark:prose-invert max-w-none">
+					<ScrollArea className="prose prose-slate dark:prose-invert max-w-none max-h-[85vh] w-full">
 						{selectedResource?.type === "text" ? (
-							<ReactMarkdown remarkPlugins={[remarkGfm]}>
+							<ReactMarkdown
+								remarkPlugins={[remarkGfm]}
+								components={{
+									a: ({ children, href }) => (
+										<a
+											href={href}
+											target="_blank"
+											rel="noopener noreferrer"
+											onClick={(event) => event.stopPropagation()}
+										>
+											{children}
+										</a>
+									),
+								}}
+							>
 								{selectedResource.content}
 							</ReactMarkdown>
 						) : null}
-					</div>
+					</ScrollArea>
 				</DialogContent>
 			</Dialog>
 		</div>

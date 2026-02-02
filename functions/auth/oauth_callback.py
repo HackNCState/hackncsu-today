@@ -142,7 +142,7 @@ def _get_registration(uid: str, username: str) -> User:
             reg_headers, USERNAME_COL_R.value
         )
 
-        cell = reg_sheet.find(username, in_column=username_col_idx)
+        cell = reg_sheet.find(username, in_column=username_col_idx, case_sensitive=False)
 
         # participant not registered
         if not cell:

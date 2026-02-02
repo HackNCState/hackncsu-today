@@ -85,7 +85,7 @@ export const addResourceAtom = atom(
 	async (get, _, resource: Resource) => {
 		const resources = get(resourcesAtom);
 
-		const updatedResources = [resource, ...resources];
+		const updatedResources = [...resources, resource];
 
 		await firestoreService.updateEventConfig({ resources: updatedResources });
 	},
