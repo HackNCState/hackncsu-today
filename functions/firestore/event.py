@@ -192,6 +192,10 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
                 "name": "lunch_day_2",
                 "eligibleForRaffle": False,
             },
+            {
+                "name": "career_fair_friday",
+                "eligibleForRaffle": True,
+            },
         ],
     }
 

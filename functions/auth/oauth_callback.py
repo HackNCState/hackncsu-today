@@ -154,13 +154,16 @@ def _get_registration(uid: str, username: str) -> User:
         checked_in_idx = _get_col_index_from_headers(
             checkin_headers, CHECKED_IN_COL_C.value
         )
-        checked_in = _get_cell_from_row(checkin_row, checked_in_idx)
+        checked_in = _get_cell_from_row(checkin_row, checked_in_idx).upper()
 
         # participant did not check in
-        if str(checked_in).upper() != "TRUE":
+        if checked_in == "NO":
             raise ValueError(
                 "not_checked_in",
             )
+
+        # if checked in friday
+        friday_checked_in = checked_in == "FRIDAY"
 
         shirt_size_idx = _get_col_index_from_headers(
             reg_headers, SHIRT_SIZE_COL_R.value
@@ -214,6 +217,8 @@ def _get_registration(uid: str, username: str) -> User:
             dietaryRestrictions=dietary_restrictions,
             shirtSize=shirt_size,
             rfidUUID=rfid_uuid,
+            # mark if they checked in on friday as having attended the career fair event
+            attendedEvents=["career_fair_friday"] if friday_checked_in else [],
         )
 
 
