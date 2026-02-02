@@ -2,8 +2,8 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper function to check for organizer role
+
+  // Helper function to check for organizer role
     function isOrganizer() {
       return request.auth.token.isOrganizer == true;
     }
@@ -22,10 +22,6 @@ service cloud.firestore {
       // Team members can read the entire team document.
       allow read: if request.auth.uid in resource.data.memberIds;
 
-      // Team members can only update the 'checklist' field.
-      allow update: if request.auth.uid in resource.data.memberIds &&
-                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['checklist']);
-      
       // Prevent members from creating or deleting teams (only organizers can do that via the global rule)
       allow create, delete: if false; 
     }

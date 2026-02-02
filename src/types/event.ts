@@ -47,18 +47,42 @@ export const TrackSchema = z.object({
 	description: z.string().optional(),
 });
 
+export const ChallengeSchema = z.object({
+	name: z.string(),
+	description: z.string().optional(),
+});
+
+export const ChecklistItemSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	description: z.string(),
+	autoCheck: z.boolean().optional(), // whether this item is auto checked by the system
+});
+
+export const ActivitySchema = z.object({
+	name: z.string(),
+	eligibleForRaffle: z.boolean().default(false),
+});
+
 export const EventConfigSchema = z.object({
 	tracks: z.array(TrackSchema).default([]),
+	challenges: z.array(ChallengeSchema).default([]),
 	hackingState: z.enum(["setup", "countdown", "judging", "ended"]),
 	hackingEndTime: z.iso.datetime(),
 	schedules: z.array(ScheduleSchema).default([]),
 	announcements: z.array(AnnouncementSchema).default([]),
 	resources: z.array(ResourceSchema).default([]),
+	checklistItems: z.array(ChecklistItemSchema).default([]),
+	activities: z.array(ActivitySchema).default([]),
+	webhookURL: z.url().optional(),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
+export type Challenge = z.infer<typeof ChallengeSchema>;
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
 export type Announcement = z.infer<typeof AnnouncementSchema>;
 export type Resource = z.infer<typeof ResourceSchema>;
+export type ChecklistItem = z.infer<typeof ChecklistItemSchema>;
+export type Activity = z.infer<typeof ActivitySchema>;
 export type EventConfig = z.infer<typeof EventConfigSchema>;

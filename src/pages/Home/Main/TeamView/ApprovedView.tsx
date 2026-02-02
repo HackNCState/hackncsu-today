@@ -24,7 +24,7 @@ export default function ApprovedView({ team }: ApprovedViewProps) {
 
 	return (
 		<div className="w-full flex py-2">
-			<div className="relative w-full max-w-md group drop-shadow-xl">
+			<div className="relative w-full max-w-xl group drop-shadow-xl">
 				{/* Ticket Container */}
 				<div
 					className="relative bg-[#fdfbf7] dark:bg-[#1c1c1c] text-stone-900 dark:text-stone-100 border-x-2 border-stone-900/10 dark:border-stone-100/10"
@@ -47,14 +47,17 @@ export default function ApprovedView({ team }: ApprovedViewProps) {
 					<div className="absolute left-0 top-0 bottom-0 w-1 bg-repeat-y border-r-2 border-dashed border-stone-300 dark:border-stone-700" />
 					<div className="absolute right-0 top-0 bottom-0 w-1 bg-repeat-y border-l-2 border-dashed border-stone-300 dark:border-stone-700" />
 
-					<div className="p-4 sm:p-6 flex flex-col gap-4 mx-2">
+					<div className="p-4 sm:p-6 flex flex-col gap-3 mx-2">
 						{/* Top Section: Team Name and Track */}
 						<div className="flex flex-col gap-1">
 							<h2 className="font-playfair text-3xl sm:text-4xl font-black tracking-tightest uppercase break-words leading-none">
 								{team.name}
 							</h2>
-							<p className="text-base sm:text-lg text-muted-foreground uppercase tracking-[0.2em] font-synemono">
-								STARRING: {team.track}
+							<p className="text-base sm:text-lg text-muted-foreground uppercase tracking-[0.2em] font-synemono leading-snug">
+								STARRING: {team.track}{" "}
+								{team.challenges?.map((c) => (
+									<> &bull; {c}</>
+								))}
 							</p>
 						</div>
 
@@ -126,6 +129,13 @@ export default function ApprovedView({ team }: ApprovedViewProps) {
 								</div>
 							</div>
 						</div>
+
+						<p className="text-xs text-muted-foreground">
+							Hack_NCState &copy; 2025 &nbsp;|&nbsp;{" "}
+							<span className="italic">
+								Care for a different track? Let a staff member know.
+							</span>
+						</p>
 					</div>
 				</div>
 			</div>

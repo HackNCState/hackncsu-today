@@ -6,7 +6,7 @@
 
 import { atom } from "jotai";
 import type { User as FirebaseUser } from "firebase/auth";
-import type { UserData } from "@/types/user";
+import type { ChecklistItemStatus, UserData } from "@/types/user";
 import { firestoreService } from "@/services/firestore.service";
 
 // undefined = loading, null = not authenticated, UserData = authenticated
@@ -23,6 +23,34 @@ export const teamIdAtom = atom((get) => {
 	const user = get(userAtom);
 	return user?.role === "participant" ? user.teamId : null;
 });
+
+export const completedChecklistStatusesAtom = atom((get) => {
+	const user = get(userAtom);
+	if (user?.role !== "participant") return [];
+	return user.checklistItemStatuses;
+});
+
+export const setChecklistStatusAtom = atom(
+	null,
+	async (get, _, id: string, checked: boolean) => {
+		const user = get(userAtom);
+		if (!user || user.role !== "participant") return;
+
+		const existingStatuses = user.checklistItemStatuses;
+
+		const filteredStatuses = existingStatuses.filter(
+			(status) => status.id !== id,
+		);
+
+		const updatedStatuses: ChecklistItemStatus[] = checked
+			? [...filteredStatuses, { id, completed: true }]
+			: filteredStatuses;
+
+		await firestoreService.updateUser(user.id, {
+			checklistItemStatuses: updatedStatuses,
+		});
+	},
+);
 
 export const debugSwitchUserRoleAtom = atom(
 	null,

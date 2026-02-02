@@ -7,6 +7,7 @@ i hope this all works if not let me know
 ### Prerequisites
 
 - `service-account.json` file with access to the Google Sheets API (let me know if you need access)
+- `CLIENT_SECRET` value for Discord OAuth2 (let me know if you need this)
 - Your Discord username in the Registration Google Sheet (so you can log in)
 
 ### 1. Tooling
@@ -21,21 +22,21 @@ i hope this all works if not let me know
 1. Create a Python virtual environment:
 
    ```bash
-   python -m venv .venv
+   python -m venv functions/venv
    ```
 
 2. Activate the virtual environment:
    - On Windows:
 
      ```powershell
-     .venv\Scripts\activate
+     functions\venv\Scripts\activate
       ```
 
    - On macOS/Linux:
 
-    ```bash
-    source .venv/bin/activate
-    ```
+      ```bash
+      source functions/venv/bin/activate
+      ```
 
 3. Install the required Python packages:
 
@@ -50,6 +51,14 @@ i hope this all works if not let me know
    ```
 
 5. This isn't best practice but we're using a service account file to allow you to access the spreadsheet data locally. Let me know and I'll share the file with you. Place it in the root of the project as `service-account.json`.
+
+6. You'll also need a file `functions/.env.local` with the following content:
+
+   ```env
+   CLIENT_SECRET=<???>
+   ```
+
+   Let me know and I'll share the client secret with you.
 
 ### 3. Running Locally
 
@@ -68,6 +77,9 @@ i hope this all works if not let me know
        export GOOGLE_APPLICATION_CREDENTIALS="$PWD/service-account.json"
        firebase emulators:start --project=hackncsu-today
        ```
+
+   The emulator will ask you to configure some parameters. I set defaults for these
+   so you can just hit enter to accept them.
 
 2. Run the frontend:
 

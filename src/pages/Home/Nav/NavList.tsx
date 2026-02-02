@@ -7,6 +7,8 @@ import {
 import { authService } from "@/services/auth.service";
 import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
 import { firestoreService } from "@/services/firestore.service";
+import NotificationDialog from "./NotificationDialog";
+import { useState } from "react";
 
 export default function NavList() {
 	const textResources = useAtomValue(visibleTextResourcesAtom);
@@ -14,6 +16,8 @@ export default function NavList() {
 
 	const user = useAtomValue(userAtom);
 	const debugSwitchRole = useSetAtom(debugSwitchUserRoleAtom);
+
+	const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
 
 	const systemItems = [
 		...(import.meta.env.DEV && user?.role !== "organizer"
@@ -41,12 +45,12 @@ export default function NavList() {
 				]
 			: []),
 		{
-			label: "Log out",
-			onClick: () => authService.logout(),
+			label: "Notifications",
+			onClick: () => setNotificationDialogOpen(true),
 		},
 		{
-			label: "About",
-			onClick: () => alert("HackNC 2024 - Powered by NC State University"),
+			label: "Log out",
+			onClick: () => authService.logout(),
 		},
 	];
 
@@ -71,6 +75,11 @@ export default function NavList() {
 			<NavSection
 				title="System"
 				items={systemItems.map((item) => ({ type: "function", ...item }))}
+			/>
+
+			<NotificationDialog
+				open={notificationDialogOpen}
+				onOpenChange={setNotificationDialogOpen}
 			/>
 		</div>
 	);

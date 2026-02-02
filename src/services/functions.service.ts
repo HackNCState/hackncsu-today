@@ -7,6 +7,7 @@ const functions = {
 	searchUsers: "search_users",
 	registerTeam: "submit_team_registration",
 	loadSchedule: "load_schedule", // this one is organizer only
+	initializeEvent: "initialize_event", // this one is organizer only
 };
 
 const SearchUsersResponseSchema = z.array(PartialParticipantSchema);
@@ -23,6 +24,7 @@ export const functionsService = {
 		track: string;
 		mentoringHelp: string;
 		members: string[];
+		challenges: string[];
 	}) => {
 		const func = httpsCallable(fn, functions.registerTeam);
 		await func(teamData);
@@ -30,5 +32,9 @@ export const functionsService = {
 	loadSchedule: async () => {
 		const func = httpsCallable(fn, functions.loadSchedule);
 		await func();
-	}
+	},
+	initializeEvent: async () => {
+		const func = httpsCallable(fn, functions.initializeEvent);
+		await func();
+	},
 };

@@ -62,49 +62,15 @@ export const countdownStringAtom = atom<string | null>((get) => {
 	return `${hh}:${mm}:${ss}`;
 });
 
-export const countdownMessageAtom = atom<string>((get) => {
-	const countdown = get(countdownAtom);
-	const hackingState = get(hackingStateAtom);
-
-	if (!countdown || !hackingState) return "???";
-
-	switch (hackingState) {
-		case "setup":
-			return "STARTING SOON! PLEASE STAND BY";
-		case "countdown":
-			if (countdown.isMoreThan24Hours) {
-				return "START HACKING IN";
-			} else if (countdown.totalSeconds <= 0) {
-				return "TIME'S UP!";
-			} else if (countdown.totalSeconds <= 60) {
-				return "SUBMIT ASAP";
-			} else if (countdown.totalSeconds <= 600) {
-				return "FINAL CALL";
-			} else if (countdown.totalSeconds <= 3600) {
-				return "FINISH STRONG";
-			} else if (
-				countdown.totalSeconds <= 12 * 3600 &&
-				countdown.totalSeconds >= 11 * 3600
-			) {
-				return "HALFWAY THERE";
-			} else {
-				return "TIME REMAINING";
-			}
-		case "judging":
-			return "JUDGING IN PROGRESS";
-		case "ended":
-			return "THANK YOU FOR PARTICIPATING!";
-	}
-});
-
-// will be used to determine urgency-based UI changes
+// will be used to determine urgency-based UI changes and notifications
 type HackingUrgency =
 	| "notHacking"
 	| "startingSoon"
 	| "ongoing"
+	| "halfway"
 	| "lastHour"
 	| "last10Minutes"
-	| "ended";
+	| "timesUp";
 
 export const hackingUrgencyAtom = atom<HackingUrgency>((get) => {
 	const hackingState = get(hackingStateAtom);
@@ -125,12 +91,57 @@ export const hackingUrgencyAtom = atom<HackingUrgency>((get) => {
 		return "notHacking";
 	}
 
+	if (countdown.totalSeconds <= 0) {
+		return "timesUp";
+	}
 	if (countdown.totalSeconds <= 600) {
 		return "last10Minutes";
 	}
 	if (countdown.totalSeconds <= 3600) {
 		return "lastHour";
 	}
+	if (
+		countdown.totalSeconds <= 12 * 3600 &&
+		countdown.totalSeconds >= 11 * 3600
+	) {
+		return "halfway";
+	}
 
 	return "ongoing";
+});
+
+export const countdownMessageAtom = atom<string>((get) => {
+	const countdown = get(countdownAtom);
+	const hackingState = get(hackingStateAtom);
+	const urgency = get(hackingUrgencyAtom);
+
+	if (!countdown || !hackingState) return "???";
+
+	switch (hackingState) {
+		case "setup":
+			return "STARTING SOON! PLEASE STAND BY";
+		case "countdown":
+			switch (urgency) {
+				case "notHacking":
+				case "startingSoon":
+					return "START HACKING IN";
+				case "timesUp":
+					return "TIME'S UP!";
+				case "last10Minutes":
+					if (countdown.totalSeconds <= 60) {
+						return "SUBMIT ASAP";
+					}
+					return "FINAL CALL";
+				case "lastHour":
+					return "FINISH STRONG";
+				case "halfway":
+					return "HALFWAY THERE";
+				default:
+					return "TIME REMAINING";
+			}
+		case "judging":
+			return "JUDGING IN PROGRESS";
+		case "ended":
+			return "THANK YOU FOR PARTICIPATING!";
+	}
 });

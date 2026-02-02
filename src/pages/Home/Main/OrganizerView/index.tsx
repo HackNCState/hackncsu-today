@@ -1,25 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import { EventConfigSchema } from "@/types/event";
 import { SendIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import FeedItem from "../FeedItem";
 import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event/config";
+import { webhookURLAtom, setWebhookURLAtom, deleteWebhookURLAtom } from "@/atoms/event/webhookURL";
 import { useBreakpoint } from "@/hooks/useMediaQuery";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import ResourceEditor from "./ResourceEditor";
 import { TrackEditor } from "./TrackEditor";
+import { ChallengeEditor } from "./ChallengeEditor";
+import ActivityEditor from "./ActivityEditor";
 import { useNavigate } from "react-router-dom";
+import { functionsService } from "@/services/functions.service";
+import { webhookService } from "@/services/webhook.service";
+import { set } from "zod";
 
 export default function OrganizerView() {
 	const navigate = useNavigate();
@@ -27,96 +33,43 @@ export default function OrganizerView() {
 	const config = useAtomValue(eventConfigAtom);
 	const updateConfig = useSetAtom(updateEventConfigAtom);
 
+	const webhookURL = useAtomValue(webhookURLAtom);
+	const [localWebhookURL, setLocalWebhookURL] = useState(webhookURL ?? "");
+	const [validWebhook, setValidWebhook] = useState(true);
+	const setWebhookURL = useSetAtom(setWebhookURLAtom);
+	const deleteWebhookURL = useSetAtom(deleteWebhookURLAtom);
+	// TODO: make this configurable
+	const roleIDToPing = "1467638050774585492";
+
 	const isDesktop = useBreakpoint("lg");
 
 	const [announcementText, setAnnouncementText] = useState("");
+	const [isInitializing, setIsInitializing] = useState(false);
+	const [initializeError, setInitializeError] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (config === null) {
-			// set config if none exists
-			const startTime = new Date();
-			startTime.setHours(11, 0, 0);
-			const endTime = new Date(startTime);
-			endTime.setDate(startTime.getDate() + 1);
-
-			const defaultConfig = EventConfigSchema.parse({
-				tracks: [
-					{ name: "Track 1", description: "Sample elite ball track" },
-					{ name: "Track 2", description: "Sample great ball track" },
-					{ name: "Track 3", description: "Sample poke ball track" },
-				],
-				hackingState: "setup",
-				hackingEndTime: endTime.toISOString(),
-				resources: [
-					{
-						type: "text",
-						label: "Rules",
-						content: `- Rule 1
-- Rule 2
-- Rule 3
-- etc.
-						`,
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Tracks",
-						content:
-							"The Tracks resource is auto-generated based on the tracks you configure for the event.",
-						hidden: true,
-					},
-					{
-						type: "text",
-						label: "FAQs",
-						content:
-							"Event FAQs go here. You can use markdown to bold, italicize, and add links and even images!",
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Judging Criteria",
-						content:
-							"Judging criteria go here. You can use markdown to bold, italicize, and add links and even images!",
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Prizes",
-						content:
-							"Prizes information goes here. You can use markdown to bold, italicize, and add links and even images!",
-						hidden: false,
-					},
-					{
-						type: "text",
-						label: "Catering Menu",
-						content:
-							"![borzoi](https://media1.tenor.com/m/J3sih0hnKLwAAAAC/borzoi-siren.gif	)",
-						hidden: false,
-					},
-					{
-						type: "link",
-						label: "Opening Slides",
-						url: "https://example.com",
-						hidden: true,
-					},
-					{
-						type: "link",
-						label: "Discord",
-						url: "https://example.com",
-						hidden: false,
-					},
-				],
-			});
-
-			updateConfig(defaultConfig);
-
-			console.log("No event config found, initializing default config");
+	const handleInitializeEvent = async () => {
+		setIsInitializing(true);
+		setInitializeError(null);
+		try {
+			await functionsService.initializeEvent();
+		} catch (error) {
+			console.error(error);
+			setInitializeError("Failed to initialize event data.");
+		} finally {
+			setIsInitializing(false);
 		}
-	}, [config, updateConfig]);
+	};
+
+	const handleSaveWebhookURL = async () => {
+		if ( webhookService.isValidDiscordWebhook(localWebhookURL) ) {
+			setValidWebhook(true);
+await setWebhookURL(localWebhookURL || undefined);
+		}
+		else
+			setValidWebhook(false);
+	};
 
 	const handlePostAnnouncement = (e: React.FormEvent) => {
-		// should also handle sending to discord webhook
-
 		e.preventDefault();
 		if (!config || !announcementText.trim()) return;
 
@@ -128,8 +81,30 @@ export default function OrganizerView() {
 		updateConfig({
 			announcements: [newAnnouncement, ...config.announcements],
 		});
+
+		webhookService.postMessage(config.webhookURL, `<@&${roleIDToPing}> ${announcementText}`);
 		setAnnouncementText("");
 	};
+
+	if (config === null) {
+		return (
+			<FeedItem title="Organizer Settings">
+				<div className="flex flex-col gap-4">
+					<p className="text-lg font-synemono">Event data is uninitialized!</p>
+					<Button
+						onClick={handleInitializeEvent}
+						disabled={isInitializing}
+						className="w-fit"
+					>
+						Create data
+					</Button>
+					{initializeError && (
+						<p className="text-sm text-destructive">{initializeError}</p>
+					)}
+				</div>
+			</FeedItem>
+		);
+	}
 
 	if (!config) return null;
 
@@ -160,9 +135,20 @@ export default function OrganizerView() {
 				<h4 className="text-xl font-synemono">Management</h4>
 
 				<div className="flex flex-wrap gap-2">
-					<Button variant="outline">Manage Participants</Button>
+					<Button variant="outline" onClick={() => navigate("/admin/rfid")}>
+						RFID Card Scanner
+					</Button>
+					<Button
+						variant="outline"
+						onClick={() => navigate("/admin/participants")}
+					>
+						Manage Participants
+					</Button>
 					<Button variant="outline" onClick={() => navigate("/admin/teams")}>
 						Manage Teams
+					</Button>
+					<Button variant="outline" onClick={() => navigate("/admin/raffle")}>
+						Draw Raffle Winners
 					</Button>
 				</div>
 
@@ -197,6 +183,19 @@ export default function OrganizerView() {
 
 					<Dialog>
 						<DialogTrigger asChild>
+							<Button variant="outline">Edit challenges</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col">
+							<DialogHeader>
+								<DialogTitle>Configure Challenges</DialogTitle>
+							</DialogHeader>
+
+							<ChallengeEditor />
+						</DialogContent>
+					</Dialog>
+
+					<Dialog>
+						<DialogTrigger asChild>
 							<Button variant="outline">Edit resources</Button>
 						</DialogTrigger>
 						<DialogContent className="max-h-[80vh] flex flex-col">
@@ -208,6 +207,64 @@ export default function OrganizerView() {
 						</DialogContent>
 					</Dialog>
 
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Edit activities</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col">
+							<DialogHeader>
+								<DialogTitle>Configure Activities</DialogTitle>
+								<DialogDescription>
+									Try not to edit the name of an activity once its attendance
+									has been recorded, because that can lead to inconsistent data.
+									(I did NOT implement an ID system 💔💔)
+								</DialogDescription>
+							</DialogHeader>
+
+							<ActivityEditor />
+						</DialogContent>
+					</Dialog>
+
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Edit Webhook URL</Button>
+						</DialogTrigger>
+						<DialogContent className="max-h-[80vh] flex flex-col gap-4">
+							<DialogHeader>
+								<DialogTitle>Configure Webhook URL</DialogTitle>
+							</DialogHeader>
+						<div className="flex flex-col gap-4">
+							<div className="flex gap-2">
+								<Input
+									placeholder="Discord Webhook URL"
+									value={localWebhookURL}
+									onChange={(e) => setLocalWebhookURL(e.target.value)}
+								/>
+								<Button
+									onClick={() => handleSaveWebhookURL()}
+								>
+									Save
+								</Button>
+								<Button
+									variant="destructive"
+									onClick={() => {
+										deleteWebhookURL();
+										setLocalWebhookURL("");
+									}}
+								>
+									Clear
+								</Button>
+								<div>
+									{!validWebhook && (
+										<p className="text-sm text-destructive">
+											Please enter a valid Discord Webhook URL.
+										</p>
+									)}
+								</div>
+							</div>
+						</div>
+						</DialogContent>
+					</Dialog>
 					<Button variant="destructive" onClick={() => updateConfig(null)}>
 						Reset event data
 					</Button>

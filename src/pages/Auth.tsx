@@ -9,14 +9,17 @@ export default function Auth() {
 	const navigate = useNavigate();
 
 	const [errorCode, setErrorCode] = useState("");
+	const [authenticating, setAuthenticating] = useState(true);
 
 	useEffect(() => {
 		const token = searchParams.get("token");
 		const error = searchParams.get("error");
 
 		if (token) {
-			authService.login(token)
+			authService
+				.login(token)
 				.then(() => {
+					setAuthenticating(false);
 					navigate("/");
 				})
 				.catch((err) => {
@@ -36,9 +39,13 @@ export default function Auth() {
 			case "invalid_token":
 				return "Invalid authorization token. Please try logging in again.";
 			case "participant_not_found":
-				return "This Discord account is not associated with a registered participant. Let a staff member know if you think this is a mistake.";
+				return (
+					"This Discord account is not associated with a registered participant.\n\n" +
+					"If you think this is a mistake, please open a support ticket in the Hack_NCState 2026 Discord server.\n" +
+					"Include your full name and email used during registration."
+				);
 			case "not_checked_in":
-				return "You're a participant but it seems you haven't checked in yet! Please check in at the registration desk or let a staff member know if you think this is a mistake.";
+				return "You're a participant but it seems you haven't checked in yet!\n\nPlease check in at the registration desk or let a staff member know if you think this is a mistake.";
 			case "missing_info":
 				return "Participant information is incomplete. Please contact a staff member.";
 			case "auth_error":
@@ -56,13 +63,15 @@ export default function Auth() {
 				{errorCode ? "Authentication Failed" : "One moment please"}
 			</h1>
 			{errorCode ? (
-				<div className="flex flex-col gap-4 items-center">
+				<div className="flex flex-col gap-4 items-center whitespace-pre-wrap">
 					<p>{getErrorMessage(errorCode)}</p>
 
 					<Button variant="secondary" onClick={() => navigate("/login")}>
 						Return to Login
 					</Button>
 				</div>
+			) : authenticating ? (
+				<p>We're logging you in.</p>
 			) : (
 				<p>
 					If you are not redirected automatically, please click{" "}

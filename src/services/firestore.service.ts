@@ -1,7 +1,7 @@
 import { firestore } from "@/lib/firebase-config";
 import { EventConfigSchema, type EventConfig } from "@/types/event";
 import { TeamSchema, type Team } from "@/types/team";
-import { UserSchema, type UserData } from "@/types/user";
+import { ParticipantSchema, UserSchema, type UserData } from "@/types/user";
 import {
 	collection,
 	deleteDoc,
@@ -9,8 +9,10 @@ import {
 	getDoc,
 	getDocs,
 	onSnapshot,
+	query,
 	setDoc,
 	updateDoc,
+	where,
 } from "firebase/firestore";
 
 const collections = {
@@ -31,6 +33,25 @@ export const firestoreService = {
 		}
 
 		return null;
+	},
+
+	fetchUserByRFID: async (rfidUUID: string) => {
+		const usersCollectionRef = collection(firestore, collections.users);
+		const usersQuery = query(
+			usersCollectionRef,
+			where("rfidUUID", "==", rfidUUID),
+		);
+		const docs = await getDocs(usersQuery);
+
+		if (docs.empty) {
+			return null;
+		}
+
+		if (docs.docs.length > 1) {
+			console.warn(`Multiple users found with the same RFID UUID: ${rfidUUID}`);
+		}
+
+		return ParticipantSchema.parse(docs.docs[0].data());
 	},
 
 	onUserSnapshot: (
@@ -68,6 +89,13 @@ export const firestoreService = {
 		const docs = await getDocs(teamsCollectionRef);
 
 		return docs.docs.map((doc) => TeamSchema.parse(doc.data()));
+	},
+
+	fetchAllUsers: async () => {
+		const usersCollectionRef = collection(firestore, collections.users);
+		const docs = await getDocs(usersCollectionRef);
+
+		return docs.docs.map((doc) => UserSchema.parse(doc.data()));
 	},
 
 	deleteTeam: async (teamId: string) => {
@@ -160,7 +188,10 @@ export const firestoreService = {
 	// for creating example users in debug mode
 	debugCreateSampleParticipants: async () => {
 		if (import.meta.env.DEV) {
-			const sampleUsers = Array.from({ length: 10 }).map((_, i) => ({
+			const config = await firestoreService.fetchEventConfig();
+			const availableActivities = config?.activities.map((a) => a.name) || [];
+
+			const sampleUsers = Array.from({ length: 99 }).map((_, i) => ({
 				id: `sample-user-${i}`,
 				username: `sampleuser${i}`,
 				role: "participant" as const,
@@ -171,7 +202,7 @@ export const firestoreService = {
 				shirtSize: "M",
 				dietaryRestrictions: "None",
 				rfidUUID: `rfid-${i}`,
-				attendedEvents: [],
+				attendedEvents: availableActivities.filter(() => Math.random() > 0.5),
 				hadFirstLunch: false,
 				hadSecondLunch: false,
 				hadBreakfast: false,
@@ -182,6 +213,25 @@ export const firestoreService = {
 				const userDocRef = doc(firestore, collections.users, user.id);
 				await setDoc(userDocRef, user);
 			}
+
+			const userDocRef = doc(firestore, collections.users, "john-rfidsample");
+			await setDoc(userDocRef, {
+				id: "john-rfidsample",
+				username: "johnrfid",
+				role: "participant" as const,
+				email: "john@gnail.com",
+				firstName: "John",
+				lastName: "RFIDSample",
+				phone: "987-654-3210",
+				shirtSize: "L",
+				dietaryRestrictions: "Vegetarian",
+				rfidUUID: "f1dafe33-f6f3-4786-9f07-de15480b8dbf",
+				attendedEvents: availableActivities.filter(() => Math.random() > 0.5),
+				hadFirstLunch: false,
+				hadSecondLunch: false,
+				hadBreakfast: false,
+				hadDinner: false,
+			});
 		}
 	},
 };

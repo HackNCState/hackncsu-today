@@ -6,6 +6,10 @@ import Auth from "./pages/Auth";
 import { useAuthListener } from "@/hooks/useAuthListener";
 import { useTeamListener } from "@/atoms/team";
 import TeamManager from "./pages/TeamManager";
+import ParticipantManager from "./pages/ParticipantManager";
+import NotificationListener from "./components/NotificationListener";
+import RFIDReader from "./pages/RFIDReader";
+import Raffle from "./pages/Raffle";
 
 function App() {
 	useAuthListener();
@@ -14,6 +18,8 @@ function App() {
 	return (
 		<BrowserRouter>
 			<div className="min-h-screen">
+				<NotificationListener />
+
 				<Routes>
 					<Route
 						path="/"
@@ -31,6 +37,31 @@ function App() {
 							</ProtectedRoute>
 						}
 					/>
+					<Route
+						path="/admin/participants"
+						element={
+							<ProtectedRoute>
+								<ParticipantManager />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/admin/rfid"
+						element={
+							<ProtectedRoute>
+								<RFIDReader />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/admin/raffle"
+						element={
+							<ProtectedRoute>
+								<Raffle />
+							</ProtectedRoute>
+						}
+					/>
+
 					<Route path="/login" element={<Login />} />
 					<Route path="/auth" element={<Auth />} />
 					<Route path="*" element={<Navigate to="/" replace />} />

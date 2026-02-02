@@ -10,11 +10,13 @@ class Team:
     memberIds: list[str]
     """Min 2 max 4 members"""
     track: str
+    challenges: list[str]
     creatorId: str
     mentoringHelp: str
     """Do you need any mentoring on a specific subject?"""
     status: Literal["unverified", "approved", "rejected"]
     """The status of the team registration"""
+
 
 @dataclass
 class ScheduleItem:
@@ -23,6 +25,7 @@ class ScheduleItem:
     time: str
     state: Literal["upcoming", "ongoing", "ended"]
     oldTime: str | None = None
+
 
 @dataclass
 class Schedule:

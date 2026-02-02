@@ -14,7 +14,7 @@ export default function Home() {
 
 			<Nav />
 
-			<div className="flex-1 flex flex-col lg:flex-row sm:overflow-y-auto lg:overflow-hidden sm:border-x">
+			<div className="flex-1 flex flex-col lg:flex-row sm:overflow-y-auto lg:overflow-hidden sm:border-x ">
 				<Main />
 
 				<Schedule />
