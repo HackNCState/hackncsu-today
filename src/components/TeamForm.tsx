@@ -49,17 +49,17 @@ export interface TeamFormSubmitPayload {
 	mentoringHelp: string;
 	challenges: string[];
 	memberIds: string[];
-};
+}
 
 interface TrackOption {
 	name: string;
 	description?: string;
-};
+}
 
 interface ChallengeOption {
 	name: string;
 	description?: string;
-};
+}
 
 interface TeamFormInitialValues {
 	name: string;
@@ -67,7 +67,7 @@ interface TeamFormInitialValues {
 	mentoringHelp: string;
 	challenges: string[];
 	members: PartialParticipant[];
-};
+}
 
 interface TeamFormProps {
 	tracks: TrackOption[];
@@ -385,7 +385,10 @@ export default function TeamForm({
 											{!loading &&
 												query.length >= 2 &&
 												filteredSearchResults.length === 0 && (
-													<CommandEmpty>No users found.</CommandEmpty>
+													<CommandEmpty>
+														No users found. Make sure everyone from your team
+														has logged in for them to appear here.
+													</CommandEmpty>
 												)}
 											{!loading &&
 												filteredSearchResults.map((user) => (
