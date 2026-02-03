@@ -113,7 +113,7 @@ def _get_registration(uid: str, username: str) -> User:
 
     import gspread
 
-    is_organizer = uid in ORGANIZERS_LIST.value.split(",")
+    is_organizer = uid in (id.strip() for id in ORGANIZERS_LIST.value.split(","))
 
     if is_organizer:
         return User(id=uid, role="organizer", username=username)
