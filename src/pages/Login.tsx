@@ -72,22 +72,23 @@ export default function Login() {
 						<DialogTitle>About Hack_NCState Today</DialogTitle>
 						<DialogDescription>
 							<div>
-								The Hack_NCState Today platform is designed to enhance your
-								hackathon experience by providing real-time updates,
-								announcements, and resources throughout the event.
+								Hack_NCState Today is your one-stop platform for everything.
+								Create your team, view announcements, access useful resources,
+								follow the event schedule, share your resume with our sponsors,
+								and more! Everything is live and updated in real-time throughout
+								the event.
 							</div>
 							<br />
 							<div>
-								As long as you leave this page open, you'll receive
-								notifications about important happenings during the hackathon.
+								You need to log in at least once to be registered as a user.
+								Once you do, you'll also be able to enable notifications to stay
+								informed even when busy hacking.
 							</div>
 							<br />
 							<div>
 								This year is our first time launching this platform, so we'd
-								love to hear your feedback!
+								love to hear your feedback afterwards!
 							</div>
-							<br />
-							<div>Made with ❤️ by the Hack_NCState team.</div>
 						</DialogDescription>
 					</DialogHeader>
 				</DialogContent>
