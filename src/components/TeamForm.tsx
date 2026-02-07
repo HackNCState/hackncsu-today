@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DialogFooter } from "@/components/ui/dialog";
 import {
@@ -42,6 +43,7 @@ import {
 	ItemTitle,
 } from "@/components/ui/item";
 import React from "react";
+import type { ChallengeCategory } from "@/types/event";
 
 export interface TeamFormSubmitPayload {
 	name: string;
@@ -59,6 +61,7 @@ interface TrackOption {
 interface ChallengeOption {
 	name: string;
 	description?: string;
+	category?: ChallengeCategory;
 }
 
 interface TeamFormInitialValues {
@@ -103,9 +106,35 @@ export default function TeamForm({
 	const [selectedTrack, setSelectedTrack] = useState(
 		initialValues?.track ?? "",
 	);
-	const [selectedChallenge, setSelectedChallenge] = useState<string>(
-		initialValues?.challenges?.[0] ?? "none",
+
+	// Split challenges by category
+	const defaultChallenges = useMemo(
+		() => challenges.filter((c) => (c.category ?? "default") === "default"),
+		[challenges],
 	);
+	const mlhChallenges = useMemo(
+		() => challenges.filter((c) => c.category === "mlh"),
+		[challenges],
+	);
+
+	// Default challenge: single-select via radio (stores one name or "none")
+	const [selectedDefaultChallenge, setSelectedDefaultChallenge] =
+		useState<string>(() => {
+			const initial = initialValues?.challenges ?? [];
+			const defaultNames = new Set(
+				defaultChallenges.map((c) => c.name),
+			);
+			return initial.find((c) => defaultNames.has(c)) ?? "none";
+		});
+
+	// MLH challenges: multi-select via checkboxes (stores set of names)
+	const [selectedMlhChallenges, setSelectedMlhChallenges] = useState<
+		Set<string>
+	>(() => {
+		const initial = initialValues?.challenges ?? [];
+		const mlhNames = new Set(mlhChallenges.map((c) => c.name));
+		return new Set(initial.filter((c) => mlhNames.has(c)));
+	});
 	const [teamName, setTeamName] = useState(initialValues?.name ?? "");
 	const [mentoringHelp, setMentoringHelp] = useState(
 		initialValues?.mentoringHelp ?? "",
@@ -122,10 +151,17 @@ export default function TeamForm({
 	useEffect(() => {
 		setMembers(initialValues?.members ?? []);
 		setSelectedTrack(initialValues?.track ?? "");
-		setSelectedChallenge(initialValues?.challenges?.[0] ?? "none");
 		setTeamName(initialValues?.name ?? "");
 		setMentoringHelp(initialValues?.mentoringHelp ?? "");
-	}, [initialValues]);
+
+		const initial = initialValues?.challenges ?? [];
+		const defaultNames = new Set(defaultChallenges.map((c) => c.name));
+		const mlhNames = new Set(mlhChallenges.map((c) => c.name));
+		setSelectedDefaultChallenge(
+			initial.find((c) => defaultNames.has(c)) ?? "none",
+		);
+		setSelectedMlhChallenges(new Set(initial.filter((c) => mlhNames.has(c))));
+	}, [initialValues, defaultChallenges, mlhChallenges]);
 
 	const filteredSearchResults = useMemo(
 		() => searchResults.filter((u) => !members.some((m) => m.id === u.id)),
@@ -180,12 +216,19 @@ export default function TeamForm({
 		setIsSubmitting(true);
 		setSubmitError(null);
 
+		const mergedChallenges = [
+			...(selectedDefaultChallenge !== "none"
+				? [selectedDefaultChallenge]
+				: []),
+			...selectedMlhChallenges,
+		];
+
 		try {
 			await onSubmit({
 				name: teamName,
 				track: selectedTrack,
 				mentoringHelp,
-				challenges: selectedChallenge === "none" ? [] : [selectedChallenge],
+				challenges: mergedChallenges,
 				memberIds: members.map((m) => m.id),
 			});
 			onSuccess?.();
@@ -199,7 +242,7 @@ export default function TeamForm({
 
 	const teamNameId = `${baseId}-team-name`;
 	const trackId = `${baseId}-track`;
-	const challengeNoneId = `${baseId}-challenge-none`;
+	const defaultChallengeNoneId = `${baseId}-challenge-none`;
 	const mentoringId = `${baseId}-mentoring`;
 
 	return (
@@ -258,45 +301,102 @@ export default function TeamForm({
 				</Field>
 
 				{/* Challenge Selection */}
-				<Field>
-					<FieldContent>
-						<FieldLabel>Challenge (Optional)</FieldLabel>
-						<FieldDescription>
-							Select a challenge your team will participate in.
-						</FieldDescription>
-					</FieldContent>
-					<RadioGroup
-						value={selectedChallenge}
-						onValueChange={setSelectedChallenge}
-						variant="compact"
-						className="flex flex-col gap-3 py-2"
-					>
-						{challenges.map((challenge) => (
-							<Field key={challenge.name} orientation="horizontal">
+				{defaultChallenges.length > 0 && (
+					<Field>
+						<FieldContent>
+							<FieldLabel>Challenge (Optional)</FieldLabel>
+							<FieldDescription>
+								Select a challenge your team will participate in.
+							</FieldDescription>
+						</FieldContent>
+						<RadioGroup
+							value={selectedDefaultChallenge}
+							onValueChange={setSelectedDefaultChallenge}
+							variant="compact"
+							className="flex flex-col gap-3 py-2"
+						>
+							{defaultChallenges.map((challenge) => (
+								<Field key={challenge.name} orientation="horizontal">
+									<RadioGroupItem
+										value={challenge.name}
+										id={`${baseId}-challenge-${challenge.name}`}
+									/>
+									<FieldContent>
+										<FieldLabel
+											htmlFor={`${baseId}-challenge-${challenge.name}`}
+										>
+											{challenge.name}
+										</FieldLabel>
+										{challenge.description && (
+											<FieldDescription>
+												{challenge.description}
+											</FieldDescription>
+										)}
+									</FieldContent>
+								</Field>
+							))}
+							<Field orientation="horizontal">
 								<RadioGroupItem
-									value={challenge.name}
-									id={`${baseId}-challenge-${challenge.name}`}
+									value="none"
+									id={defaultChallengeNoneId}
 								/>
 								<FieldContent>
-									<FieldLabel htmlFor={`${baseId}-challenge-${challenge.name}`}>
-										{challenge.name}
+									<FieldLabel htmlFor={defaultChallengeNoneId}>
+										No specific challenge
 									</FieldLabel>
-									{challenge.description && (
-										<FieldDescription>{challenge.description}</FieldDescription>
-									)}
 								</FieldContent>
 							</Field>
-						))}
-						<Field orientation="horizontal">
-							<RadioGroupItem value="none" id={challengeNoneId} />
-							<FieldContent>
-								<FieldLabel htmlFor={challengeNoneId}>
-									No specific challenge
-								</FieldLabel>
-							</FieldContent>
-						</Field>
-					</RadioGroup>
-				</Field>
+						</RadioGroup>
+					</Field>
+				)}
+
+				{/* MLH Challenge Selection (multi-select) */}
+				{mlhChallenges.length > 0 && (
+					<Field>
+						<FieldContent>
+							<FieldLabel>MLH Challenges (Optional)</FieldLabel>
+							<FieldDescription>
+								Select any MLH challenges your team wants to participate in.
+								You can choose multiple.
+							</FieldDescription>
+						</FieldContent>
+						<div className="flex flex-col gap-3 py-2">
+							{mlhChallenges.map((challenge) => {
+								const checked = selectedMlhChallenges.has(challenge.name);
+								const checkboxId = `${baseId}-mlh-${challenge.name}`;
+								return (
+									<Field key={challenge.name} orientation="horizontal">
+										<Checkbox
+											id={checkboxId}
+											checked={checked}
+											onCheckedChange={(val) => {
+												setSelectedMlhChallenges((prev) => {
+													const next = new Set(prev);
+													if (val) {
+														next.add(challenge.name);
+													} else {
+														next.delete(challenge.name);
+													}
+													return next;
+												});
+											}}
+										/>
+										<FieldContent>
+											<FieldLabel htmlFor={checkboxId}>
+												{challenge.name}
+											</FieldLabel>
+											{challenge.description && (
+												<FieldDescription>
+													{challenge.description}
+												</FieldDescription>
+											)}
+										</FieldContent>
+									</Field>
+								);
+							})}
+						</div>
+					</Field>
+				)}
 
 				{/* Members Section */}
 				<Field>

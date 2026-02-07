@@ -14,8 +14,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Challenge } from "@/types/event";
+import type { Challenge, ChallengeCategory } from "@/types/event";
 import { useAtomValue, useSetAtom } from "jotai";
 import { Edit2, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -33,10 +40,13 @@ function ChallengeForm({
 	const [description, setDescription] = useState(
 		initialChallenge?.description ?? "",
 	);
+	const [category, setCategory] = useState<ChallengeCategory>(
+		initialChallenge?.category ?? "default",
+	);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onSave({ name, description });
+		onSave({ name, description, category });
 	};
 
 	return (
@@ -58,6 +68,22 @@ function ChallengeForm({
 					onChange={(e) => setDescription(e.target.value)}
 					placeholder="Challenge Description"
 				/>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<Label>Category</Label>
+				<Select
+					value={category}
+					onValueChange={(v) => setCategory(v as ChallengeCategory)}
+				>
+					<SelectTrigger className="w-full">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="default">Default (single-select)</SelectItem>
+						<SelectItem value="mlh">MLH (multi-select)</SelectItem>
+					</SelectContent>
+				</Select>
 			</div>
 
 			<div className="flex justify-end gap-2">
@@ -112,7 +138,12 @@ export function ChallengeEditor() {
 						className="flex items-center justify-between rounded-lg border p-4 bg-card"
 					>
 						<div className="flex flex-col gap-1">
-							<span className="font-medium">{challenge.name}</span>
+						<span className="font-medium">
+							{challenge.name}
+							<span className="ml-2 text-xs font-normal px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+								{challenge.category === "mlh" ? "MLH · multi" : "default · single"}
+							</span>
+						</span>
 							{challenge.description && (
 								<span className="text-sm text-muted-foreground">
 									{challenge.description}

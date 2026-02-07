@@ -54,10 +54,7 @@ export default function ApprovedView({ team }: ApprovedViewProps) {
 								{team.name}
 							</h2>
 							<p className="text-base sm:text-lg text-muted-foreground uppercase tracking-[0.2em] font-synemono leading-snug">
-								STARRING: {team.track}{" "}
-								{team.challenges?.map((c) => (
-									<> &bull; {c}</>
-								))}
+								STARRING: {team.track} &bull; {team.challenges.join(", ")}
 							</p>
 						</div>
 

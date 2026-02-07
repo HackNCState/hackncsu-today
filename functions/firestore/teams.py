@@ -41,17 +41,45 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
         )
 
     challenges = request.data.get("challenges", [])
-    if not isinstance(challenges, list) or len(challenges) > 1:
+    if not isinstance(challenges, list):
         raise https_fn.HttpsError(
             code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
-            message="Only one challenge may be selected.",
+            message="Challenges must be a list.",
         )
 
     challenges = [str(c).strip() for c in challenges if str(c).strip()]
 
-    # check if members are not already in a team (check their teamId field)
-
+    # Validate challenge selections against event config categories
     db = firestore.client()
+
+    event_config_doc = db.collection("event").document("main").get()
+    event_config = event_config_doc.to_dict() if event_config_doc.exists else {}
+    configured_challenges = event_config.get("challenges", [])
+
+    # Build a lookup of challenge name -> category
+    challenge_category_map = {}
+    for cc in configured_challenges:
+        challenge_category_map[cc.get("name", "")] = cc.get("category", "default")
+
+    # Validate all submitted challenges exist in config
+    for c in challenges:
+        if c not in challenge_category_map:
+            raise https_fn.HttpsError(
+                code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+                message=f"Unknown challenge: {c}",
+            )
+
+    # Validate at most 1 default-category challenge
+    default_count = sum(
+        1 for c in challenges if challenge_category_map.get(c, "default") == "default"
+    )
+    if default_count > 1:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+            message="Only one default challenge may be selected.",
+        )
+
+    # check if members are not already in a team (check their teamId field)
 
     users_ref = db.collection("users")
 

@@ -47,10 +47,15 @@ export const TrackSchema = z.object({
 	description: z.string().optional(),
 });
 
+export const ChallengeCategorySchema = z.enum(["default", "mlh"]);
+
 export const ChallengeSchema = z.object({
 	name: z.string(),
 	description: z.string().optional(),
+	category: ChallengeCategorySchema.default("default"),
 });
+
+export type ChallengeCategory = z.infer<typeof ChallengeCategorySchema>;
 
 export const ChecklistItemSchema = z.object({
 	id: z.string(),

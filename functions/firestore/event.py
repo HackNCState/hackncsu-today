@@ -38,10 +38,17 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
             {
                 "name": "Sample Challenge 1",
                 "description": "This is a sample challenge description.",
+                "category": "default",
             },
             {
-                "name": "Sample Challenge 2",
-                "description": "This is another sample challenge description. Perhaps this could be an API challenge?",
+                "name": "MLH Best Use of AI",
+                "description": "Build a project that uses AI in a creative way.",
+                "category": "mlh",
+            },
+            {
+                "name": "MLH Best Domain Name",
+                "description": "Register a domain name for your project.",
+                "category": "mlh",
             },
         ],
         "hackingState": "setup",
