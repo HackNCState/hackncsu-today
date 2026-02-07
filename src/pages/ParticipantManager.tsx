@@ -11,6 +11,7 @@ import { firestoreService } from "@/services/firestore.service";
 import type { Participant, UserData } from "@/types/user";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { exportResumesZip } from "@/lib/export-resumes";
 
 export default function ParticipantManager() {
 	const navigate = useNavigate();
@@ -70,6 +71,16 @@ export default function ParticipantManager() {
 				</Button>
 				<Button variant="outline" onClick={() => fetchUsers()}>
 					<p>refresh table</p>
+				</Button>
+				<Button
+					variant="outline"
+					onClick={() =>
+						exportResumesZip(
+							users.filter((u): u is Participant => u.role === "participant"),
+						)
+					}
+				>
+					<p>download resumes in zip (may take a bit)</p>
 				</Button>
 			</header>
 

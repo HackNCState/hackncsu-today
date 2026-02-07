@@ -25,6 +25,7 @@ import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAtomValue } from "jotai";
+import { exportTeamsCsv } from "@/lib/export-csv";
 
 function TeamMembersList({ team }: { team: Team }) {
 	const [members, setMembers] = useState<UserData[]>([]);
@@ -260,6 +261,9 @@ export default function TeamManager() {
 				</Button>
 				<Button variant="outline" onClick={() => fetchTeams()}>
 					<p>refresh table</p>
+				</Button>
+				<Button variant="outline" onClick={() => exportTeamsCsv(teams)}>
+					<p>export CSV</p>
 				</Button>
 			</header>
 
