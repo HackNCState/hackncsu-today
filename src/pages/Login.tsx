@@ -30,7 +30,7 @@ export default function Login() {
 	}, [user, loading, navigation]);
 
 	return (
-		<div className="flex flex-col gap-8 items-center justify-center sm:text-center p-4 sm:p-8 min-h-screen">
+		<div className="flex flex-col gap-8 sm:items-center justify-center sm:text-center p-4 lg:mx-64 sm:p-8 min-h-screen">
 			<header>
 				<h1 className="font-playfair font-semibold text-5xl sm:text-7xl">
 					Hack_NCState Today
@@ -59,7 +59,9 @@ export default function Login() {
 				Log in
 			</Button>
 
-			<p className="font-splash text-2xl select-none">Team Hack_NCState</p>
+			<p className="font-splash text-2xl select-none mx-auto">
+				Team Hack_NCState
+			</p>
 
 			<Dialog>
 				<DialogTrigger asChild>
@@ -87,7 +89,7 @@ export default function Login() {
 							<br />
 							<div>
 								This year is our first time launching this platform, so we'd
-								love to hear your feedback afterwards!
+								love to hear your feedback after the event!
 							</div>
 						</DialogDescription>
 					</DialogHeader>
