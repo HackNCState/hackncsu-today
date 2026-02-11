@@ -35,6 +35,7 @@ export default function ParticipantManager() {
 				<TableCell>{user.username}</TableCell>
 				<TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
 				<TableCell>{user.email}</TableCell>
+				<TableCell>{user.university || "N/A"}</TableCell>
 				<TableCell>{user.shirtSize}</TableCell>
 				<TableCell>{user.dietaryRestrictions || "None"}</TableCell>
 				<TableCell>{user.attendedEvents.join(", ") || "None"}</TableCell>
@@ -91,6 +92,7 @@ export default function ParticipantManager() {
 							<TableHead>Username</TableHead>
 							<TableHead>Name</TableHead>
 							<TableHead>Email</TableHead>
+							<TableHead>University</TableHead>
 							<TableHead>Shirt Size</TableHead>
 							<TableHead>Dietary Restrictions</TableHead>
 							<TableHead>Events Attended</TableHead>

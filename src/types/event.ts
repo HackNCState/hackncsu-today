@@ -45,6 +45,8 @@ export const ResourceSchema = z.discriminatedUnion("type", [
 export const TrackSchema = z.object({
 	name: z.string(),
 	description: z.string().optional(),
+	fullDescription: z.string().optional(),
+	allowedUniversities: z.array(z.string()).default([]),
 });
 
 export const ChallengeCategorySchema = z.enum(["default", "mlh"]);
@@ -52,6 +54,7 @@ export const ChallengeCategorySchema = z.enum(["default", "mlh"]);
 export const ChallengeSchema = z.object({
 	name: z.string(),
 	description: z.string().optional(),
+	fullDescription: z.string().optional(),
 	category: ChallengeCategorySchema.default("default"),
 });
 

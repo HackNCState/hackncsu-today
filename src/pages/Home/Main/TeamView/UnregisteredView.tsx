@@ -56,7 +56,8 @@ export default function UnregisteredView() {
 						<DialogHeader>
 							<DialogTitle>Register Team</DialogTitle>
 							<DialogDescription>
-								Only one member of your team needs to fill out this form.
+								Only one member of your team needs to fill out this form. 
+								View full track and challenge information in the Resources section.
 							</DialogDescription>
 						</DialogHeader>
 

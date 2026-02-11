@@ -404,10 +404,14 @@ export default function TeamForm({
 						<FieldLabel>
 							Members ({members.length}/{maxMembers})
 						</FieldLabel>
+						
 						<span className="text-xs text-muted-foreground">
 							Min {minMembers} members required
 						</span>
 					</div>
+					<FieldDescription>
+						Ensure that all your team members have logged into Hack_NCState Today at least once in order to appear in the search results.
+					</FieldDescription>
 
 					<div className="flex flex-col gap-2">
 						<ItemGroup>
@@ -486,8 +490,7 @@ export default function TeamForm({
 												query.length >= 2 &&
 												filteredSearchResults.length === 0 && (
 													<CommandEmpty>
-														No users found. Make sure everyone from your team
-														has logged in for them to appear here.
+														No users found
 													</CommandEmpty>
 												)}
 											{!loading &&

@@ -29,12 +29,13 @@ export const ParticipantSchema = BaseUserSchema.extend({
 	shirtSize: z.string(),
 	dietaryRestrictions: z.string(),
 	rfidUUID: z.string(),
+	university: z.string().optional(),
 
 	teamId: z.string().nullable().optional(),
 	attendedEvents: z.array(z.string()).default([]),
 
 	resumeURL: z.string().nullable().optional(),
-	checklistItemStatuses: z.array(ChecklistItemStatusSchema).default([]), // TODO: complete implementation
+	checklistItemStatuses: z.array(ChecklistItemStatusSchema).default([]),
 });
 
 export const UserSchema = z.discriminatedUnion("role", [

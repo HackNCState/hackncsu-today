@@ -55,6 +55,7 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
     event_config_doc = db.collection("event").document("main").get()
     event_config = event_config_doc.to_dict() if event_config_doc.exists else {}
     configured_challenges = event_config.get("challenges", [])
+    configured_tracks = event_config.get("tracks", [])
 
     # Build a lookup of challenge name -> category
     challenge_category_map = {}
@@ -82,12 +83,14 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
     # check if members are not already in a team (check their teamId field)
 
     users_ref = db.collection("users")
+    member_docs = {}
 
     for member_id in member_ids:
         user_doc = users_ref.document(member_id).get()
 
         if user_doc.exists:
             user_data = user_doc.to_dict()
+            member_docs[member_id] = user_data
 
             if user_data and user_data.get("teamId"):
                 raise https_fn.HttpsError(
@@ -99,6 +102,26 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
                 code=https_fn.FunctionsErrorCode.NOT_FOUND,
                 message=f"User {member_id} not found.",
             )
+
+    # Validate track university restrictions
+    selected_track_config = next(
+        (t for t in configured_tracks if t.get("name") == track), None
+    )
+    if selected_track_config:
+        allowed_universities = selected_track_config.get("allowedUniversities", [])
+        if allowed_universities:
+            for member_id in member_ids:
+                member_data = member_docs.get(member_id, {})
+                member_university = (member_data.get("university") or "").strip()
+                if member_university not in allowed_universities:
+                    raise https_fn.HttpsError(
+                        code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+                        message=(
+                            f"Your selected track is restricted to certain universities, "
+                            f"and one or more of your team members are not from an eligible university. "
+                            f"If you believe this is a mistake, please open a support ticket on the Discord."
+                        ),
+                    )
 
     teams_ref = db.collection("teams")
     team_doc_ref = teams_ref.document()

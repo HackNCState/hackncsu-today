@@ -33,10 +33,20 @@ function TrackForm({
 	const [description, setDescription] = useState(
 		initialTrack?.description ?? "",
 	);
+	const [fullDescription, setFullDescription] = useState(
+		initialTrack?.fullDescription ?? "",
+	);
+	const [allowedUniversities, setAllowedUniversities] = useState(
+		initialTrack?.allowedUniversities?.join(", ") ?? "",
+	);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onSave({ name, description });
+		const universities = allowedUniversities
+			.split(",")
+			.map((u) => u.trim())
+			.filter(Boolean);
+		onSave({ name, description, fullDescription, allowedUniversities: universities });
 	};
 
 	return (
@@ -52,12 +62,34 @@ function TrackForm({
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<Label>Description</Label>
-				<Textarea
+				<Label>Brief Description</Label>
+				<Input
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
-					placeholder="Track Description"
+					placeholder="Short description shown during team registration"
 				/>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<Label>Full Description (Markdown)</Label>
+				<Textarea
+					value={fullDescription}
+					onChange={(e) => setFullDescription(e.target.value)}
+					placeholder="Detailed description shown in the Resources panel. Supports markdown."
+					rows={4}
+				/>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<Label>Allowed Universities</Label>
+				<Input
+					value={allowedUniversities}
+					onChange={(e) => setAllowedUniversities(e.target.value)}
+					placeholder="Comma-separated list (leave empty for no restriction)"
+				/>
+				<span className="text-xs text-muted-foreground">
+					If set, only teams where all members belong to one of these universities can register for this track.
+				</span>
 			</div>
 
 			<div className="flex justify-end gap-2">
@@ -117,8 +149,11 @@ export function TrackEditor() {
 								<span className="text-sm text-muted-foreground">
 									{track.description}
 								</span>
-							)}
-						</div>
+							)}						{track.allowedUniversities && track.allowedUniversities.length > 0 && (
+							<span className="text-xs text-muted-foreground">
+								Restricted to: {track.allowedUniversities.join(", ")}
+							</span>
+						)}						</div>
 						<div className="flex items-center gap-2">
 							<Dialog
 								open={editingIndex === index}

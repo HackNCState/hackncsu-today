@@ -40,13 +40,16 @@ function ChallengeForm({
 	const [description, setDescription] = useState(
 		initialChallenge?.description ?? "",
 	);
+	const [fullDescription, setFullDescription] = useState(
+		initialChallenge?.fullDescription ?? "",
+	);
 	const [category, setCategory] = useState<ChallengeCategory>(
 		initialChallenge?.category ?? "default",
 	);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onSave({ name, description, category });
+		onSave({ name, description, fullDescription, category });
 	};
 
 	return (
@@ -62,11 +65,21 @@ function ChallengeForm({
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<Label>Description</Label>
-				<Textarea
+				<Label>Brief Description</Label>
+				<Input
 					value={description}
 					onChange={(e) => setDescription(e.target.value)}
-					placeholder="Challenge Description"
+					placeholder="Short description shown during team registration"
+				/>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<Label>Full Description (Markdown)</Label>
+				<Textarea
+					value={fullDescription}
+					onChange={(e) => setFullDescription(e.target.value)}
+					placeholder="Detailed description shown in the Resources panel. Supports markdown."
+					rows={4}
 				/>
 			</div>
 

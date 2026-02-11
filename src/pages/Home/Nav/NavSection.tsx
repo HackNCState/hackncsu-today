@@ -64,7 +64,7 @@ export default function NavSection({
 					<DialogHeader>
 						<DialogTitle>{selectedResource?.label}</DialogTitle>
 					</DialogHeader>
-					<ScrollArea className="prose prose-slate dark:prose-invert max-w-none max-h-[85vh] w-full">
+					<ScrollArea className="prose prose-slate dark:prose-invert prose-headings:mt-3 prose-headings:mb-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-img:my-2 max-w-none max-h-[85vh] w-full">
 						{selectedResource?.type === "text" ? (
 							<ReactMarkdown
 								remarkPlugins={[remarkGfm]}

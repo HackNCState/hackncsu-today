@@ -85,6 +85,11 @@ RFID_UUID_COL_C = StringParam(
     default="RFID UUID",
     description="The header name of the column containing participants' RFID UUIDs.",
 )
+UNIVERSITY_COL_R = StringParam(
+    "UNIVERSITY_COL_R",
+    default="University",
+    description="The header name of the column containing participants' university in the Registrations sheet.",
+)
 
 
 def _get_col_index_from_headers(headers: list[str], name: str) -> int:
@@ -113,7 +118,9 @@ def _get_registration(uid: str, username: str) -> User:
 
     import gspread
 
-    is_organizer = uid in [o.strip() for o in ORGANIZERS_LIST.value.split(",") if o.strip()]
+    is_organizer = uid in [
+        o.strip() for o in ORGANIZERS_LIST.value.split(",") if o.strip()
+    ]
 
     if is_organizer:
         return User(id=uid, role="organizer", username=username)
@@ -142,7 +149,9 @@ def _get_registration(uid: str, username: str) -> User:
             reg_headers, USERNAME_COL_R.value
         )
 
-        cell = reg_sheet.find(username, in_column=username_col_idx, case_sensitive=False)
+        cell = reg_sheet.find(
+            username, in_column=username_col_idx, case_sensitive=False
+        )
 
         # participant not registered
         if not cell:
@@ -196,6 +205,11 @@ def _get_registration(uid: str, username: str) -> User:
         rfid_idx = _get_col_index_from_headers(checkin_headers, RFID_UUID_COL_C.value)
         rfid_uuid = _get_cell_from_row(checkin_row, rfid_idx)
 
+        university_idx = _get_col_index_from_headers(
+            reg_headers, UNIVERSITY_COL_R.value
+        )
+        university = _get_cell_from_row(reg_row, university_idx)
+
         print(
             email,
             first_name,
@@ -204,6 +218,7 @@ def _get_registration(uid: str, username: str) -> User:
             dietary_restrictions,
             shirt_size,
             rfid_uuid,
+            university,
         )
 
         return User(
@@ -217,6 +232,7 @@ def _get_registration(uid: str, username: str) -> User:
             dietaryRestrictions=dietary_restrictions,
             shirtSize=shirt_size,
             rfidUUID=rfid_uuid,
+            university=university,
             # mark if they checked in on friday as having attended the career fair event
             attendedEvents=["career_fair_friday"] if friday_checked_in else [],
         )

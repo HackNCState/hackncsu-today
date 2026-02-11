@@ -1,6 +1,7 @@
 import {
 	addResourceAtom,
 	deleteResourceAtom,
+	reorderResourceAtom,
 	resourcesAtom,
 	setResourceAtom,
 } from "@/atoms/event/resources";
@@ -25,7 +26,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { Resource } from "@/types/event";
 import { useAtomValue, useSetAtom } from "jotai";
-import { Edit2, Plus, Trash2 } from "lucide-react";
+import { Edit2, Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 
 function ResourceForm({
@@ -149,6 +150,7 @@ export default function ResourceEditor() {
 	const addResource = useSetAtom(addResourceAtom);
 	const deleteResource = useSetAtom(deleteResourceAtom);
 	const setResource = useSetAtom(setResourceAtom);
+	const reorderResource = useSetAtom(reorderResourceAtom);
 
 	const [isAddOpen, setIsAddOpen] = useState(false);
 	const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -182,21 +184,47 @@ export default function ResourceEditor() {
 			<div className="flex flex-col gap-2 overflow-y-auto max-h-128">
 				{resources.map((resource, index) => (
 					<div
-						key={index} // TODO: change if we will reorder resources
+						key={`${resource.label}-${index}`}
 						className="flex items-center justify-between p-3 border rounded-md bg-card"
 					>
-						<div className="flex flex-col">
-							<span className="font-medium">
-								{resource.label}
-								{resource.hidden && (
-									<span className="ml-2 text-xs text-muted-foreground">
-										(Hidden)
-									</span>
-								)}
-							</span>
-							<span className="text-sm text-muted-foreground">
-								{resource.type === "link" ? resource.url : resource.content}
-							</span>
+						<div className="flex items-center gap-2">
+							<div className="flex flex-col">
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-5 w-5"
+									disabled={index === 0}
+									onClick={() =>
+										reorderResource({ fromIndex: index, toIndex: index - 1 })
+									}
+								>
+									<ChevronUp className="h-3 w-3" />
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-5 w-5"
+									disabled={index === resources.length - 1}
+									onClick={() =>
+										reorderResource({ fromIndex: index, toIndex: index + 1 })
+									}
+								>
+									<ChevronDown className="h-3 w-3" />
+								</Button>
+							</div>
+							<div className="flex flex-col">
+								<span className="font-medium">
+									{resource.label}
+									{resource.hidden && (
+										<span className="ml-2 text-xs text-muted-foreground">
+											(Hidden)
+										</span>
+									)}
+								</span>
+								<span className="text-sm text-muted-foreground line-clamp-1">
+									{resource.type === "link" ? resource.url : resource.content}
+								</span>
+							</div>
 						</div>
 						<div className="flex gap-2">
 							<Dialog

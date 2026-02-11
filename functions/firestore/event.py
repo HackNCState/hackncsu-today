@@ -30,24 +30,42 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
 
     default_config = {
         "tracks": [
-            {"name": "Track 1", "description": "Sample elite ball track"},
-            {"name": "Track 2", "description": "Sample great ball track"},
-            {"name": "Track 3", "description": "Sample poke ball track"},
+            {
+                "name": "Track 1",
+                "description": "Sample elite ball track",
+                "fullDescription": "",
+                "allowedUniversities": [],
+            },
+            {
+                "name": "Track 2",
+                "description": "Sample great ball track",
+                "fullDescription": "",
+                "allowedUniversities": [],
+            },
+            {
+                "name": "Track 3",
+                "description": "Sample poke ball track",
+                "fullDescription": "",
+                "allowedUniversities": [],
+            },
         ],
         "challenges": [
             {
                 "name": "Sample Challenge 1",
                 "description": "This is a sample challenge description.",
+                "fullDescription": "",
                 "category": "default",
             },
             {
                 "name": "MLH Best Use of AI",
                 "description": "Build a project that uses AI in a creative way.",
+                "fullDescription": "",
                 "category": "mlh",
             },
             {
                 "name": "MLH Best Domain Name",
                 "description": "Register a domain name for your project.",
+                "fullDescription": "",
                 "category": "mlh",
             },
         ],

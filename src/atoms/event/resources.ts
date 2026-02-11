@@ -11,14 +11,28 @@ export const resourcesAtom = atom((get) => {
 
 	// straight up hardcoding the tracks and challenges resource here to always be in sync 😭😭
 	let tracksContent = tracks
-		.map((t) => `**${t.name}**\\\n${t.description ?? ""}`)
+		.map((t) => {
+			const isRestricted = t.allowedUniversities && t.allowedUniversities.length > 0;
+			const desc = t.fullDescription || t.description || "";
+			let entry = `**${t.name}**${isRestricted ? "*" : ""}`;
+			if (desc) entry += `  \n${desc}`;
+			if (isRestricted) {
+				entry += `  \n*\\* this track is restricted to students of: ${t.allowedUniversities.join(", ")}*`;
+			}
+			return entry;
+		})
 		.join("\n\n");
-	tracksContent = `Select the track that best fits your project. You can only submit to one track.\\\n\\\n${tracksContent}`;
+	tracksContent = `Select the track that best fits your project. You can only submit to one track.\n\n${tracksContent}`;
 
 	let challengesContent = challenges
-		.map((c) => `**${c.name}**\\\n${c.description ?? ""}`)
+		.map((c) => {
+			const desc = c.fullDescription || c.description || "";
+			let entry = `**${c.name}**`;
+			if (desc) entry += `  \n${desc}`;
+			return entry;
+		})
 		.join("\n\n");
-	challengesContent = `Complete these additional challenges for extra prizes. You can only submit to one challenge.\\\n\\\n${challengesContent}`;
+	challengesContent = `Participate in these additional challenges for extra prizes.\n\n*You can only choose one challenge. However, you can choose to participate in any additional MLH challenges as well.*\n\n${challengesContent}`;
 
 	const newResources = [...resources];
 
@@ -101,6 +115,33 @@ export const deleteResourceAtom = atom(null, async (get, _, index: number) => {
 });
 
 // TODO: add reorderResourceAtom?
+export const reorderResourceAtom = atom(
+	null,
+	async (
+		get,
+		_,
+		payload: { fromIndex: number; toIndex: number },
+	) => {
+		const resources = get(resourcesAtom);
+		if (!resources) return;
+
+		const { fromIndex, toIndex } = payload;
+		if (
+			fromIndex < 0 ||
+			fromIndex >= resources.length ||
+			toIndex < 0 ||
+			toIndex >= resources.length
+		)
+			return;
+
+		const updated = [...resources];
+		const [moved] = updated.splice(fromIndex, 1);
+		updated.splice(toIndex, 0, moved);
+
+		await firestoreService.updateEventConfig({ resources: updated });
+	},
+);
+
 export const setResourceAtom = atom(
 	null,
 	async (get, _, payload: { index: number; resource: Resource }) => {
