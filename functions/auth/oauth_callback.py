@@ -224,7 +224,7 @@ def _get_registration(uid: str, username: str) -> User:
         return User(
             id=uid,
             role="participant",
-            username=username,
+            username=username.lower(),
             firstName=first_name,
             lastName=last_name,
             phone=phone,

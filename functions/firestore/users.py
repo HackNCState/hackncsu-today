@@ -16,8 +16,8 @@ def search_users(request: https_fn.CallableRequest) -> list[dict]:
     users_ref = db.collection("users")
 
     query = (
-        users_ref.where(filter=FieldFilter("username", ">=", query_text))
-        .where(filter=FieldFilter("username", "<=", query_text + "\uf8ff"))
+        users_ref.where(filter=FieldFilter("usernameLower", ">=", query_text.lower()))
+        .where(filter=FieldFilter("usernameLower", "<=", query_text.lower() + "\uf8ff"))
         .limit(5)
     )
 
