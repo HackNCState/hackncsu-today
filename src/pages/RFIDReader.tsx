@@ -219,6 +219,8 @@ export default function RFIDReader() {
 									<p className="text-muted-foreground">
 										Name: {rfidParticipant.firstName} {rfidParticipant.lastName}
 										<br />
+										Discord: {rfidParticipant.username}
+										<br />
 										Email: {rfidParticipant.email || "N/A"}
 										<br />
 										Phone: {rfidParticipant.phone || "N/A"}
@@ -230,8 +232,6 @@ export default function RFIDReader() {
 										<br />
 										Attended Events:{" "}
 										{rfidParticipant.attendedEvents.join(", ") || "None"}
-										<br />
-										ID: {rfidParticipant.id}
 									</p>
 								</>
 							) : rfidParticipant === null ? (
