@@ -222,6 +222,8 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
                 "eligibleForRaffle": True,
             },
         ],
+        "teamRegistrationEnabled": False,
+        "loginEnabled": True,
     }
 
     doc_ref.set(default_config)

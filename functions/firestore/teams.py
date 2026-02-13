@@ -5,6 +5,61 @@ from .models import Team
 
 
 @https_fn.on_call()
+def get_team_member_profiles(request: https_fn.CallableRequest) -> list[dict]:
+    """Returns limited profile data for members of the caller's team."""
+
+    if not request.auth:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.UNAUTHENTICATED,
+            message="Authentication is required.",
+        )
+
+    caller_id = request.auth.uid
+    team_id = request.data.get("teamId", "")
+
+    if not team_id:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+            message="Team ID is required.",
+        )
+
+    db = firestore.client()
+    team_doc = db.collection("teams").document(team_id).get()
+
+    if not team_doc.exists:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.NOT_FOUND,
+            message="Team not found.",
+        )
+
+    team_data = team_doc.to_dict()
+    member_ids = team_data.get("memberIds", [])
+
+    if caller_id not in member_ids:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.PERMISSION_DENIED,
+            message="You are not a member of this team.",
+        )
+
+    profiles = []
+    for member_id in member_ids:
+        user_doc = db.collection("users").document(member_id).get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            profiles.append(
+                {
+                    "id": user_data.get("id", member_id),
+                    "username": user_data.get("username", ""),
+                    "firstName": user_data.get("firstName", ""),
+                    "lastName": user_data.get("lastName", ""),
+                    "role": user_data.get("role", "participant"),
+                }
+            )
+
+    return profiles
+
+
+@https_fn.on_call()
 def submit_team_registration(request: https_fn.CallableRequest) -> None:
     """Submits a new team registration."""
 
@@ -16,12 +71,23 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
             message="Authentication is required to register a team.",
         )
 
+    db = firestore.client()
+
     name = request.data.get("name", "").strip()
 
     if not name:
         raise https_fn.HttpsError(
             code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
             message="Team name is required.",
+        )
+
+    # Check if team registration is enabled
+    event_config_ref = db.collection("event").document("main").get()
+    event_config_data = event_config_ref.to_dict() if event_config_ref.exists else {}
+    if not event_config_data.get("teamRegistrationEnabled", False):
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.PERMISSION_DENIED,
+            message="Team registration is currently closed.",
         )
 
     member_ids = request.data.get("members", [])
@@ -50,7 +116,6 @@ def submit_team_registration(request: https_fn.CallableRequest) -> None:
     challenges = [str(c).strip() for c in challenges if str(c).strip()]
 
     # Validate challenge selections against event config categories
-    db = firestore.client()
 
     event_config_doc = db.collection("event").document("main").get()
     event_config = event_config_doc.to_dict() if event_config_doc.exists else {}

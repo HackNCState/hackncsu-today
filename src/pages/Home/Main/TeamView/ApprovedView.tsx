@@ -1,6 +1,6 @@
-import { firestoreService } from "@/services/firestore.service";
+import { functionsService } from "@/services/functions.service";
 import type { Team } from "@/types/team";
-import type { UserData } from "@/types/user";
+import type { TeamMemberProfile } from "@/types/user";
 import { useEffect, useState } from "react";
 
 interface ApprovedViewProps {
@@ -9,18 +9,19 @@ interface ApprovedViewProps {
 
 // lowkey kinda vibecoded this one but it's okay it looks decent
 export default function ApprovedView({ team }: ApprovedViewProps) {
-	const [members, setMembers] = useState<UserData[]>([]);
+	const [members, setMembers] = useState<TeamMemberProfile[]>([]);
 
 	useEffect(() => {
 		const fetchMembers = async () => {
-			const memberPromises = team.memberIds.map((id) =>
-				firestoreService.fetchUser(id),
-			);
-			const fetchedMembers = await Promise.all(memberPromises);
-			setMembers(fetchedMembers.filter((m): m is UserData => m !== null));
+			try {
+				const profiles = await functionsService.getTeamMemberProfiles(team.id);
+				setMembers(profiles);
+			} catch (err) {
+				console.error("Failed to fetch team member profiles:", err);
+			}
 		};
 		fetchMembers();
-	}, [team.memberIds]);
+	}, [team.id]);
 
 	return (
 		<div className="w-full flex py-2">
@@ -54,7 +55,9 @@ export default function ApprovedView({ team }: ApprovedViewProps) {
 								{team.name}
 							</h2>
 							<p className="text-base sm:text-lg text-muted-foreground uppercase tracking-[0.2em] font-synemono leading-snug">
-								STARRING: {team.track} &bull; {team.challenges.join(", ")}
+								STARRING: {team.track}{" "}
+								{team.challenges.length > 0 && <span>&bull;</span>}{" "}
+								{team.challenges.join(", ")}
 							</p>
 						</div>
 

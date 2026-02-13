@@ -49,7 +49,17 @@ export const PartialParticipantSchema = ParticipantSchema.pick({
 	username: true,
 });
 
+/** Limited profile data returned by get_team_member_profiles */
+export const TeamMemberProfileSchema = z.object({
+	id: z.string(),
+	username: z.string(),
+	firstName: z.string().optional(),
+	lastName: z.string().optional(),
+	role: z.enum(["organizer", "participant"]),
+});
+
 export type PartialParticipant = z.infer<typeof PartialParticipantSchema>;
+export type TeamMemberProfile = z.infer<typeof TeamMemberProfileSchema>;
 export type Organizer = z.infer<typeof OrganizerSchema>;
 export type ChecklistItemStatus = z.infer<typeof ChecklistItemStatusSchema>;
 export type Participant = z.infer<typeof ParticipantSchema>;

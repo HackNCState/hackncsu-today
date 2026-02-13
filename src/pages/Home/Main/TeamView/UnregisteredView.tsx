@@ -2,6 +2,7 @@
 import { useAtomValue } from "jotai";
 import { tracksAtom } from "@/atoms/event/tracks";
 import { challengesAtom } from "@/atoms/event/challenges";
+import { teamRegistrationEnabledAtom } from "@/atoms/event/teamRegistration";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -12,7 +13,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { functionsService } from "@/services/functions.service";
 import {
 	PartialParticipantSchema,
@@ -25,6 +26,7 @@ export default function UnregisteredView() {
 	const tracks = useAtomValue(tracksAtom);
 	const challenges = useAtomValue(challengesAtom);
 	const user = useAtomValue(userAtom);
+	const registrationEnabled = useAtomValue(teamRegistrationEnabledAtom);
 
 	const initialMembers: PartialParticipant[] = user
 		? [PartialParticipantSchema.parse(user)]
@@ -40,7 +42,7 @@ export default function UnregisteredView() {
 		});
 	};
 
-	return (
+	return registrationEnabled ? (
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button
@@ -56,8 +58,8 @@ export default function UnregisteredView() {
 						<DialogHeader>
 							<DialogTitle>Register Team</DialogTitle>
 							<DialogDescription>
-								Only one member of your team needs to fill out this form. 
-								View full track and challenge information in the Resources section.
+								Only one member of your team needs to fill out this form. View
+								full track and challenge information in the Resources section.
 							</DialogDescription>
 						</DialogHeader>
 
@@ -81,5 +83,15 @@ export default function UnregisteredView() {
 				</ScrollArea>
 			</DialogContent>
 		</Dialog>
+	) : (
+		<Button
+			size="lg"
+			variant="outline"
+			disabled
+			className="mt-2 w-full sm:w-auto"
+		>
+			<Clock className="mr-2 h-4 w-4" /> Team registration will open soon. Stay
+			tuned!
+		</Button>
 	);
 }

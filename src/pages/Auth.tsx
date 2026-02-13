@@ -46,6 +46,8 @@ export default function Auth() {
 				);
 			case "not_checked_in":
 				return "You're a participant but it seems you haven't checked in yet!\n\nPlease check in at the registration desk or let a staff member know if you think this is a mistake.";
+			case "login_disabled":
+				return "Login is not available yet. Please wait for the event to begin!";
 			case "missing_info":
 				return "Participant information is incomplete. Please contact a staff member.";
 			case "auth_error":

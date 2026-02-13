@@ -56,7 +56,7 @@ export default function Login() {
 				size="lg"
 				onClick={handleDiscordLogin}
 			>
-				Log in
+				Log in with Discord
 			</Button>
 
 			<p className="font-splash text-2xl select-none mx-auto">

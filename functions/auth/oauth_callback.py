@@ -258,6 +258,15 @@ def _generate_login_token(uid: str, username: str) -> str:
 
     user = _get_registration(uid, username)
 
+    # If login is disabled for participants, reject them
+    if user.role != "organizer" and os.getenv("FUNCTIONS_EMULATOR") == "false":
+        db = firestore.client()
+        event_doc = db.document("event/main").get()
+        if event_doc.exists:
+            event_data = event_doc.to_dict()
+            if event_data and not event_data.get("loginEnabled", True):
+                raise ValueError("login_disabled")
+
     _create_user(user)
 
     # if running locally with the emulator, give all users organizer permissions

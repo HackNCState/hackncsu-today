@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { SendIcon } from "lucide-react";
 import { useState } from "react";
@@ -270,6 +271,30 @@ export default function OrganizerView() {
 							Reset event data
 						</Button>
 					)}
+				</div>
+
+				<div className="flex flex-col gap-3">
+					<label className="flex items-center gap-2 cursor-pointer">
+						<Checkbox
+							checked={config.loginEnabled}
+							onCheckedChange={(checked) =>
+								updateConfig({ loginEnabled: checked === true })
+							}
+						/>
+						<span className="text-sm">Allow participants to log in</span>
+					</label>
+
+					<label className="flex items-center gap-2 cursor-pointer">
+						<Checkbox
+							checked={config.teamRegistrationEnabled}
+							onCheckedChange={(checked) =>
+								updateConfig({ teamRegistrationEnabled: checked === true })
+							}
+						/>
+						<span className="text-sm">
+							Allow participants to register teams
+						</span>
+					</label>
 				</div>
 
 				<Label>Hacking State</Label>

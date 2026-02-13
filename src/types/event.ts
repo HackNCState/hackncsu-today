@@ -83,6 +83,8 @@ export const EventConfigSchema = z.object({
 	checklistItems: z.array(ChecklistItemSchema).default([]),
 	activities: z.array(ActivitySchema).default([]),
 	webhookURL: z.url().optional(),
+	teamRegistrationEnabled: z.boolean().default(false),
+	loginEnabled: z.boolean().default(true),
 });
 
 export type Track = z.infer<typeof TrackSchema>;
