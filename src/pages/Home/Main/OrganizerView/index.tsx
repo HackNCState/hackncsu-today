@@ -8,7 +8,11 @@ import HackingDatesPicker from "./HackingDatesPicker";
 import { Label } from "@/components/ui/label";
 import { useAtomValue, useSetAtom } from "jotai";
 import { eventConfigAtom, updateEventConfigAtom } from "@/atoms/event/config";
-import { webhookURLAtom, setWebhookURLAtom, deleteWebhookURLAtom } from "@/atoms/event/webhookURL";
+import {
+	webhookURLAtom,
+	setWebhookURLAtom,
+	deleteWebhookURLAtom,
+} from "@/atoms/event/webhookURL";
 import { useBreakpoint } from "@/hooks/useMediaQuery";
 import {
 	Dialog,
@@ -60,12 +64,10 @@ export default function OrganizerView() {
 	};
 
 	const handleSaveWebhookURL = async () => {
-		if ( webhookService.isValidDiscordWebhook(localWebhookURL) ) {
+		if (webhookService.isValidDiscordWebhook(localWebhookURL)) {
 			setValidWebhook(true);
-await setWebhookURL(localWebhookURL || undefined);
-		}
-		else
-			setValidWebhook(false);
+			await setWebhookURL(localWebhookURL || undefined);
+		} else setValidWebhook(false);
 	};
 
 	const handlePostAnnouncement = (e: React.FormEvent) => {
@@ -81,7 +83,10 @@ await setWebhookURL(localWebhookURL || undefined);
 			announcements: [newAnnouncement, ...config.announcements],
 		});
 
-		webhookService.postMessage(config.webhookURL, `<@&${roleIDToPing}> ${announcementText}`);
+		webhookService.postMessage(
+			config.webhookURL,
+			`<@&${roleIDToPing}> ${announcementText}`,
+		);
 		setAnnouncementText("");
 	};
 
@@ -232,41 +237,39 @@ await setWebhookURL(localWebhookURL || undefined);
 							<DialogHeader>
 								<DialogTitle>Configure Webhook URL</DialogTitle>
 							</DialogHeader>
-						<div className="flex flex-col gap-4">
-							<div className="flex gap-2">
-								<Input
-									placeholder="Discord Webhook URL"
-									value={localWebhookURL}
-									onChange={(e) => setLocalWebhookURL(e.target.value)}
-								/>
-								<Button
-									onClick={() => handleSaveWebhookURL()}
-								>
-									Save
-								</Button>
-								<Button
-									variant="destructive"
-									onClick={() => {
-										deleteWebhookURL();
-										setLocalWebhookURL("");
-									}}
-								>
-									Clear
-								</Button>
-								<div>
-									{!validWebhook && (
-										<p className="text-sm text-destructive">
-											Please enter a valid Discord Webhook URL.
-										</p>
-									)}
+							<div className="flex flex-col gap-4">
+								<div className="flex gap-2">
+									<Input
+										placeholder="Discord Webhook URL"
+										value={localWebhookURL}
+										onChange={(e) => setLocalWebhookURL(e.target.value)}
+									/>
+									<Button onClick={() => handleSaveWebhookURL()}>Save</Button>
+									<Button
+										variant="destructive"
+										onClick={() => {
+											deleteWebhookURL();
+											setLocalWebhookURL("");
+										}}
+									>
+										Clear
+									</Button>
+									<div>
+										{!validWebhook && (
+											<p className="text-sm text-destructive">
+												Please enter a valid Discord Webhook URL.
+											</p>
+										)}
+									</div>
 								</div>
 							</div>
-						</div>
 						</DialogContent>
 					</Dialog>
-					<Button variant="destructive" onClick={() => updateConfig(null)}>
-						Reset event data
-					</Button>
+					{import.meta.env.DEV && (
+						<Button variant="destructive" onClick={() => updateConfig(null)}>
+							Reset event data
+						</Button>
+					)}
 				</div>
 
 				<Label>Hacking State</Label>
