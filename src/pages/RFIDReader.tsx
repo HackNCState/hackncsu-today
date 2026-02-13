@@ -7,7 +7,8 @@ import { rfidService } from "@/services/rfid.service";
 import type { Team } from "@/types/team";
 import type { Participant } from "@/types/user";
 import { useAtomValue } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { Check, Clipboard } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function RFIDReader() {
@@ -32,6 +33,13 @@ export default function RFIDReader() {
 	const [showActivityAssignedToast, setShowActivityAssignedToast] = useState<
 		"hidden" | "success" | "alreadyAttended"
 	>("hidden");
+	const [copied, setCopied] = useState(false);
+
+	const copyToClipboard = useCallback((text: string) => {
+		navigator.clipboard.writeText(text);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 1500);
+	}, []);
 
 	useEffect(() => {
 		if (!rfidService.isSupported()) {
@@ -65,6 +73,8 @@ export default function RFIDReader() {
 	async function onRFIDScan(uuid: string) {
 		setShowActivityAssignedToast("hidden");
 		setRfidData(uuid);
+
+		copyToClipboard(uuid);
 
 		setRfidParticipant(undefined);
 		setTeam(null);
@@ -162,8 +172,8 @@ export default function RFIDReader() {
 
 							<p className="mt-4">
 								Choose whether the user should receive attendance for an
-								activity when they tap their card. No need to use this for
-								check-in.
+								activity when they tap their card.
+								<strong> No need to use this for check-in.</strong>
 								<br />* means this activity is not eligible for the raffle.
 							</p>
 
@@ -208,9 +218,25 @@ export default function RFIDReader() {
 							{rfidData && (
 								<>
 									<p className="mt-4">The card has the following ID:</p>
-									<p className="font-mono text-lg text-muted-foreground">
-										{rfidData}
-									</p>
+									<button
+										type="button"
+										className="mt-1 inline-flex items-center gap-2 font-mono text-lg text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+										onClick={() => copyToClipboard(rfidData)}
+									>
+										<span className="underline decoration-dashed underline-offset-4">
+											{rfidData}
+										</span>
+										{copied ? (
+											<>
+												<Check className="size-4 text-green-500" />
+												<span className="text-sm text-green-500 font-sans">
+													Copied to clipboard!
+												</span>
+											</>
+										) : (
+											<Clipboard className="size-4" />
+										)}
+									</button>
 								</>
 							)}
 							{rfidParticipant ? (
