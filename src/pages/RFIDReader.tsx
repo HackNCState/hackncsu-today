@@ -73,9 +73,6 @@ export default function RFIDReader() {
 	async function onRFIDScan(uuid: string) {
 		setShowActivityAssignedToast("hidden");
 		setRfidData(uuid);
-
-		copyToClipboard(uuid);
-
 		setRfidParticipant(undefined);
 		setTeam(null);
 
