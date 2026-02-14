@@ -1,5 +1,6 @@
 import { activitiesAtom } from "@/atoms/event/activities";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { cn } from "@/lib/utils";
 import { firestoreService } from "@/services/firestore.service";
 import { rfidService } from "@/services/rfid.service";
@@ -173,7 +174,7 @@ export default function RFIDReader() {
 								<br />* means this activity is not eligible for the raffle.
 							</p>
 
-							<div className="mt-2 flex flex-wrap gap-2">
+							<ButtonGroup orientation="horizontal" className="mt-2">
 								<Button
 									variant={!selectedActivity ? "default" : "outline"}
 									onClick={() => setSelectedActivity(null)}
@@ -195,7 +196,7 @@ export default function RFIDReader() {
 										{!activity.eligibleForRaffle && "*"}
 									</Button>
 								))}
-							</div>
+							</ButtonGroup>
 
 							{showActivityAssignedToast === "success" && (
 								<p className="mt-2 text-green-500">
