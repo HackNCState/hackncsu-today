@@ -194,15 +194,15 @@ export default function TeamManager() {
 				key={team.id}
 				className={isUnverified ? "bg-yellow-50 dark:bg-yellow-900/20" : ""}
 			>
-				<TableCell className="break-words">{team.name}</TableCell>
-				<TableCell className="break-words">{team.track}</TableCell>
-				<TableCell className="break-words">
+				<TableCell>{team.name}</TableCell>
+				<TableCell>{team.track}</TableCell>
+				<TableCell>
 					{team.challenges.length > 0 ? team.challenges.join(", ") : "-"}
 				</TableCell>
-				<TableCell className="break-words">
+				<TableCell>
 					<TeamMembersList team={team} />
 				</TableCell>
-				<TableCell className="whitespace-pre-wrap break-words">
+				<TableCell className="whitespace-pre-wrap">
 					{team.mentoringHelp}
 				</TableCell>
 				<TableCell>{team.status}</TableCell>
@@ -268,16 +268,16 @@ export default function TeamManager() {
 			</header>
 
 			<main>
-				<Table className="table-fixed w-full">
+				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead className="w-[12%]">Name</TableHead>
-							<TableHead className="w-[10%]">Track</TableHead>
-							<TableHead className="w-[15%]">Challenge</TableHead>
-							<TableHead className="w-[18%]">Members</TableHead>
-							<TableHead className="w-[20%]">Mentoring Help</TableHead>
-							<TableHead className="w-[8%]">Status</TableHead>
-							<TableHead className="w-[17%]">Actions</TableHead>
+							<TableHead>Name</TableHead>
+							<TableHead>Track</TableHead>
+							<TableHead>Challenge</TableHead>
+							<TableHead>Members</TableHead>
+							<TableHead>Mentoring Help</TableHead>
+							<TableHead className="w-0">Status</TableHead>
+							<TableHead className="w-0">Actions</TableHead>
 						</TableRow>
 					</TableHeader>
 

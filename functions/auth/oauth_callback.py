@@ -1,8 +1,6 @@
 from dataclasses import asdict
 import json
 import os
-import time
-import threading
 import requests
 from firebase_functions import https_fn
 from firebase_functions.params import SecretParam, StringParam
@@ -94,63 +92,6 @@ UNIVERSITY_COL_R = StringParam(
 )
 
 
-# ---------------------------------------------------------------------------
-# In-memory spreadsheet cache – avoids hitting Google Sheets on every login.
-# Cloud Functions reuse warm instances, so the cache survives across
-# invocations on the same instance.  A TTL (default 5 min) keeps it fresh.
-# ---------------------------------------------------------------------------
-
-SHEET_CACHE_TTL_SECONDS = 300  # 5 minutes
-
-_sheet_cache_lock = threading.Lock()
-_sheet_cache: dict | None = (
-    None  # {"ts": float, "reg_headers": [...], "reg_rows": [...], "checkin_headers": [...], "checkin_rows": [...]}
-)
-
-
-def _fetch_sheets_data() -> dict:
-    """Fetch both worksheets from Google Sheets and return them as a dict."""
-    import gspread
-
-    creds, _ = google.auth.default(
-        scopes=[
-            "https://www.googleapis.com/auth/spreadsheets.readonly",
-            "https://www.googleapis.com/auth/drive",
-        ]
-    )
-    gc = gspread.authorize(creds)
-    spreadsheet = gc.open_by_url(SPREADSHEET_URL.value)
-
-    reg_sheet = spreadsheet.worksheet("Registration Submissions")
-    checkin_sheet = spreadsheet.worksheet("Check-in")
-
-    # Batch-fetch all values in two calls (instead of per-row later)
-    reg_all = reg_sheet.get_all_values()
-    checkin_all = checkin_sheet.get_all_values()
-
-    return {
-        "ts": time.monotonic(),
-        "reg_headers": reg_all[0] if reg_all else [],
-        "reg_rows": reg_all[1:] if len(reg_all) > 1 else [],
-        "checkin_headers": checkin_all[0] if checkin_all else [],
-        "checkin_rows": checkin_all[1:] if len(checkin_all) > 1 else [],
-    }
-
-
-def _get_cached_sheets() -> dict:
-    """Return cached sheet data, refreshing if stale or missing."""
-    global _sheet_cache
-    with _sheet_cache_lock:
-        now = time.monotonic()
-        if _sheet_cache is None or (now - _sheet_cache["ts"]) > SHEET_CACHE_TTL_SECONDS:
-            print("[sheet-cache] cache miss – fetching from Google Sheets")
-            _sheet_cache = _fetch_sheets_data()
-        else:
-            age = round(now - _sheet_cache["ts"], 1)
-            print(f"[sheet-cache] cache hit (age {age}s)")
-        return _sheet_cache
-
-
 def _get_col_index_from_headers(headers: list[str], name: str) -> int:
     """Return 1-based column index for a given header name.
 
@@ -175,6 +116,8 @@ def _get_registration(uid: str, username: str) -> User:
     Organizers will not need to be present on the spreadsheet
     """
 
+    import gspread
+
     is_organizer = uid in [
         o.strip() for o in ORGANIZERS_LIST.value.split(",") if o.strip()
     ]
@@ -182,33 +125,40 @@ def _get_registration(uid: str, username: str) -> User:
     if is_organizer:
         return User(id=uid, role="organizer", username=username)
     else:
-        sheets = _get_cached_sheets()
-        reg_headers = sheets["reg_headers"]
-        checkin_headers = sheets["checkin_headers"]
+        creds, _ = google.auth.default(
+            scopes=[
+                "https://www.googleapis.com/auth/spreadsheets.readonly",
+                "https://www.googleapis.com/auth/drive",
+            ]
+        )
+        gc = gspread.authorize(creds)
+
+        spreadsheet = gc.open_by_url(
+            SPREADSHEET_URL.value,
+        )
+
+        print(spreadsheet.worksheets())
+
+        reg_sheet = spreadsheet.worksheet("Registration Submissions")
+        checkin_sheet = spreadsheet.worksheet("Check-in")
+
+        reg_headers = reg_sheet.row_values(1)
+        checkin_headers = checkin_sheet.row_values(1)
 
         username_col_idx = _get_col_index_from_headers(
             reg_headers, USERNAME_COL_R.value
         )
 
-        # Search for the user in cached registration rows
-        username_lower = username.lower()
-        matched_row_idx: int | None = None
-        for i, row in enumerate(sheets["reg_rows"]):
-            cell_val = _get_cell_from_row(row, username_col_idx)
-            if cell_val.strip().lower() == username_lower:
-                matched_row_idx = i
-                break
+        cell = reg_sheet.find(
+            username, in_column=username_col_idx, case_sensitive=False
+        )
 
         # participant not registered
-        if matched_row_idx is None:
+        if not cell:
             raise ValueError("participant_not_found")
 
-        reg_row = sheets["reg_rows"][matched_row_idx]
-        checkin_row = (
-            sheets["checkin_rows"][matched_row_idx]
-            if matched_row_idx < len(sheets["checkin_rows"])
-            else []
-        )
+        reg_row = reg_sheet.row_values(cell.row)
+        checkin_row = checkin_sheet.row_values(cell.row)
 
         checked_in_idx = _get_col_index_from_headers(
             checkin_headers, CHECKED_IN_COL_C.value
@@ -309,7 +259,7 @@ def _generate_login_token(uid: str, username: str) -> str:
     user = _get_registration(uid, username)
 
     # If login is disabled for participants, reject them
-    if user.role != "organizer" and os.getenv("FUNCTIONS_EMULATOR") != "true":
+    if user.role != "organizer" and os.getenv("FUNCTIONS_EMULATOR") == "false":
         db = firestore.client()
         event_doc = db.document("event/main").get()
         if event_doc.exists:
