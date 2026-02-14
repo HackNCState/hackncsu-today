@@ -32,13 +32,19 @@ export default function ParticipantManager() {
 
 		return (
 			<TableRow key={user.id}>
-				<TableCell>{user.username}</TableCell>
-				<TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-				<TableCell>{user.email}</TableCell>
-				<TableCell>{user.university || "N/A"}</TableCell>
+				<TableCell className="break-words">{user.username}</TableCell>
+				<TableCell className="break-words">{`${user.firstName} ${user.lastName}`}</TableCell>
+				<TableCell className="break-words">{user.email}</TableCell>
+				<TableCell className="break-words">
+					{user.university || "N/A"}
+				</TableCell>
 				<TableCell>{user.shirtSize}</TableCell>
-				<TableCell>{user.dietaryRestrictions || "None"}</TableCell>
-				<TableCell>{user.attendedEvents.join(", ") || "None"}</TableCell>
+				<TableCell className="break-words">
+					{user.dietaryRestrictions || "None"}
+				</TableCell>
+				<TableCell className="break-words">
+					{user.attendedEvents.join(", ") || "None"}
+				</TableCell>
 				<TableCell className="justify-end flex">
 					{resumeURL && (
 						<Button
@@ -86,17 +92,17 @@ export default function ParticipantManager() {
 			</header>
 
 			<main>
-				<Table>
+				<Table className="table-fixed w-full">
 					<TableHeader>
 						<TableRow>
-							<TableHead>Username</TableHead>
-							<TableHead>Name</TableHead>
-							<TableHead>Email</TableHead>
-							<TableHead>University</TableHead>
-							<TableHead>Shirt Size</TableHead>
-							<TableHead>Dietary Restrictions</TableHead>
-							<TableHead>Events Attended</TableHead>
-							<TableHead className="w-0">Actions</TableHead>
+							<TableHead className="w-[10%]">Username</TableHead>
+							<TableHead className="w-[12%]">Name</TableHead>
+							<TableHead className="w-[15%]">Email</TableHead>
+							<TableHead className="w-[12%]">University</TableHead>
+							<TableHead className="w-[8%]">Shirt Size</TableHead>
+							<TableHead className="w-[13%]">Dietary Restrictions</TableHead>
+							<TableHead className="w-[18%]">Events Attended</TableHead>
+							<TableHead className="w-[12%]">Actions</TableHead>
 						</TableRow>
 					</TableHeader>
 
