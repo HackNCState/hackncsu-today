@@ -1,30 +1,32 @@
 /**
- * User types (organizer and participant)
+ * User types for dashboard
  */
 
 import { z } from "zod";
 
 const BaseUserSchema = z.object({
 	id: z.string(),
-	username: z.string(),
-	attrs: z.array(z.string()).optional(),
+	email: z.email(),
+	firstName: z.string(),
+	lastName: z.string(),
 });
 
 export const OrganizerSchema = BaseUserSchema.extend({
 	role: z.literal("organizer"),
 });
 
+// --- Participant related schemas ---
+
 export const ChecklistItemStatusSchema = z.object({
 	id: z.string(),
 	completed: z.boolean(),
 });
 
+
 export const ParticipantSchema = BaseUserSchema.extend({
 	role: z.literal("participant"),
+	username: z.string(), // TODO: remove after migration to email-based login
 
-	email: z.string(),
-	firstName: z.string(),
-	lastName: z.string(),
 	phone: z.string(),
 	shirtSize: z.string(),
 	dietaryRestrictions: z.string(),
@@ -38,16 +40,30 @@ export const ParticipantSchema = BaseUserSchema.extend({
 	checklistItemStatuses: z.array(ChecklistItemStatusSchema).default([]),
 });
 
+// ---
+
+export const JudgeSchema = BaseUserSchema.extend({
+	role: z.literal("judge"),
+	// TODO: add additional fields for judges as needed
+}); 
+
+export const MentorSchema = BaseUserSchema.extend({
+	role: z.literal("mentor"),
+	// TODO: add additional fields for mentors as needed
+}); 
+
 export const UserSchema = z.discriminatedUnion("role", [
 	OrganizerSchema,
 	ParticipantSchema,
+	JudgeSchema,
+	MentorSchema,
 ]);
 
 /** The partial participant is the data of other users that participants can see */
 export const PartialParticipantSchema = ParticipantSchema.pick({
 	id: true,
 	username: true,
-});
+}); // TODO: remove?
 
 /** Limited profile data returned by get_team_member_profiles */
 export const TeamMemberProfileSchema = z.object({
@@ -56,7 +72,7 @@ export const TeamMemberProfileSchema = z.object({
 	firstName: z.string().optional(),
 	lastName: z.string().optional(),
 	role: z.enum(["organizer", "participant"]),
-});
+}); // TODO: remove?
 
 export type PartialParticipant = z.infer<typeof PartialParticipantSchema>;
 export type TeamMemberProfile = z.infer<typeof TeamMemberProfileSchema>;
@@ -64,3 +80,5 @@ export type Organizer = z.infer<typeof OrganizerSchema>;
 export type ChecklistItemStatus = z.infer<typeof ChecklistItemStatusSchema>;
 export type Participant = z.infer<typeof ParticipantSchema>;
 export type UserData = z.infer<typeof UserSchema>;
+export type Judge = z.infer<typeof JudgeSchema>;
+export type Mentor = z.infer<typeof MentorSchema>;

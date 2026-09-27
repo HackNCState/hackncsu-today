@@ -14,7 +14,7 @@ set_global_options(max_instances=10)
 
 initialize_app()
 
-from functions.auth.provision_user import *
+from auth.provision_user import *
 from firestore.users import *
 from firestore.teams import *
 from firestore.schedule import *
