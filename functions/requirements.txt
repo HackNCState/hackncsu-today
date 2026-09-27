@@ -1,3 +1,2 @@
-firebase_functions~=0.1.0
-gspread~=6.2.1
-pydantic~=2.11.7
+firebase-functions==0.6.0
+pydantic==2.13.5
