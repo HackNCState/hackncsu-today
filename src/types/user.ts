@@ -9,6 +9,8 @@ const BaseUserSchema = z.object({
 	email: z.email(),
 	firstName: z.string(),
 	lastName: z.string(),
+
+	username: z.string(), // TODO: remove after migration to email-based login
 });
 
 export const OrganizerSchema = BaseUserSchema.extend({
@@ -25,7 +27,6 @@ export const ChecklistItemStatusSchema = z.object({
 
 export const ParticipantSchema = BaseUserSchema.extend({
 	role: z.literal("participant"),
-	username: z.string(), // TODO: remove after migration to email-based login
 
 	phone: z.string(),
 	shirtSize: z.string(),
