@@ -1,21 +1,26 @@
+import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
 import { auth } from "@/lib/firebase-config";
-import { signInWithCustomToken } from "firebase/auth";
+import { functionsService } from "./functions.service";
 
-const clientId = "1371413608394653736";
-const baseUrl = "https://discord.com/api/oauth2/authorize";
-const redirectUri = encodeURIComponent(
-	import.meta.env.DEV
-		? "http://127.0.0.1:5001/hackncsu-today/us-central1/oauth_callback"
-		: "https://us-central1-hackncsu-today.cloudfunctions.net/oauth_callback",
-);
+// the email is saved so the user doesn't have to retype it when they open the link
+// (if they open it on a different device, /auth will ask for it again)
+const emailStorageKey = "emailForSignIn";
 
 export const authService = {
-	startOAuth: () => {
-		window.location.href = `${baseUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify`;
+	// the backend checks the user is allowed to log in, then emails the link via SendGrid
+	sendLoginLink: async (email: string) => {
+		const normalized = email.trim().toLowerCase();
+		await functionsService.sendLoginLink(normalized);
+		window.localStorage.setItem(emailStorageKey, normalized);
 	},
 
-	login: async (token: string) => {
-		const credential = await signInWithCustomToken(auth, token);
+	isLoginLink: (url: string) => isSignInWithEmailLink(auth, url),
+
+	getSavedEmail: () => window.localStorage.getItem(emailStorageKey),
+
+	completeLogin: async (email: string, url: string) => {
+		const credential = await signInWithEmailLink(auth, email, url);
+		window.localStorage.removeItem(emailStorageKey);
 		return credential;
 	},
 

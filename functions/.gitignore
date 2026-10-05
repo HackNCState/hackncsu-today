@@ -4,3 +4,5 @@ __pycache__/
 # Python virtual environment
 venv/
 .env.*
+# local secrets for the emulator (e.g. SENDGRID_API_KEY)
+.secret.local
