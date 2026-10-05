@@ -1,62 +1,105 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { authService } from "@/services/auth.service";
 
 export default function Auth() {
-	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 
 	const [errorCode, setErrorCode] = useState("");
-	const [authenticating, setAuthenticating] = useState(true);
+	// the email is missing when the link is opened on a different device/browser
+	const [needsEmail, setNeedsEmail] = useState(false);
+	const [email, setEmail] = useState("");
+	const [submitting, setSubmitting] = useState(false);
 
-	useEffect(() => {
-		const token = searchParams.get("token");
-		const error = searchParams.get("error");
+	// a login link can only be used once, so make sure StrictMode's double effect doesn't consume it twice
+	const attemptedRef = useRef(false);
 
-		if (token) {
-			authService
-				.login(token)
-				.then(() => {
-					setAuthenticating(false);
-					navigate("/");
-				})
-				.catch((err) => {
-					console.error("Auth error:", err);
-					setErrorCode("auth_error");
-				});
-		} else if (error) {
-			console.error("Authentication failed");
-			setErrorCode(error);
-		} else {
-			setErrorCode("no_token");
+	const completeLogin = async (loginEmail: string) => {
+		setSubmitting(true);
+		try {
+			await authService.completeLogin(loginEmail, window.location.href);
+			navigate("/", { replace: true });
+		} catch (err) {
+			console.error("Auth error:", err);
+			setErrorCode(err instanceof FirebaseError ? err.code : "auth_error");
+		} finally {
+			setSubmitting(false);
 		}
-	}, [navigate, searchParams]);
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: should only run once on page load
+	useEffect(() => {
+		if (attemptedRef.current) return;
+		attemptedRef.current = true;
+
+		if (!authService.isLoginLink(window.location.href)) {
+			setErrorCode("invalid_link");
+			return;
+		}
+
+		const savedEmail = authService.getSavedEmail();
+		if (savedEmail) {
+			completeLogin(savedEmail);
+		} else {
+			setNeedsEmail(true);
+		}
+	}, []);
+
+	const handleEmailSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		const trimmed = email.trim();
+		if (!trimmed) return;
+		setNeedsEmail(false);
+		completeLogin(trimmed);
+	};
 
 	function getErrorMessage(code: string) {
 		switch (code) {
-			case "invalid_token":
-				return "Invalid authorization token. Please try logging in again.";
-			case "participant_not_found":
-				return (
-					"This Discord account is not associated with a registered participant.\n\n" +
-					"If you think this is a mistake, please open a support ticket in the Hack_NCState 2026 Discord server.\n" +
-					"Include your full name and email used during registration."
-				);
+			case "invalid_link":
+				return "This doesn't look like a valid login link. Please request a new one.";
+			case "auth/invalid-action-code":
+			case "auth/expired-action-code":
+				return "This login link has expired or was already used. Please request a new one.";
+			case "auth/invalid-email":
+				return "That email doesn't match the one this login link was sent to.";
 			case "not_checked_in":
 				return "You're a participant but it seems you haven't checked in yet!\n\nPlease check in at the registration desk or let a staff member know if you think this is a mistake.";
 			case "login_disabled":
 				return "Login is not available yet. Please wait for the event to begin!";
-			case "missing_info":
-				return "Participant information is incomplete. Please contact a staff member.";
-			case "auth_error":
-				return "An unexpected error occurred while logging in. Please try again.";
-			case "no_token":
-				return "No authentication token provided.";
 			default:
-				return "An unknown error occurred.";
+				return "An unexpected error occurred while logging in. Please try again.";
 		}
+	}
+
+	if (needsEmail) {
+		return (
+			<div className="flex flex-col gap-4 items-center justify-center h-screen text-center px-4">
+				<h1 className="font-synemono text-4xl">Confirm your email</h1>
+				<p>
+					Looks like you opened this link on a different device. Please enter
+					the email you requested the login link with.
+				</p>
+				<form
+					onSubmit={handleEmailSubmit}
+					className="flex flex-col sm:flex-row gap-2 w-full max-w-md"
+				>
+					<Input
+						type="email"
+						required
+						autoComplete="email"
+						placeholder="you@example.com"
+						aria-label="Email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+					/>
+					<Button type="submit">Continue</Button>
+				</form>
+			</div>
+		);
 	}
 
 	return (
@@ -72,7 +115,7 @@ export default function Auth() {
 						Return to Login
 					</Button>
 				</div>
-			) : authenticating ? (
+			) : submitting ? (
 				<p>We're logging you in.</p>
 			) : (
 				<p>

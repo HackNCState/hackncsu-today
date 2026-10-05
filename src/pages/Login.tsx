@@ -1,5 +1,9 @@
+import { FirebaseError } from "firebase/app";
+import { useAtomValue } from "jotai";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { userAtom } from "@/atoms/user";
 import { Button } from "@/components/ui/button";
-
 import {
 	Dialog,
 	DialogContent,
@@ -8,19 +12,54 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { authService } from "@/services/auth.service";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAtomValue } from "jotai";
-import { userAtom } from "@/atoms/user";
+
+function getLoginErrorMessage(err: unknown) {
+	const reason =
+		err instanceof FirebaseError
+			? (err as FirebaseError & { details?: { reason?: string } }).details
+					?.reason
+			: undefined;
+
+	switch (reason) {
+		case "invalid_email":
+			return "Please enter a valid email address.";
+		case "not_checked_in":
+			return "We couldn't find a checked-in participant with that email. Please check in at the registration desk, or make sure you're using the email you registered with.";
+		case "login_disabled":
+			return "Login is not available yet. Please wait for the event to begin!";
+		default:
+			return "We couldn't send a login link. Please try again.";
+	}
+}
 
 export default function Login() {
 	const navigation = useNavigate();
 	const user = useAtomValue(userAtom);
 	const loading = user === undefined;
 
-	const handleDiscordLogin = () => {
-		authService.startOAuth();
+	const [email, setEmail] = useState("");
+	const [sending, setSending] = useState(false);
+	const [sentTo, setSentTo] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	const handleEmailLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		const trimmed = email.trim();
+		if (!trimmed) return;
+
+		setSending(true);
+		setError(null);
+		try {
+			await authService.sendLoginLink(trimmed);
+			setSentTo(trimmed);
+		} catch (err) {
+			console.error("Failed to send login link:", err);
+			setError(getLoginErrorMessage(err));
+		} finally {
+			setSending(false);
+		}
 	};
 
 	useEffect(() => {
@@ -44,20 +83,52 @@ export default function Login() {
 			<main className="font-synemono sm:text-2xl flex flex-col gap-4">
 				<p>
 					Welcome to Hack_NCState 2026! Please check in, then log in with the
-					Discord account you used at registration.
+					email you used at registration.
 				</p>
 				<p>
 					Thank you for joining us this weekend. We hope you have a great time!
 				</p>
 			</main>
 
-			<Button
-				className="w-full sm:w-auto"
-				size="lg"
-				onClick={handleDiscordLogin}
-			>
-				Log in with Discord
-			</Button>
+			{sentTo ? (
+				<div className="flex flex-col gap-2 sm:items-center">
+					<p className="font-synemono">
+						Check your inbox! We sent a login link to <strong>{sentTo}</strong>.
+					</p>
+					<Button
+						variant="link"
+						className="text-muted-foreground w-fit"
+						onClick={() => setSentTo(null)}
+					>
+						Use a different email
+					</Button>
+				</div>
+			) : (
+				<form
+					onSubmit={handleEmailLogin}
+					className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:min-w-md"
+				>
+					<Input
+						type="email"
+						required
+						autoComplete="email"
+						placeholder="you@example.com"
+						aria-label="Email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						className="h-10"
+					/>
+					<Button
+						type="submit"
+						size="lg"
+						disabled={sending}
+						className="w-full sm:w-auto"
+					>
+						{sending ? "Sending..." : "Log in with email"}
+					</Button>
+				</form>
+			)}
+			{error && <p className="text-sm text-destructive">{error}</p>}
 
 			<p className="font-splash text-2xl select-none mx-auto">
 				Team Hack_NCState

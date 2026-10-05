@@ -1,6 +1,6 @@
 import { httpsCallable } from "firebase/functions";
-import { functions as fn } from "@/lib/firebase-config";
 import z from "zod";
+import { functions as fn } from "@/lib/firebase-config";
 import {
 	PartialParticipantSchema,
 	TeamMemberProfileSchema,
@@ -12,6 +12,7 @@ const functions = {
 	loadSchedule: "load_schedule", // this one is organizer only
 	initializeEvent: "initialize_event", // this one is organizer only
 	getTeamMemberProfiles: "get_team_member_profiles",
+	sendLoginLink: "send_login_link",
 };
 
 const SearchUsersResponseSchema = z.array(PartialParticipantSchema);
@@ -46,5 +47,9 @@ export const functionsService = {
 		const func = httpsCallable(fn, functions.getTeamMemberProfiles);
 		const result = await func({ teamId });
 		return TeamMemberProfilesResponseSchema.parse(result.data);
+	},
+	sendLoginLink: async (email: string) => {
+		const func = httpsCallable(fn, functions.sendLoginLink);
+		await func({ email });
 	},
 };
