@@ -1,14 +1,14 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import NavSection from "./NavSection";
+import { useState } from "react";
 import {
 	visibleLinkResourcesAtom,
 	visibleTextResourcesAtom,
 } from "@/atoms/event/resources";
-import { authService } from "@/services/auth.service";
 import { debugSwitchUserRoleAtom, userAtom } from "@/atoms/user";
+import { authService } from "@/services/auth.service";
 import { firestoreService } from "@/services/firestore.service";
+import NavSection from "./NavSection";
 import NotificationDialog from "./NotificationDialog";
-import { useState } from "react";
 
 export default function NavList() {
 	const textResources = useAtomValue(visibleTextResourcesAtom);
@@ -18,13 +18,34 @@ export default function NavList() {
 	const debugSwitchRole = useSetAtom(debugSwitchUserRoleAtom);
 
 	const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+	const [roleError, setRoleError] = useState("");
+
+	const switchRole = async (role: "organizer" | "participant") => {
+		setRoleError("");
+		try {
+			await debugSwitchRole(role);
+		} catch (error) {
+			console.error("Could not switch preview role:", error);
+			setRoleError(
+				"Could not switch roles. Check that the emulators are running.",
+			);
+		}
+	};
 
 	const systemItems = [
 		...(import.meta.env.DEV && user?.role !== "organizer"
 			? [
 					{
 						label: "(dev) View as Organizer",
-						onClick: () => debugSwitchRole("organizer"),
+						onClick: () => switchRole("organizer"),
+					},
+				]
+			: []),
+		...(import.meta.env.DEV && user?.role === "organizer"
+			? [
+					{
+						label: "(dev) Refresh Organizer permissions",
+						onClick: () => switchRole("organizer"),
 					},
 				]
 			: []),
@@ -32,7 +53,7 @@ export default function NavList() {
 			? [
 					{
 						label: "(dev) View as Participant",
-						onClick: () => debugSwitchRole("participant"),
+						onClick: () => switchRole("participant"),
 					},
 				]
 			: []),
@@ -76,6 +97,8 @@ export default function NavList() {
 				title="System"
 				items={systemItems.map((item) => ({ type: "function", ...item }))}
 			/>
+
+			{roleError && <p role="alert">{roleError}</p>}
 
 			<NotificationDialog
 				open={notificationDialogOpen}

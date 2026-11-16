@@ -1,5 +1,8 @@
+import { useAtomValue } from "jotai";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { userAtom } from "@/atoms/user";
 import { Button } from "@/components/ui/button";
-
 import {
 	Dialog,
 	DialogContent,
@@ -9,18 +12,33 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { authService } from "@/services/auth.service";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAtomValue } from "jotai";
-import { userAtom } from "@/atoms/user";
 
 export default function Login() {
 	const navigation = useNavigate();
 	const user = useAtomValue(userAtom);
 	const loading = user === undefined;
+	const [previewLoading, setPreviewLoading] = useState(false);
+	const [previewError, setPreviewError] = useState("");
 
 	const handleDiscordLogin = () => {
 		authService.startOAuth();
+	};
+
+	const handlePreviewLogin = async () => {
+		setPreviewLoading(true);
+		setPreviewError("");
+		try {
+			await authService.previewLogin();
+		} catch (error) {
+			console.error("Preview login failed:", error);
+			setPreviewError(
+				`Preview login failed. Make sure the Firebase emulators are running and try again. ${
+					error instanceof Error ? error.message : ""
+				}`,
+			);
+		} finally {
+			setPreviewLoading(false);
+		}
 	};
 
 	useEffect(() => {
@@ -58,6 +76,21 @@ export default function Login() {
 			>
 				Log in with Discord
 			</Button>
+
+			{import.meta.env.DEV && (
+				<>
+					<Button
+						variant="secondary"
+						className="w-full sm:w-auto"
+						size="lg"
+						onClick={handlePreviewLogin}
+						disabled={previewLoading || loading}
+					>
+						{previewLoading ? "Starting preview..." : "Preview as participant"}
+					</Button>
+					{previewError && <p role="alert">{previewError}</p>}
+				</>
+			)}
 
 			<p className="font-splash text-2xl select-none mx-auto">
 				Team Hack_NCState

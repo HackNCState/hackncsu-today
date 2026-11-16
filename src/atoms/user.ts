@@ -4,10 +4,11 @@
  * (the atoms are read by components and other atoms)
  */
 
-import { atom } from "jotai";
 import type { User as FirebaseUser } from "firebase/auth";
-import type { ChecklistItemStatus, UserData } from "@/types/user";
+import { atom } from "jotai";
+import { authService } from "@/services/auth.service";
 import { firestoreService } from "@/services/firestore.service";
+import type { ChecklistItemStatus, UserData } from "@/types/user";
 
 // undefined = loading, null = not authenticated, UserData = authenticated
 export const userAtom = atom<UserData | null | undefined>(undefined);
@@ -58,6 +59,7 @@ export const debugSwitchUserRoleAtom = atom(
 		const user = get(userAtom);
 		if (!user) return;
 
+		await authService.setEmulatorRole(role);
 		await firestoreService.debugSetUserType(user.id, role);
 
 		const updatedUser = await firestoreService.fetchUser(user.id);

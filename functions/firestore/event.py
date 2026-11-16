@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from firebase_functions import https_fn
 from firebase_admin import firestore
@@ -70,7 +70,9 @@ def initialize_event(request: https_fn.CallableRequest) -> None:
             },
         ],
         "hackingState": "setup",
-        "hackingEndTime": end_time.isoformat().replace("+00:00", "Z"),
+        "hackingEndTime": (
+            end_time.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+        ),
         "schedules": [],
         "announcements": [],
         "resources": [

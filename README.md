@@ -61,3 +61,10 @@ i hope this all works if not let me know
    ```
 
 3. Open your browser and navigate to `http://localhost:8080` to see the application running locally.
+
+On the login page, use **Preview as participant** to enter without Discord. This
+development-only option creates an anonymous account and participant profile in
+the local Firebase emulators. Use **(dev) View as Organizer** in the sidebar to
+switch roles and initialize or edit event data locally.
+If you already switched roles before the emulator permissions were added, use
+**(dev) Refresh Organizer permissions** before initializing event data.
